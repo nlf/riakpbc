@@ -1,0 +1,22 @@
+{
+  "name": "riakpbc",
+  "version": "0.0.1",
+  "description": "a very rough and basic riak protobuf client",
+  "main": "index.js",
+  "dependencies": {
+    "async": "~0.1.22",
+    "protobuf.js": "~0.0.4"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git://github.com:nathan-lafreniere/riakpbc.git"
+  },
+  "keywords": [
+    "riak",
+    "pbc",
+    "protobuf"
+  ],
+  "author": "Nathan <quitlahok@gmail.com> (https://github.com/nathan-lafreniere)",
+  "license": "MIT"
+}
