@@ -44,9 +44,10 @@ function RiakPBC(options) {
     self.port = options.port || 8087;
     self.bucket = options.bucket || undefined;
     self.translator = protobuf.loadSchema('./spec/riak_kv.proto');
-    self.client = net.connect(self.port, self.host, function () {
-        self.connected = true;
-    });
+    self.client = new net.Socket();
+    self.connected = false;
+    self.client.on('disconnect', self.disconnect);
+    self.client.on('error', self.disconnect);
     self.queue = async.queue(function (task, callback) {
         var mc, reply = {};
         var checkReply = function (chunk) {
@@ -108,7 +109,9 @@ RiakPBC.prototype.makeRequest = function (type, data, callback, expectMultiple) 
     message.writeUInt32BE(buffer.length + 1, 0);
     message.writeInt8(messageCodes[type], 4);
     buffer.copy(message, 5);
-    this.queue.push({ message: message, callback: callback, expectMultiple: expectMultiple });
+    this.connect(function () {
+        self.queue.push({ message: message, callback: callback, expectMultiple: expectMultiple });
+    });
 };
 
 RiakPBC.prototype.getBuckets = function (callback) {
@@ -165,6 +168,25 @@ RiakPBC.prototype.getServerInfo = function (callback) {
 
 RiakPBC.prototype.ping = function (callback) {
     this.makeRequest('RpbPingReq', null, callback);
+};
+
+RiakPBC.prototype.connect = function (callback) {
+    var self = this;
+    if (!this.connected) {
+        this.client = net.connect(this.port, this.host, function () {
+            self.connected = true;
+            callback();
+        });
+    } else {
+        callback();
+    }
+};
+
+RiakPBC.prototype.disconnect = function () {
+    if (this.connected) {
+        this.connected = false;
+        this.client.end();
+    }
 };
 
 exports.createClient = function (options) {
