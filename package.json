@@ -5,7 +5,8 @@
   "main": "index.js",
   "dependencies": {
     "async": "~0.1.22",
-    "protobuf.js": "~0.0.4"
+    "protobuf.js": "~0.0.4",
+    "butils": "0.0.1"
   },
   "devDependencies": {},
   "repository": {
