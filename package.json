@@ -5,11 +5,13 @@
   "main": "index.js",
   "dependencies": {
     "protobuf.js": "",
-    "butils": "",
-    "nodeunit": "~0.7.4"
+    "butils": ""
   },
   "devDependencies": {
-    "mocha": ""
+    "nodeunit": ""
+  },
+  "scripts": {
+    "test": "node test"
   },
   "repository": {
     "type": "git",
