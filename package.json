@@ -1,13 +1,16 @@
 {
   "name": "riakpbc",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "a very rough and basic riak protobuf client",
   "main": "index.js",
   "dependencies": {
     "protobuf.js": "",
-    "butils": ""
+    "butils": "",
+    "nodeunit": "~0.7.4"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "mocha": ""
+  },
   "repository": {
     "type": "git",
     "url": "git://github.com:nathan-lafreniere/riakpbc.git"

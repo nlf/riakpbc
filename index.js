@@ -71,37 +71,41 @@ function RiakPBC(options) {
                 mc = undefined;
                 self.task = undefined;
                 reply = {};
+                self.paused = false;
                 self.processNext();
             }
         });
     });
 
     self.processNext = function () {
-        if (self.queue.length > 0) {
+        if (self.queue.length && !self.paused) {
+            self.paused = true;
             self.connect(function () {
                 self.task = self.queue.shift();
                 self.client.write(self.task.message);
-                self.paused = true;
             });
-        } else {
-            self.paused = false;
         }
     };
 }
 
 function _merge(obj1, obj2) {
     var obj = {};
-    [obj1, obj2].forEach(function (old) {
-        Object.keys(old).forEach(function (key) {
-            if (!old.hasOwnProperty(key)) return;
-            if (Array.isArray(old[key])) {
-                if (!obj[key]) obj[key] = [];
-                obj[key] = obj[key].concat(old[key]);
-            } else {
-                obj[key] = old[key];
-            }
+    if (obj2.hasOwnProperty('phase')) {
+        obj = obj1;
+        obj[obj2.phase] = JSON.parse(obj2.response);
+    } else {
+        [obj1, obj2].forEach(function (old) {
+            Object.keys(old).forEach(function (key) {
+                if (!old.hasOwnProperty(key)) return;
+                if (Array.isArray(old[key])) {
+                    if (!obj[key]) obj[key] = [];
+                    obj[key] = obj[key].concat(old[key]);
+                } else {
+                    obj[key] = old[key];
+                }
+            });
         });
-    });
+    }
     return obj;
 }
 
@@ -115,7 +119,7 @@ RiakPBC.prototype.makeRequest = function (type, data, callback, expectMultiple) 
     butils.writeInt(message, messageCodes[type], 4);
     message = message.concat(buffer);
     self.queue.push({ message: new Buffer(message), callback: callback, expectMultiple: expectMultiple });
-    if (!self.paused) self.processNext();
+    process.nextTick(self.processNext);
 };
 
 RiakPBC.prototype.getBuckets = function (callback) {
