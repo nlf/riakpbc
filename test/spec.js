@@ -126,15 +126,11 @@ exports.mapred = function (test) {
     });
 };
 
-/*
- * this doesn't work for some weird damn reason...
 exports.search = function (test) {
     client.search({ index: 'test', q: 'test:data' }, function (reply) {
-        console.log(reply);
         test.done();
     });
-}
-*/
+};
 
 exports.del = function (test) {
     client.del({ bucket: 'test', key: 'test' }, function (reply) {
