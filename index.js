@@ -1,6 +1,7 @@
 var net = require('net'),
     protobuf = require('protobuf.js'),
-    butils = require('butils');
+    butils = require('butils'),
+ path = require('path');
 
 var messageCodes = {
     '0': 'RpbErrorResp',
@@ -43,7 +44,7 @@ function RiakPBC(options) {
     self.host = options.host || '127.0.0.1';
     self.port = options.port || 8087;
     self.bucket = options.bucket || undefined;
-    self.translator = protobuf.loadSchema('./spec/riak_kv.proto');
+    self.translator = protobuf.loadSchema(path.join(__dirname, './spec/riak_kv.proto'));
     self.client = new net.Socket();
     self.connected = false;
     self.client.on('end', self.disconnect);
