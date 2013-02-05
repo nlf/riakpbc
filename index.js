@@ -65,6 +65,12 @@ function RiakPBC(options) {
     self.client.on('data', function (chunk) {
         splitPacket(chunk).forEach(function (packet) {
             mc = messageCodes['' + packet[0]];
+
+            if (self.task.streaming && !reply.done) {
+                self.task.callback(reply);
+                return;
+            }
+
             reply = _merge(reply, self.translator.decode(mc, packet.slice(1)));
             if (!self.task.expectMultiple || reply.done || mc === 'RpbErrorResp') {
                 self.task.callback(reply);
@@ -110,7 +116,7 @@ function _merge(obj1, obj2) {
     return obj;
 }
 
-RiakPBC.prototype.makeRequest = function (type, data, callback, expectMultiple) {
+RiakPBC.prototype.makeRequest = function (type, data, callback, expectMultiple, streaming) {
     var self = this,
         reply = {},
         buffer = this.translator.encode(type, data),
@@ -119,7 +125,7 @@ RiakPBC.prototype.makeRequest = function (type, data, callback, expectMultiple) 
     butils.writeInt32(message, buffer.length + 1);
     butils.writeInt(message, messageCodes[type], 4);
     message = message.concat(buffer);
-    self.queue.push({ message: new Buffer(message), callback: callback, expectMultiple: expectMultiple });
+    self.queue.push({ message: new Buffer(message), callback: callback, expectMultiple: expectMultiple, streaming: streaming });
     process.nextTick(self.processNext);
 };
 
@@ -135,8 +141,8 @@ RiakPBC.prototype.setBucket = function (params, callback) {
     this.makeRequest('RpbSetBucketReq', params, callback);
 };
 
-RiakPBC.prototype.getKeys = function (params, callback) {
-    this.makeRequest('RpbListKeysReq', params, callback, true);
+RiakPBC.prototype.getKeys = function (params, callback, streaming) {
+    this.makeRequest('RpbListKeysReq', params, callback, true, streaming;
 };
 
 RiakPBC.prototype.put = function (params, callback) {
@@ -151,8 +157,8 @@ RiakPBC.prototype.del = function (params, callback) {
     this.makeRequest('RpbDelReq', params, callback);
 };
 
-RiakPBC.prototype.mapred = function (params, callback) {
-    this.makeRequest('RpbMapRedReq', params, callback, true);
+RiakPBC.prototype.mapred = function (params, callback, streaming) {
+    this.makeRequest('RpbMapRedReq', params, callback, true, streaming);
 };
 
 RiakPBC.prototype.getIndex = function (params, callback) {
