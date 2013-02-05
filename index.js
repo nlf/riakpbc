@@ -141,8 +141,8 @@ RiakPBC.prototype.setBucket = function (params, callback) {
     this.makeRequest('RpbSetBucketReq', params, callback);
 };
 
-RiakPBC.prototype.getKeys = function (params, callback, streaming) {
-    this.makeRequest('RpbListKeysReq', params, callback, true, streaming;
+RiakPBC.prototype.getKeys = function (params, callback) {
+    this.makeRequest('RpbListKeysReq', params, callback, true, streaming);
 };
 
 RiakPBC.prototype.put = function (params, callback) {
