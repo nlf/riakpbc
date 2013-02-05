@@ -1,7 +1,7 @@
 var net = require('net'),
     protobuf = require('protobuf.js'),
     butils = require('butils'),
- path = require('path');
+    path = require('path');
 
 var messageCodes = {
     '0': 'RpbErrorResp',
