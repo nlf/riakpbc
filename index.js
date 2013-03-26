@@ -51,20 +51,36 @@ function RiakPBC(options) {
     self.client.on('error', self.disconnect);
     self.paused = false;
     self.queue = [];
-    var mc, reply = {};
+    var mc, reply = {}, resBuffers = [], numBytesAwaiting = 0;
 
     function splitPacket(pkt) {
-        var ret = [], len, pos = 0, end = pkt.length;
-        while (pos < end) {
+        var pos = 0, len;
+        if (numBytesAwaiting > 0) {
+            len = Math.min(pkt.length, numBytesAwaiting);
+            var oldBuf = resBuffers[resBuffers.length - 1];
+            var newBuf = new Buffer(oldBuf.length + len);
+            oldBuf.copy(newBuf, 0);
+            pkt.slice(0, len).copy(newBuf, oldBuf.length);
+            resBuffers[resBuffers.length - 1] = newBuf;
+            pos = len;
+            numBytesAwaiting -= len;
+        } else {
+            resBuffers = [];
+        }
+        while (pos < pkt.length) {
             len = butils.readInt32(pkt, pos);
-            ret.push(pkt.slice(pos + 4, pos + len + 4));
+            numBytesAwaiting = len + 4 - pkt.length;
+            resBuffers.push(pkt.slice(pos + 4, Math.min(pos + len + 4, pkt.length)));
             pos += len + 4;
         }
-        return ret;
     }
 
     self.client.on('data', function (chunk) {
-        splitPacket(chunk).forEach(function (packet) {
+        splitPacket(chunk);
+        if (numBytesAwaiting > 0) {
+            return;
+        }
+        resBuffers.forEach(function (packet) {
             mc = messageCodes['' + packet[0]];
             reply = _merge(reply, self.translator.decode(mc, packet.slice(1)));
             if (!self.task.expectMultiple || reply.done || mc === 'RpbErrorResp') {
