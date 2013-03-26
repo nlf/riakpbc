@@ -1,7 +1,7 @@
 var net = require('net'),
     protobuf = require('protobuf.js'),
     butils = require('butils'),
-	path = require('path');
+    path = require('path');
 
 var messageCodes = {
     '0': 'RpbErrorResp',
@@ -110,7 +110,8 @@ function _merge(obj1, obj2) {
     var obj = {};
     if (obj2.hasOwnProperty('phase')) {
         obj = obj1;
-        obj[obj2.phase] = JSON.parse(obj2.response);
+        if (obj[obj2.phase] === undefined) obj[obj2.phase] = [];
+        obj[obj2.phase] = obj[obj2.phase].concat(JSON.parse(obj2.response));
     } else {
         [obj1, obj2].forEach(function (old) {
             Object.keys(old).forEach(function (key) {
