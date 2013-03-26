@@ -67,8 +67,7 @@ function RiakPBC(options) {
         } else {
             resBuffers = [];
         }
-        var end = pkt.length;
-        while (pos < end) {
+        while (pos < pkt.length) {
             len = butils.readInt32(pkt, pos);
             numBytesAwaiting = len + 4 - pkt.length;
             resBuffers.push(pkt.slice(pos + 4, Math.min(pos + len + 4, pkt.length)));
