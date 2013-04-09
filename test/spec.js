@@ -38,6 +38,20 @@ exports.put = function (test) {
     });
 };
 
+
+exports.putVclock = function (test) {
+    var options = { bucket: 'test', key: 'test-vclock', content: { value: '{"test":"data"}', content_type: 'application/json' }, return_body: true };
+    client.put(options, function (reply) {
+        test.equal(reply.errmsg, undefined);
+        var options = { bucket: 'test', key: 'test-vclock', content: { value: '{"test":"data"}', content_type: 'application/json' }, return_body: true };
+        options.vclock = reply.vclock;
+        client.put(options, function(reply) {
+            test.equal(reply.errmsg, undefined, reply.errmsg && reply.errmsg.toString());
+            test.done();
+        });
+    });
+};
+
 exports.get = function (test) {
     client.get({ bucket: 'test', key: 'test' }, function (reply) {
         test.equal(reply.errmsg, undefined);
