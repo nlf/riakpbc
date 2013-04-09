@@ -1,7 +1,8 @@
 var net = require('net'),
     protobuf = require('protobuf.js'),
     butils = require('butils'),
-    EventEmitter = require('events').EventEmitter;
+    EventEmitter = require('events').EventEmitter,
+    path = require('path');
 
 var messageCodes = {
     '0': 'RpbErrorResp',
@@ -44,27 +45,43 @@ function RiakPBC(options) {
     self.host = options.host || '127.0.0.1';
     self.port = options.port || 8087;
     self.bucket = options.bucket || undefined;
-    self.translator = protobuf.loadSchema('./spec/riak_kv.proto');
+    self.translator = protobuf.loadSchema(path.join(__dirname, './spec/riak_kv.proto'));
     self.client = new net.Socket();
     self.connected = false;
     self.client.on('end', self.disconnect);
     self.client.on('error', self.disconnect);
     self.paused = false;
     self.queue = [];
-    var mc, reply = {};
+    var mc, reply = {}, resBuffers = [], numBytesAwaiting = 0;
 
     function splitPacket(pkt) {
-        var ret = [], len, pos = 0, end = pkt.length;
-        while (pos < end) {
+        var pos = 0, len;
+        if (numBytesAwaiting > 0) {
+            len = Math.min(pkt.length, numBytesAwaiting);
+            var oldBuf = resBuffers[resBuffers.length - 1];
+            var newBuf = new Buffer(oldBuf.length + len);
+            oldBuf.copy(newBuf, 0);
+            pkt.slice(0, len).copy(newBuf, oldBuf.length);
+            resBuffers[resBuffers.length - 1] = newBuf;
+            pos = len;
+            numBytesAwaiting -= len;
+        } else {
+            resBuffers = [];
+        }
+        while (pos < pkt.length) {
             len = butils.readInt32(pkt, pos);
-            ret.push(pkt.slice(pos + 4, pos + len + 4));
+            numBytesAwaiting = len + 4 - pkt.length;
+            resBuffers.push(pkt.slice(pos + 4, Math.min(pos + len + 4, pkt.length)));
             pos += len + 4;
         }
-        return ret;
     }
 
     self.client.on('data', function (chunk) {
-        splitPacket(chunk).forEach(function (packet) {
+        splitPacket(chunk);
+        if (numBytesAwaiting > 0) {
+            return;
+        }
+        resBuffers.forEach(function (packet) {
             mc = messageCodes['' + packet[0]];
 
             if (self.task.emitter && !reply.done) {

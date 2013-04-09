@@ -48,6 +48,31 @@ exports.get = function (test) {
     });
 };
 
+exports.putLarge = function (test) {
+    var value = {};
+    for (var i = 0; i < 5000; i++) {
+        value['test_key_' + i] = 'test_value_' + i;
+    }
+    client.put({ bucket: 'test', key: 'large_test', content: { value: JSON.stringify(value), content_type: 'application/json' }}, function (reply) {
+        test.equal(reply.errmsg, undefined);
+        test.done();
+    });
+};
+
+exports.getLarge = function (test) {
+    var value = {};
+    for (var i = 0; i < 5000; i++) {
+        value['test_key_' + i] = 'test_value_' + i;
+    }
+    client.get({ bucket: 'test', key: 'large_test' }, function (reply) {
+        test.equal(reply.errmsg, undefined);
+        test.ok(Array.isArray(reply.content));
+        test.equal(reply.content.length, 1);
+        test.equal(reply.content[0].value, JSON.stringify(value));
+        test.done();
+    });
+};
+
 exports.getIndex = function (test) {
     client.getIndex({ bucket: 'test', index: 'test_bin', qtype: 0, key: 'test' }, function (reply) {
         test.equal(reply.errmsg, undefined);
