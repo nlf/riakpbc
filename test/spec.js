@@ -125,7 +125,11 @@ exports.getKeys = function (test) {
     client.getKeys({ bucket: 'test' }, function (reply) {
         test.equal(reply.errmsg, undefined);
         test.ok(Array.isArray(reply.keys));
-        test.equal(reply.keys[0], 'test');
+        var len = reply.keys.length;
+        reply.keys = reply.keys.filter(function (key) {
+            return (key.toString() === 'test' || key.toString() === 'large_test' || key.toString() === 'test-vclock')
+        });
+        test.equal(reply.keys.length, len);
         test.equal(reply.done, true);
         test.done();
     });
@@ -133,7 +137,7 @@ exports.getKeys = function (test) {
 
 exports.mapred = function (test) {
     var request = {
-        inputs: 'test',
+        inputs: [['test', 'test']],
         query: [
             {
                 map: {
@@ -174,7 +178,13 @@ exports.search = function (test) {
 exports.del = function (test) {
     client.del({ bucket: 'test', key: 'test' }, function (reply) {
         test.equal(reply.errmsg, undefined);
-        test.done();
+        client.del({ bucket: 'test', key: 'large_test' }, function (reply) {
+            test.equal(reply.errmsg, undefined);
+            client.del({ bucket: 'test', key: 'test-vclock' }, function (reply) {
+                test.equal(reply.errmsg, undefined);
+                test.done();
+            });
+        });
     });
 };
 
