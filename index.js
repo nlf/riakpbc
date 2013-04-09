@@ -84,15 +84,16 @@ function RiakPBC(options) {
         resBuffers.forEach(function (packet) {
             mc = messageCodes['' + packet[0]];
 
-            if (self.task.emitter && !reply.done) {
-                self.task.emitter.emit('data', reply);
-                return;
+            var response = self.translator.decode(mc, packet.slice(1));
+
+            if (self.task.emitter && !response.done) {
+                self.task.emitter.emit('data', response);
             }
 
-            reply = _merge(reply, self.translator.decode(mc, packet.slice(1)));
+            reply = _merge(reply, response);
             if (!self.task.expectMultiple || reply.done || mc === 'RpbErrorResp') {
                 if (self.task.emitter) {
-                  self.task.emitter.emit('end', reply);
+                  self.task.emitter.emit('end', response);
                 } else {
                   self.task.callback(reply);
                 }
@@ -163,7 +164,7 @@ RiakPBC.prototype.setBucket = function (params, callback) {
     this.makeRequest('RpbSetBucketReq', params, callback);
 };
 
-RiakPBC.prototype.getKeys = function (params, callback, streaming) {
+RiakPBC.prototype.getKeys = function (params, streaming, callback) {
     if (streaming) {
       var emitter = new EventEmitter();
       this.makeRequest('RpbListKeysReq', params, callback, true, emitter);
@@ -185,7 +186,7 @@ RiakPBC.prototype.del = function (params, callback) {
     this.makeRequest('RpbDelReq', params, callback);
 };
 
-RiakPBC.prototype.mapred = function (params, callback, streaming) {
+RiakPBC.prototype.mapred = function (params, streaming, callback) {
     if (streaming) {
       var emitter = new EventEmitter();
       this.makeRequest('RpbMapRedReq', params, callback, true, emitter);
