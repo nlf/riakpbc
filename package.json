@@ -1,6 +1,6 @@
 {
   "name": "riakpbc",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "a very rough and basic riak protobuf client",
   "main": "index.js",
   "dependencies": {
