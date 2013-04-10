@@ -52,6 +52,16 @@ exports.putVclock = function (test) {
     });
 };
 
+exports.putIndex = function (test) {
+    var indexes = [{key: new Buffer('key1_bin'), value: new Buffer('value1')}, {key: new Buffer('key2_bin'), value: new Buffer('value2')}];
+    var options = { bucket: 'test', key: 'test-put-index', content: { value: '{"test":"data"}', content_type: 'application/json', indexes: indexes }, return_body: true };
+    client.put(options, function (reply) {
+        console.log('reply.content[0].indexes:', reply.content[0].indexes);
+        test.deepEqual(reply.content[0].indexes, indexes);
+        test.done();
+    });
+};
+
 exports.get = function (test) {
     client.get({ bucket: 'test', key: 'test' }, function (reply) {
         test.equal(reply.errmsg, undefined);
