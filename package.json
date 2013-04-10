@@ -1,10 +1,10 @@
 {
   "name": "riakpbc",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "a very rough and basic riak protobuf client",
   "main": "index.js",
   "dependencies": {
-    "protobuf.js": "git://github.com/keikku/protobuf.js.git",
+    "protobuf.js": "",
     "butils": ""
   },
   "devDependencies": {
