@@ -165,6 +165,11 @@ RiakPBC.prototype.setBucket = function (params, callback) {
 };
 
 RiakPBC.prototype.getKeys = function (params, streaming, callback) {
+    if (typeof streaming === 'function') {
+        callback = streaming;
+        streaming = false;
+    } 
+
     if (streaming) {
       var emitter = new EventEmitter();
       this.makeRequest('RpbListKeysReq', params, callback, true, emitter);
@@ -187,6 +192,11 @@ RiakPBC.prototype.del = function (params, callback) {
 };
 
 RiakPBC.prototype.mapred = function (params, streaming, callback) {
+    if (typeof streaming === 'function') {
+        callback = streaming;
+        streaming = false;
+    } 
+
     if (streaming) {
       var emitter = new EventEmitter();
       this.makeRequest('RpbMapRedReq', params, callback, true, emitter);
