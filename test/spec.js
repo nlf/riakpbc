@@ -56,7 +56,6 @@ exports.putIndex = function (test) {
     var indexes = [{ key: 'key1_bin', value: 'value1' }, { key: 'key2_bin', value: 'value2' }];
     var options = { bucket: 'test', key: 'test-put-index', content: { value: '{"test":"data"}', content_type: 'application/json', indexes: indexes }, return_body: true };
     client.put(options, function (reply) {
-        console.log('reply.content[0].indexes:', reply.content[0].indexes);
         test.deepEqual(reply.content[0].indexes, indexes);
         test.done();
     });
