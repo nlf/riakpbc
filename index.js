@@ -85,6 +85,14 @@ function RiakPBC(options) {
             mc = messageCodes['' + packet[0]];
 
             var response = self.translator.decode(mc, packet.slice(1));
+            if (response.content && Array.isArray(response.content)) {
+                response.content.map(function (item) {
+                    if (item.value && item.content_type) {
+                        if (item.content_type.match(/^(text\/\*)|(application\/json)$/)) item.value = item.value.toString();
+                    }
+                    return item;
+                });
+            }
 
             if (self.task.emitter && !response.done) {
                 self.task.emitter.emit('data', response);
@@ -93,9 +101,9 @@ function RiakPBC(options) {
             reply = _merge(reply, response);
             if (!self.task.expectMultiple || reply.done || mc === 'RpbErrorResp') {
                 if (self.task.emitter) {
-                  self.task.emitter.emit('end', response);
+                    self.task.emitter.emit('end', response);
                 } else {
-                  self.task.callback(reply);
+                    self.task.callback(reply);
                 }
                 mc = undefined;
                 self.task = undefined;
