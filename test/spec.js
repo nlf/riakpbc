@@ -53,7 +53,7 @@ exports.putVclock = function (test) {
 };
 
 exports.putIndex = function (test) {
-    var indexes = [{key: new Buffer('key1_bin'), value: new Buffer('value1')}, {key: new Buffer('key2_bin'), value: new Buffer('value2')}];
+    var indexes = [{ key: 'key1_bin', value: 'value1' }, { key: 'key2_bin', value: 'value2' }];
     var options = { bucket: 'test', key: 'test-put-index', content: { value: '{"test":"data"}', content_type: 'application/json', indexes: indexes }, return_body: true };
     client.put(options, function (reply) {
         console.log('reply.content[0].indexes:', reply.content[0].indexes);
@@ -137,7 +137,7 @@ exports.getKeys = function (test) {
         test.ok(Array.isArray(reply.keys));
         var len = reply.keys.length;
         reply.keys = reply.keys.filter(function (key) {
-            return (key.toString() === 'test' || key.toString() === 'large_test' || key.toString() === 'test-vclock')
+            return (key.toString() === 'test' || key.toString() === 'large_test' || key.toString() === 'test-vclock' || key.toString() === 'test-put-index')
         });
         test.equal(reply.keys.length, len);
         test.equal(reply.done, true);
@@ -192,7 +192,10 @@ exports.del = function (test) {
             test.equal(reply.errmsg, undefined);
             client.del({ bucket: 'test', key: 'test-vclock' }, function (reply) {
                 test.equal(reply.errmsg, undefined);
-                test.done();
+                client.del({ bucket: 'test', key: 'test-put-index' }, function (reply) {
+                    test.equal(reply.errmsg, undefined);
+                    test.done();
+                });
             });
         });
     });
