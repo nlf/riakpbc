@@ -33,7 +33,16 @@ var messageCodes = {
     '25': 'RpbIndexReq',
     '26': 'RpbIndexResp',
     '27': 'RpbSearchQueryReq',
-    '28': 'RpbSearchQueryResp'
+    '28': 'RpbSearchQueryResp',
+    // 1.4
+    '29': 'RpbResetBucketReq',
+    '30': 'RpbResetBucketResp',
+    '40': 'RpbCSBucketReq',
+    '41': 'RpbCSBucketResp',
+    '50': 'RpbCounterUpdateReq',
+    '51': 'RpbCounterUpdateResp',
+    '52': 'RpbCounterGetReq',
+    '53': 'RpbCounterGetResp',
 };
 Object.keys(messageCodes).forEach(function (key) {
     messageCodes[messageCodes[key]] = Number(key);
@@ -172,11 +181,15 @@ RiakPBC.prototype.setBucket = function (params, callback) {
     this.makeRequest('RpbSetBucketReq', params, callback);
 };
 
+RiakPBC.prototype.resetBucket = function (params, callback) {
+    this.makeRequest('RpbResetBucketReq', params, callback);
+};
+
 RiakPBC.prototype.getKeys = function (params, streaming, callback) {
     if (typeof streaming === 'function') {
         callback = streaming;
         streaming = false;
-    } 
+    }
 
     if (streaming) {
       var emitter = new EventEmitter();
@@ -203,7 +216,7 @@ RiakPBC.prototype.mapred = function (params, streaming, callback) {
     if (typeof streaming === 'function') {
         callback = streaming;
         streaming = false;
-    } 
+    }
 
     if (streaming) {
       var emitter = new EventEmitter();
@@ -212,6 +225,20 @@ RiakPBC.prototype.mapred = function (params, streaming, callback) {
     } else {
       this.makeRequest('RpbMapRedReq', params, callback, true);
     }
+};
+
+
+RiakPBC.prototype.getCounter = function (params, callback) {
+    this.makeRequest('RpbCounterGetReq', params, callback);
+};
+
+
+RiakPBC.prototype.updateCounter = function (params, callback) {
+    this.makeRequest('RpbCounterUpdateReq', params, callback);
+};
+
+RiakPBC.prototype.resetBucket = function (params, callback) {
+    this.makeRequest('RpbResetBucketReq', params, callback);
 };
 
 RiakPBC.prototype.getIndex = function (params, callback) {
