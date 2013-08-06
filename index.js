@@ -237,10 +237,6 @@ RiakPBC.prototype.updateCounter = function (params, callback) {
     this.makeRequest('RpbCounterUpdateReq', params, callback);
 };
 
-RiakPBC.prototype.resetBucket = function (params, callback) {
-    this.makeRequest('RpbResetBucketReq', params, callback);
-};
-
 RiakPBC.prototype.getIndex = function (params, callback) {
     this.makeRequest('RpbIndexReq', params, callback);
 };
