@@ -76,7 +76,7 @@ exports.putLarge = function (test) {
     for (var i = 0; i < 5000; i++) {
         value['test_key_' + i] = 'test_value_' + i;
     }
-    client.put({ bucket: 'test', key: 'large_test', content: { value: JSON.stringify(value), content_type: 'application/json' }}, function (reply) {
+    client.put({ bucket: 'test', key: 'test-large', content: { value: JSON.stringify(value), content_type: 'application/json' }}, function (reply) {
         test.equal(reply.errmsg, undefined);
         test.done();
     });
@@ -87,7 +87,7 @@ exports.getLarge = function (test) {
     for (var i = 0; i < 5000; i++) {
         value['test_key_' + i] = 'test_value_' + i;
     }
-    client.get({ bucket: 'test', key: 'large_test' }, function (reply) {
+    client.get({ bucket: 'test', key: 'test-large' }, function (reply) {
         test.equal(reply.errmsg, undefined);
         test.ok(Array.isArray(reply.content));
         test.equal(reply.content.length, 1);
@@ -136,7 +136,7 @@ exports.getKeys = function (test) {
         test.ok(Array.isArray(reply.keys));
         var len = reply.keys.length;
         reply.keys = reply.keys.filter(function (key) {
-            return (key.toString() === 'test' || key.toString() === 'large_test' || key.toString() === 'test-vclock' || key.toString() === 'test-put-index')
+            return (key.toString() === 'test' || key.toString() === 'test-large' || key.toString() === 'test-vclock' || key.toString() === 'test-put-index')
         });
         test.equal(reply.keys.length, len);
         test.equal(reply.done, true);
@@ -180,20 +180,61 @@ exports.mapred = function (test) {
 
 exports.search = function (test) {
     client.search({ index: 'test', q: 'test:data' }, function (reply) {
+        test.notEqual(reply, undefined);
         test.done();
     });
 };
 
+
+exports.counters = function(test) {
+    client.updateCounter({ bucket: 'test', key: 'counter'  }, function(reply) {
+        test.notEqual(reply, undefined);
+        client.getCounter({ bucket: 'test', key: 'counter' }, function(reply) {
+            test.notEqual(reply, undefined);
+            test.equal(reply.value, 0);
+            client.updateCounter({ bucket: 'test', key: 'counter', amount: 100, returnvalue: true }, function(reply) {
+                test.notEqual(reply, undefined);
+                test.equal(reply.value, 100);
+                client.updateCounter({ bucket: 'test', key: 'counter', returnvalue: true }, function(reply) {
+                    test.notEqual(reply, undefined);
+                    //test.equal(reply.value, 100);
+                    test.done();
+                });
+            });
+        });
+    });
+};
+
+exports.resetBucket = function(test) {
+    client.resetBucket({ bucket: 'test' }, function(reply) {
+        test.notEqual(reply, undefined);
+        client.getBucket({ bucket: 'test' }, function(reply) {
+            test.notEqual(reply, undefined);
+            test.equal(reply.props.allow_mult, false);
+            test.done();
+        });
+    });
+};
+
 exports.del = function (test) {
+    // Uncomment the next line and the disconnect line below
+    // for cleanup of failed tests.
+    //
+    //var client = require('../index').createClient();
+
     client.del({ bucket: 'test', key: 'test' }, function (reply) {
         test.equal(reply.errmsg, undefined);
-        client.del({ bucket: 'test', key: 'large_test' }, function (reply) {
+        client.del({ bucket: 'test', key: 'test-large' }, function (reply) {
             test.equal(reply.errmsg, undefined);
             client.del({ bucket: 'test', key: 'test-vclock' }, function (reply) {
                 test.equal(reply.errmsg, undefined);
                 client.del({ bucket: 'test', key: 'test-put-index' }, function (reply) {
                     test.equal(reply.errmsg, undefined);
-                    test.done();
+                    client.del({ bucket: 'test', key: 'counter' }, function(reply) {
+                      test.equal(reply.errmsg, undefined);
+                      //client.disconnect();
+                      test.done();
+                    });
                 });
             });
         });
