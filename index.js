@@ -192,11 +192,11 @@ RiakPBC.prototype.getKeys = function (params, streaming, callback) {
     }
 
     if (streaming) {
-      var emitter = new EventEmitter();
-      this.makeRequest('RpbListKeysReq', params, callback, true, emitter);
-      return emitter;
+        var emitter = new EventEmitter();
+        this.makeRequest('RpbListKeysReq', params, callback, true, emitter);
+        return emitter;
     } else {
-      this.makeRequest('RpbListKeysReq', params, callback, true);
+        this.makeRequest('RpbListKeysReq', params, callback, true);
     }
 };
 
@@ -219,11 +219,11 @@ RiakPBC.prototype.mapred = function (params, streaming, callback) {
     }
 
     if (streaming) {
-      var emitter = new EventEmitter();
-      this.makeRequest('RpbMapRedReq', params, callback, true, emitter);
-      return emitter;
+        var emitter = new EventEmitter();
+        this.makeRequest('RpbMapRedReq', params, callback, true, emitter);
+        return emitter;
     } else {
-      this.makeRequest('RpbMapRedReq', params, callback, true);
+        this.makeRequest('RpbMapRedReq', params, callback, true);
     }
 };
 

@@ -45,7 +45,7 @@ exports.putVclock = function (test) {
         test.equal(reply.errmsg, undefined);
         var options = { bucket: 'test', key: 'test-vclock', content: { value: '{"test":"data"}', content_type: 'application/json' }, return_body: true };
         options.vclock = reply.vclock;
-        client.put(options, function(reply) {
+        client.put(options, function (reply) {
             test.equal(reply.errmsg, undefined, reply.errmsg && reply.errmsg.toString());
             test.done();
         });
@@ -136,7 +136,7 @@ exports.getKeys = function (test) {
         test.ok(Array.isArray(reply.keys));
         var len = reply.keys.length;
         reply.keys = reply.keys.filter(function (key) {
-            return (key.toString() === 'test' || key.toString() === 'test-large' || key.toString() === 'test-vclock' || key.toString() === 'test-put-index')
+            return (key.toString() === 'test' || key.toString() === 'test-large' || key.toString() === 'test-vclock' || key.toString() === 'test-put-index');
         });
         test.equal(reply.keys.length, len);
         test.equal(reply.done, true);
@@ -186,16 +186,16 @@ exports.search = function (test) {
 };
 
 
-exports.counters = function(test) {
-    client.updateCounter({ bucket: 'test', key: 'counter'  }, function(reply) {
+exports.counters = function (test) {
+    client.updateCounter({ bucket: 'test', key: 'counter'  }, function (reply) {
         test.notEqual(reply, undefined);
-        client.getCounter({ bucket: 'test', key: 'counter' }, function(reply) {
+        client.getCounter({ bucket: 'test', key: 'counter' }, function (reply) {
             test.notEqual(reply, undefined);
             test.equal(reply.value, 0);
-            client.updateCounter({ bucket: 'test', key: 'counter', amount: 100, returnvalue: true }, function(reply) {
+            client.updateCounter({ bucket: 'test', key: 'counter', amount: 100, returnvalue: true }, function (reply) {
                 test.notEqual(reply, undefined);
                 test.equal(reply.value, 100);
-                client.updateCounter({ bucket: 'test', key: 'counter', returnvalue: true }, function(reply) {
+                client.updateCounter({ bucket: 'test', key: 'counter', returnvalue: true }, function (reply) {
                     test.notEqual(reply, undefined);
                     //test.equal(reply.value, 100);
                     test.done();
@@ -205,10 +205,10 @@ exports.counters = function(test) {
     });
 };
 
-exports.resetBucket = function(test) {
-    client.resetBucket({ bucket: 'test' }, function(reply) {
+exports.resetBucket = function (test) {
+    client.resetBucket({ bucket: 'test' }, function (reply) {
         test.notEqual(reply, undefined);
-        client.getBucket({ bucket: 'test' }, function(reply) {
+        client.getBucket({ bucket: 'test' }, function (reply) {
             test.notEqual(reply, undefined);
             test.equal(reply.props.allow_mult, false);
             test.done();
@@ -230,10 +230,10 @@ exports.del = function (test) {
                 test.equal(reply.errmsg, undefined);
                 client.del({ bucket: 'test', key: 'test-put-index' }, function (reply) {
                     test.equal(reply.errmsg, undefined);
-                    client.del({ bucket: 'test', key: 'counter' }, function(reply) {
-                      test.equal(reply.errmsg, undefined);
-                      //client.disconnect();
-                      test.done();
+                    client.del({ bucket: 'test', key: 'counter' }, function (reply) {
+                        test.equal(reply.errmsg, undefined);
+                        //client.disconnect();
+                        test.done();
                     });
                 });
             });
