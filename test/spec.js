@@ -1,5 +1,3 @@
-'use strict';
-
 var client = require('../index').createClient(),
     async = require('async');
 
