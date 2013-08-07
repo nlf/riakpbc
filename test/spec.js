@@ -1,4 +1,5 @@
-var client = require('../index').createClient();
+var client = require('../index').createClient(),
+    async = require('async');
 
 exports.setClientId = function (test) {
     client.setClientId({ client_id: 'testrunner' }, function (reply) {
@@ -53,8 +54,8 @@ exports.putVclock = function (test) {
 };
 
 exports.putIndex = function (test) {
-    var indexes = [{ key: 'key1_bin', value: 'value1' }, { key: 'key2_bin', value: 'value2' }];
-    var options = { bucket: 'test', key: 'test-put-index', content: { value: '{"test":"data"}', content_type: 'application/json', indexes: indexes }, return_body: true };
+    var indexes = [{ key: 'key1_bin', value: 'value1' }, { key: 'key2_bin', value: 'value2' }],
+        options = { bucket: 'test', key: 'test-put-index', content: { value: '{"test":"data"}', content_type: 'application/json', indexes: indexes }, return_body: true };
     client.put(options, function (reply) {
         test.deepEqual(reply.content[0].indexes, indexes);
         test.done();
@@ -72,8 +73,8 @@ exports.get = function (test) {
 };
 
 exports.putLarge = function (test) {
-    var value = {};
-    for (var i = 0; i < 5000; i++) {
+    var value = {}, i;
+    for (i = 0; i < 5000; i += 1) {
         value['test_key_' + i] = 'test_value_' + i;
     }
     client.put({ bucket: 'test', key: 'test-large', content: { value: JSON.stringify(value), content_type: 'application/json' }}, function (reply) {
@@ -83,8 +84,8 @@ exports.putLarge = function (test) {
 };
 
 exports.getLarge = function (test) {
-    var value = {};
-    for (var i = 0; i < 5000; i++) {
+    var value = {}, i;
+    for (i = 0; i < 5000; i += 1) {
         value['test_key_' + i] = 'test_value_' + i;
     }
     client.get({ bucket: 'test', key: 'test-large' }, function (reply) {
@@ -205,6 +206,67 @@ exports.counters = function (test) {
     });
 };
 
+exports.secondaryIndexPaging = function (test) {
+    var ids = [0, 1, 2, 3, 4, 5, 6],
+        make = function (id, cb) {
+            var key = 'test-paging-' + id,
+                payload = { value: id },
+                indexes = [{ key: 'value_bin', value: String(id) }],
+                request = {
+                    bucket: 'test',
+                    key: key,
+                    content_type: 'application/json',
+                    content: {value: JSON.stringify(payload), indexes: indexes}
+                };
+            client.put(request, function (reply) {
+                test.notEqual(reply, undefined);
+                test.equal(reply.errmsg, undefined);
+                cb();
+            });
+        },
+        remove = function (id, cb) {
+            client.del({ bucket: 'test', key: 'test-paging-' + id }, function (reply) {
+                test.notEqual(reply, undefined);
+                test.equal(reply.errmsg, undefined);
+                cb();
+            });
+        };
+
+    async.each(ids, make, function (err) {
+        var cursor;
+
+        test.equal(err, undefined);
+        client.getIndex({ bucket: 'test', index: 'value_bin', qtype: 1, range_min: '0', range_max: '9', max_results: 3 }, function (reply) {
+            test.notEqual(reply, undefined);
+            test.notEqual(reply.keys, undefined);
+            test.notEqual(reply.continuation, undefined);
+            test.equal(reply.keys.length, 3);
+            cursor = reply.continuation;
+
+            client.getIndex({ bucket: 'test', index: 'value_bin', qtype: 1, range_min: '0', range_max: '9', max_results: 3, continuation: cursor }, function (reply) {
+                test.notEqual(reply, undefined);
+                test.notEqual(reply.keys, undefined);
+                test.notEqual(reply.continuation, undefined);
+                test.equal(reply.keys.length, 3);
+                cursor = reply.continuation;
+
+                client.getIndex({ bucket: 'test', index: 'value_bin', qtype: 1, range_min: '0', range_max: '9', max_results: 3, continuation: cursor }, function (reply) {
+                    test.notEqual(reply, undefined);
+                    test.notEqual(reply.keys, undefined);
+                    test.equal(reply.continuation, undefined);
+                    test.equal(reply.keys.length, 1);
+
+                    async.each(ids, remove, function (err) {
+                        test.equal(err, undefined);
+                        test.done();
+                    });
+                });
+            });
+        });
+    });
+};
+
+
 exports.resetBucket = function (test) {
     client.resetBucket({ bucket: 'test' }, function (reply) {
         test.notEqual(reply, undefined);
@@ -215,6 +277,7 @@ exports.resetBucket = function (test) {
         });
     });
 };
+
 
 exports.del = function (test) {
     // Uncomment the next line and the disconnect line below
