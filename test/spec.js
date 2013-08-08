@@ -188,17 +188,17 @@ exports.search = function (test) {
 
 
 exports.counters = function (test) {
-    client.updateCounter({ bucket: 'test', key: 'counter'  }, function (reply) {
+    client.updateCounter({ bucket: 'test', key: 'counter', amount: 3  }, function (reply) {
         test.notEqual(reply, undefined);
         client.getCounter({ bucket: 'test', key: 'counter' }, function (reply) {
             test.notEqual(reply, undefined);
-            test.equal(reply.value, 0);
+            test.equal(reply.value, 3);
             client.updateCounter({ bucket: 'test', key: 'counter', amount: 100, returnvalue: true }, function (reply) {
                 test.notEqual(reply, undefined);
-                test.equal(reply.value, 100);
-                client.updateCounter({ bucket: 'test', key: 'counter', returnvalue: true }, function (reply) {
+                test.equal(reply.value, 103);
+                client.updateCounter({ bucket: 'test', key: 'counter', returnvalue: true, amount: -100 }, function (reply) {
                     test.notEqual(reply, undefined);
-                    //test.equal(reply.value, 100);
+                    test.equal(reply.value, 3);
                     test.done();
                 });
             });
