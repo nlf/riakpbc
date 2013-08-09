@@ -1,4 +1,4 @@
-    [![build status](https://secure.travis-ci.org/nlf/riakpbc.png)](http://travis-ci.org/nlf/riakpbc)
+[![build status](https://secure.travis-ci.org/nlf/riakpbc.png)](http://travis-ci.org/nlf/riakpbc)
 [![NPM version](https://badge.fury.io/js/riakpbc.png)](http://badge.fury.io/js/riakpbc)
 [![Dependency Status](https://gemnasium.com/natural/riakpbc.png)](https://gemnasium.com/natural/riakpbc)
 
