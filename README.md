@@ -2,7 +2,7 @@
 [![Dependency Status](https://gemnasium.com/natural/riakpbc.png)](https://gemnasium.com/natural/riakpbc)
 [![NPM version](https://badge.fury.io/js/riakpbc.png)](http://badge.fury.io/js/riakpbc)
 
-## RiakPBC
+# RiakPBC
 RiakPBC is a low-level [Riak 1.4](http://basho.com/riak)
 [protocol buffer](https://developers.google.com/protocol-buffers/docs/overview) client for
 [Node.js](http://nodejs.org/).
@@ -12,19 +12,19 @@ All of the API methods documented at
 are implemented.
 
 
-#### Contents
+## Contents
 
   * [Install](#install)
   * [Usage](#usage)
   * [API](#api)
-    * [Bucket Operations](#bucket-ops)
-    * [Object/Key Operations](#key-ops)
-    * [Query Operations](#query-ops)
-    * [Server Operations](#server-ops)
-
+    * [Bucket Operations](#bucket-operations)
+    * [Object/Key Operations](#key-operations)
+    * [Query Operations](#query-operations)
+    * [Server Operations](#server-operations)
+  * [License](#license)
 
 <a id="install"></a>
-#### Install
+### Install
 
 Installation is easy with NPM:
 
@@ -34,7 +34,7 @@ $ npm install riakpbc --save
 
 
 <a id="usage"></a>
-#### Usage
+### Usage
 
 Make sure you've got a working Riak install, then connect to it like this:
 
@@ -55,12 +55,12 @@ a hash of options and a callback.  Inside the callback, you handle the response
 from Riak.  Refer to the [API](#api) section below for the details of each call.
 
 <a id="api"></a>
-#### API
+### API
 
-<a id="bucket-ops"></a>
+<a id="bucket-operations"></a>
 ##### Query Operations
 
-###### `client.getBuckets(callback)`
+##### `client.getBuckets(callback)`
 
 [reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/list-buckets/)
 
@@ -82,7 +82,7 @@ The callback will receive an object like this:
 { buckets: [ 'chicken', 'ice-cream', 'jelly-beans' ] }
 ```
 
-###### `client.getBucket(params, callback)`
+##### `client.getBucket(params, callback)`
 
 [reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/get-bucket-props/)
 
@@ -125,7 +125,7 @@ This will output something like this:
      basic_quorum: false } }
 ```
 
-###### `client.setBucket(params, callback)`
+##### `client.setBucket(params, callback)`
 
 [reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/set-bucket-props/)
 
@@ -137,7 +137,7 @@ This method changes the bucket properties.  Available `params`:
 
 The callback response will be empty on success.
 
-###### `client.resetBucket(params, callback)`
+##### `client.resetBucket(params, callback)`
 
 [reference](http://docs.basho.com/riak/latest/dev/references/http/reset-bucket-props/)
 
@@ -149,7 +149,7 @@ This method resets the bucket properties to their defaults.  Available `params`:
 The callback response will be empty on success.
 
 
-###### `client.getKeys(params, [streaming], callback)`
+##### `client.getKeys(params, [streaming], callback)`
 
 [reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/list-keys/)
 
@@ -175,10 +175,10 @@ client.getKeys({ bucket: 'test' }, true).on('data', function (reply) {
 });
 ```
 
-<a id="key-ops"></a>
+<a id="key-operations"></a>
 ##### Object/Key Operations
 
-###### `client.get(params, callback)`
+##### `client.get(params, callback)`
 
 [reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/fetch-object/)
 
@@ -190,7 +190,7 @@ client.get({ bucket: 'test', key: 'the-ballad-of-john-henry' }, function (respon
 });
 ```
 
-###### `client.put(params, callback)`
+##### `client.put(params, callback)`
 
 [reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/store-object/)
 
@@ -214,7 +214,7 @@ request or a `put` request with `return_body: true`.  You should send the
 documentation for an introduction to vector clocks.
 
 
-###### `client.del(params, callback)`
+##### `client.del(params, callback)`
 
 [reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/delete-object/)
 
@@ -226,11 +226,93 @@ client.del({ bucket: 'test', song: 'thriller' }, function (response) {
 });
 ```
 
+#### `client.updateCounter()`
+
+(No Reference Docs)
+
+This method sets or updates a counter (a nifty type of CRDT).
+
+```javacript
+client.updateCounter({ bucket: 'test', key: 'times-i-mispell-definitely', amount: 31415 }, function (reply) {
+  console.log('how bad is it? this many:', reply.value);
+});
+```
+
+#### `client.getCounter()`s
+
+(No Reference Docs)
+
+Are you seeing the pattern yet?
+
+```javacript
+client.getCounter({ bucket: 'test', key: 'times-i-mispell-definitely' }, function (reply) {
+  console.log('how bad is it? this many:', reply.value);
+});
+```
 
 
-
-<a id="query-ops"></a>
+<a id="query-operations"></a>
 ##### Query Operations
 
-<a id="server-ops"></a>
+
+#### `client.mapred()`
+
+[reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/mapreduce/)
+
+#### `client.getIndex()`
+
+[reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/secondary-indexes/)
+
+#### `client.search()`
+
+[reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/search/)
+
+
+
+<a id="server-operations"></a>
 ##### Server Operations
+
+
+#### `client.ping()`
+
+[reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/ping/)
+
+#### `client.getClientId()`
+
+[reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/get-client-id/)
+
+
+#### `client.setClientId()`
+
+[reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/set-client-id/)
+
+
+#### `client.getServerInfo()`
+
+[reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/server-info/)
+
+
+
+<a id="license"></a>
+### License
+
+[The MIT License (MIT)](http://opensource.org/licenses/MIT)
+
+Copyright (c) 2013 Nathan LaFreniere
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
