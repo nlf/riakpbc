@@ -162,7 +162,7 @@ client.getKeys({ bucket: 'test' }, function (reply) {
 });
 ```
 
-The second form returns an event emitter that receives is streamed keys:
+The second form returns an event emitter that receives streamed keys:
 
 ```javascript
 client.getKeys({ bucket: 'test' }, true).on('data', function (reply) {
