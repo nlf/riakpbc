@@ -14,7 +14,7 @@ RiakPBC is a low-level [Riak 1.4](http://basho.com/riak)
   * [Usage](#usage)
   * [API](#api)
     * [Bucket Methods](#bucket-methods)
-    * [Object/Key Methods](#key-methods)
+    * [Object/Key Methods](#objectkey-methods)
     * [Query Methods](#query-methods)
     * [Server Methods](#server-methods)
     * [Connection Methods](#connection-methods)
@@ -24,7 +24,7 @@ RiakPBC is a low-level [Riak 1.4](http://basho.com/riak)
 <a id="install"></a>
 ### Install
 
-Installation is easy with NPM:
+Installation is easy:
 ```sh
 $ npm install riakpbc --save
 ```
@@ -40,8 +40,8 @@ var riakpbc = require('riakpbc'),
     client = riakpbc.createClient();
 ```
 
-You can specify host and port in the connection if your Riak server isn't local
-or if it's running on a different port:
+You can specify host and port if your Riak server isn't local or if it's running
+on a different port:
 
 ```javascript
 var client = riakpbc.createClient({host: 'riak.somewhere-else.com', port: 8086});
@@ -51,15 +51,15 @@ var client = riakpbc.createClient({host: 'riak.somewhere-else.com', port: 8086})
 <a id="api"></a>
 ## API
 
-Making requests to Riak is straight-foward.  You call methods on the client,
+Making requests to Riak is straight-forward.  You call methods on the client,
 typically with a hash of options and a callback.  Inside the callback, you
 handle the response from Riak.
 
 The descriptions and examples below show the minimal arguments needed to
 complete each call.  In many cases, the `params` object can have additional keys
-and values to change the way the server responds to the request.  Follow the
-reference links to the official Basho docs for details.  You should also be
-familiar with the Riak
+and values to change the way the server handles and responds to the request.
+Follow the reference links to the official Basho docs for the details of each
+set of parameters .  You should also be familiar with the Riak
 [CAP Controls](http://docs.basho.com/riak/latest/dev/advanced/cap-controls/).
 
 
@@ -91,7 +91,7 @@ array of bucket names, each a string:
 #### `client.getBucket(params, callback)`
 [reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/get-bucket-props/)
 
-This call retrieves the property of a bucket.  The `params` object should have
+This call retrieves the properties of a bucket.  The `params` object should have
 only one key, `bucket`, and its value should be the bucket name as a
 string. Example:
 
@@ -157,12 +157,12 @@ The first form retrieves the keys in one call:
 client.getKeys({ bucket: 'test' }, function (reply) {
   var keys = reply.keys;
   keys.forEach(function (key) {
-    console.log('key: %s', key)
+    console.log('key:', key)
   });
 });
 ```
 
-The second form returns an event emitter:
+The second form returns an event emitter that receives is streamed keys:
 
 ```javascript
 client.getKeys({ bucket: 'test' }, true).on('data', function (reply) {
@@ -171,7 +171,7 @@ client.getKeys({ bucket: 'test' }, true).on('data', function (reply) {
 ```
 
 
-<a id="key-methods"></a>
+<a id="objectkey-methods"></a>
 ## Object/Key Methods
 
 #### `client.get(params, callback)`
@@ -303,8 +303,8 @@ doc for more details and examples.
 #### `client.getIndex(query, callback)`
 [reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/secondary-indexes/)
 
-This method makes a secondary index query on the server.  Supply a bucket, and
-index, a query type:
+This method makes a secondary index query on the server.  Supply a bucket, an
+index, and a query type:
 
 ```javascript
 var query = { bucket: 'friends', index: 'name_bin', qtype: 0, key: 'Joe' };
@@ -317,7 +317,7 @@ With the `qtype` 0, you must supply `key`, with `qtype` 1, you must supply
 `range_min` and `range_max` values.
 
 NB: 2i index queries only work when the index exists.  Pass an `indexes` array
-as part of your `put` calls to add them:
+as part of your `put` calls to index objects as they're stored:
 
 ```javascript
 client.put({ bucket: '...', key: '..', content: { value: '...', indexes: [{ key: 'friends_bin', value: user.first_name }] } }, ...) function (...) {
