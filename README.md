@@ -7,8 +7,8 @@ RiakPBC is a low-level [Riak 1.4](http://basho.com/riak)
 [protocol buffer](https://developers.google.com/protocol-buffers/docs/overview) client for
 [Node.js](http://nodejs.org/).
 
-All of the API methods documented at
-[basho docs](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/)
+All of the API methods listed in the
+[Basho Riak Documentation](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/)
 are implemented.
 
 
@@ -58,13 +58,13 @@ from Riak.  Refer to the [API](#api) section below for the details of each call.
 ### API
 
 <a id="bucket-operations"></a>
-##### Query Operations
+### Query Operations
 
-##### `client.getBuckets(callback)`
+#### `client.getBuckets(callback)`
 
 [reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/list-buckets/)
 
-This method retrieves a list of buckets available on the server.  You should't
+This method retrieves a list of buckets available on the server.  You shouldn't
 run this in production.  But here in documentation land, we demonstrate:
 
 This method takes no parameters, only a callback.
@@ -82,7 +82,7 @@ The callback will receive an object like this:
 { buckets: [ 'chicken', 'ice-cream', 'jelly-beans' ] }
 ```
 
-##### `client.getBucket(params, callback)`
+#### `client.getBucket(params, callback)`
 
 [reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/get-bucket-props/)
 
@@ -125,7 +125,7 @@ This will output something like this:
      basic_quorum: false } }
 ```
 
-##### `client.setBucket(params, callback)`
+#### `client.setBucket(params, callback)`
 
 [reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/set-bucket-props/)
 
@@ -137,7 +137,7 @@ This method changes the bucket properties.  Available `params`:
 
 The callback response will be empty on success.
 
-##### `client.resetBucket(params, callback)`
+#### `client.resetBucket(params, callback)`
 
 [reference](http://docs.basho.com/riak/latest/dev/references/http/reset-bucket-props/)
 
@@ -149,7 +149,7 @@ This method resets the bucket properties to their defaults.  Available `params`:
 The callback response will be empty on success.
 
 
-##### `client.getKeys(params, [streaming], callback)`
+#### `client.getKeys(params, [streaming], callback)`
 
 [reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/list-keys/)
 
@@ -176,9 +176,9 @@ client.getKeys({ bucket: 'test' }, true).on('data', function (reply) {
 ```
 
 <a id="key-operations"></a>
-##### Object/Key Operations
+### Object/Key Operations
 
-##### `client.get(params, callback)`
+#### `client.get(params, callback)`
 
 [reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/fetch-object/)
 
@@ -190,7 +190,7 @@ client.get({ bucket: 'test', key: 'the-ballad-of-john-henry' }, function (respon
 });
 ```
 
-##### `client.put(params, callback)`
+#### `client.put(params, callback)`
 
 [reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/store-object/)
 
@@ -214,13 +214,13 @@ request or a `put` request with `return_body: true`.  You should send the
 documentation for an introduction to vector clocks.
 
 
-##### `client.del(params, callback)`
+#### `client.del(params, callback)`
 
 [reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/delete-object/)
 
 This method removes a key from a bucket.  Like this:
 
-```
+```javascript
 client.del({ bucket: 'test', song: 'thriller' }, function (response) {
   console.log('it was totally overrated.');
 });
@@ -238,7 +238,7 @@ client.updateCounter({ bucket: 'test', key: 'times-i-mispell-definitely', amount
 });
 ```
 
-#### `client.getCounter()`s
+#### `client.getCounter()`
 
 (No Reference Docs)
 
@@ -252,7 +252,7 @@ client.getCounter({ bucket: 'test', key: 'times-i-mispell-definitely' }, functio
 
 
 <a id="query-operations"></a>
-##### Query Operations
+### Query Operations
 
 
 #### `client.mapred()`
@@ -270,7 +270,7 @@ client.getCounter({ bucket: 'test', key: 'times-i-mispell-definitely' }, functio
 
 
 <a id="server-operations"></a>
-##### Server Operations
+### Server Operations
 
 
 #### `client.ping()`
