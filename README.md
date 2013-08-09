@@ -234,7 +234,7 @@ updated counter.
 NB: the bucket containing the key must have the property `allow_mult` set to
 `true`.
 
-```javacript
+```javascript
 client.updateCounter({ bucket: 'test', key: 'times-i-mispell-definitely', amount: 31415 }, function (reply) {
   console.log('how bad is it? this many:', reply.value);
 });
@@ -247,7 +247,7 @@ client.updateCounter({ bucket: 'test', key: 'times-i-mispell-definitely', amount
 This method gets a counter value.  Specify the name of the bucket and key in the
 `params` object.  Example:
 
-```javacript
+```javascript
 client.getCounter({ bucket: 'test', key: 'times-i-mispell-definitely' }, function (reply) {
   console.log('how bad is it? this many:', reply.value);
 });
@@ -313,14 +313,14 @@ client.getIndex(query, function (reply) {
 });
 ```
 
-With the `qtype` 0, you must supply `key`, with `qtype` 1, you must supply
+With the `qtype` `0`, you must supply `key`, with `qtype` `1`, you must supply
 `range_min` and `range_max` values.
 
 NB: 2i index queries only work when the index exists.  Pass an `indexes` array
 as part of your `put` calls to index objects as they're stored:
 
 ```javascript
-client.put({ bucket: '...', key: '..', content: { value: '...', indexes: [{ key: 'friends_bin', value: user.first_name }] } }, ...) function (...) {
+client.put({ bucket: '...', content: { value: '...', indexes: [{ key: 'name_bin', value: user.first_name }] } }, ...) function (...) {
   ...
 });
 ```
@@ -352,7 +352,7 @@ no parameters, only a callback.
 ```javascript
 client.ping(function (reply) {
   if (!reply.errmsg) {
-    console.log('pong')
+    console.log('pong');
   }
 });
 ```
