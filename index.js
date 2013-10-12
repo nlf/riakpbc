@@ -53,6 +53,7 @@ function RiakPBC(options) {
     options = options || {};
     self.host = options.host || '127.0.0.1';
     self.port = options.port || 8087;
+    self.timeout = options.timeout || 1000;
     self.bucket = options.bucket || undefined;
     self.translator = protobuf.loadSchema(path.join(__dirname, './spec/riak_kv.proto'));
     self.client = new net.Socket();
@@ -126,9 +127,9 @@ function RiakPBC(options) {
     self.processNext = function () {
         if (self.queue.length && !self.paused) {
             self.paused = true;
-            self.connect(function (reply) {
+            self.connect(function (err) {
                 self.task = self.queue.shift();
-                if(reply.errmsg) return self.task.callback(reply);
+                if(err) return self.task.callback({errmsg: err});
                 self.client.write(self.task.message);
             });
         }
@@ -263,19 +264,20 @@ RiakPBC.prototype.ping = function (callback) {
 };
 
 RiakPBC.prototype.connect = function (callback) {
-    if (this.connected) return callback({});
+    if (this.connected) return callback(null);
+
+    var self = this;
 
     var timeoutGuard = setTimeout(function(){
         timeoutGuard = null;
-        callback({errmsg:'timeout'});
-    }, 500);
+        callback('timeout');
+    }, self.timeout);
 
-    var self = this;
     self.client.connect(self.port, self.host, function () {
         if(timeoutGuard){
             clearTimeout(timeoutGuard);
             self.connected = true;
-            callback({});
+            callback(null);
         }
     });
 };
