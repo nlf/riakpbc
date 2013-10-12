@@ -126,8 +126,9 @@ function RiakPBC(options) {
     self.processNext = function () {
         if (self.queue.length && !self.paused) {
             self.paused = true;
-            self.connect(function () {
+            self.connect(function (reply) {
                 self.task = self.queue.shift();
+                if(reply.errmsg) return self.task.callback(reply);
                 self.client.write(self.task.message);
             });
         }
@@ -262,11 +263,20 @@ RiakPBC.prototype.ping = function (callback) {
 };
 
 RiakPBC.prototype.connect = function (callback) {
-    if (this.connected) return callback();
+    if (this.connected) return callback({});
+
+    var timeoutGuard = setTimeout(function(){
+        timeoutGuard = null;
+        callback({errmsg:'timeout'});
+    }, 500);
+
     var self = this;
     self.client.connect(self.port, self.host, function () {
-        self.connected = true;
-        callback();
+        if(timeoutGuard){
+            clearTimeout(timeoutGuard);
+            self.connected = true;
+            callback({});
+        }
     });
 };
 
