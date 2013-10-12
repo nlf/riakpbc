@@ -312,12 +312,12 @@ exports.disconnect = function (test) {
 
 
 exports.connectTimeout = function(test){
-    var client = riakpbc.createClient({port:1334});
+    var client = riakpbc.createClient({port:1337});
     client.connect(function(err){
-        test.equal(err,'timeout');
+        test.equal(err.message,'Connection timeout');
 
         client.getBuckets(function(reply){
-            test.equal(reply.errmsg,'timeout');
+            test.equal(reply.errmsg.message,'Connection timeout');
             test.done();
         })
     })

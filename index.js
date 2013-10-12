@@ -270,7 +270,7 @@ RiakPBC.prototype.connect = function (callback) {
 
     var timeoutGuard = setTimeout(function(){
         timeoutGuard = null;
-        callback('timeout');
+        callback(new Error('Connection timeout'));
     }, self.timeout);
 
     self.client.connect(self.port, self.host, function () {
