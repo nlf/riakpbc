@@ -1,4 +1,5 @@
-var client = require('../index').createClient(),
+var riakpbc = require('../index'),
+    client = riakpbc.createClient(),
     async = require('async');
 
 exports.setClientId = function (test) {
@@ -308,3 +309,16 @@ exports.disconnect = function (test) {
     client.disconnect();
     test.done();
 };
+
+
+exports.connectTimeout = function(test){
+    var client = riakpbc.createClient({port:1337});
+    client.connect(function(err){
+        test.equal(err.message,'Connection timeout');
+
+        client.getBuckets(function(reply){
+            test.equal(reply.errmsg.message,'Connection timeout');
+            test.done();
+        })
+    })
+}

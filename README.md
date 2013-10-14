@@ -406,8 +406,9 @@ This method connects the client to the server.  The callback function will be
 called when the connection is established:
 
 ```javascript
-client.connect(function () {
-  console.log('connected to %s on port %s', client.host, client.port);
+client.connect(function (err) {
+  if (!err)
+    console.log('connected to %s on port %s', client.host, client.port);
 });
 ```
 
