@@ -1,6 +1,7 @@
 var net = require('net'),
     protobuf = require('protobuf.js'),
     butils = require('butils'),
+    util = require('util'),
     EventEmitter = require('events').EventEmitter,
     path = require('path');
 
@@ -95,6 +96,7 @@ function RiakPBC(options) {
             mc = messageCodes['' + packet[0]];
 
             var response = self.translator.decode(mc, packet.slice(1));
+            var err;
             if (response.content && Array.isArray(response.content)) {
                 response.content.map(function (item) {
                     if (item.value && item.content_type) {
@@ -104,21 +106,30 @@ function RiakPBC(options) {
                 });
             }
 
+            if (response.errmsg) {
+                err = new Error(response.errmsg);
+                err.code = response.errcode;
+            }
+
             if (self.task.emitter && !response.done) {
-                self.task.emitter.emit('data', response);
+                if (err) response = undefined;
+                self.task.emitter.emit('data', err, response);
             }
 
             reply = _merge(reply, response);
             if (!self.task.expectMultiple || reply.done || mc === 'RpbErrorResp') {
+                if (err) reply = undefined;
+
                 if (self.task.emitter) {
-                    self.task.emitter.emit('end', response);
+                    self.task.emitter.emit('end', err, response);
                 } else {
-                    self.task.callback(reply);
+                    self.task.callback(err, reply);
                 }
                 mc = undefined;
                 self.task = undefined;
                 reply = {};
                 self.paused = false;
+                err = undefined;
                 self.processNext();
             }
         });
@@ -129,7 +140,7 @@ function RiakPBC(options) {
             self.paused = true;
             self.connect(function (err) {
                 self.task = self.queue.shift();
-                if(err) return self.task.callback({errmsg: err});
+                if (err) return self.task.callback(err);
                 self.client.write(self.task.message);
             });
         }
@@ -268,13 +279,13 @@ RiakPBC.prototype.connect = function (callback) {
 
     var self = this;
 
-    var timeoutGuard = setTimeout(function(){
+    var timeoutGuard = setTimeout(function () {
         timeoutGuard = null;
         callback(new Error('Connection timeout'));
     }, self.timeout);
 
     self.client.connect(self.port, self.host, function () {
-        if(timeoutGuard){
+        if (timeoutGuard) {
             clearTimeout(timeoutGuard);
             self.connected = true;
             callback(null);

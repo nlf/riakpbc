@@ -74,7 +74,7 @@ This method retrieves a list of buckets available on the server.  You shouldn't
 run this in production.  This method takes no parameters, only a callback.
 
 ```javascript
-client.getBuckets(function (reply) {
+client.getBuckets(function (err, reply) {
   var buckets = reply.buckets;
   console.log('we have buckets:', buckets);
 });
@@ -96,7 +96,7 @@ only one key, `bucket`, and its value should be the bucket name as a
 string. Example:
 
 ```javascript
-client.getBucket({ bucket: 'test' }, function (reply) {
+client.getBucket({ bucket: 'test' }, function (err, reply) {
   console.log('bucket properties:', reply.props);
 });
 ```
@@ -120,8 +120,8 @@ This method changes the bucket properties.  Supply the bucket name via `bucket`
 and properties via `props`.  Example:
 
 ```javascript
-client.setBucket({ bucket: 'test', props: { allow_mult: true }}, function (reply) {
-  if (!reply.errmsg) {
+client.setBucket({ bucket: 'test', props: { allow_mult: true }}, function (err, reply) {
+  if (!err) {
     console.log('bucket allows multiple versions.');
   }
 });
@@ -136,8 +136,8 @@ This method resets the bucket properties to default values.  Supply a bucket
 name in the `params`:
 
 ```javascript
-client.resetBucket({ bucket: 'test' }, function (reply) {
-  if (!reply.errmsg) {
+client.resetBucket({ bucket: 'test' }, function (err, reply) {
+  if (!err) {
     console.log('bucket properties restored.');
   }
 });
@@ -154,7 +154,7 @@ production.
 The first form retrieves the keys in one call:
 
 ```javascript
-client.getKeys({ bucket: 'test' }, function (reply) {
+client.getKeys({ bucket: 'test' }, function (err, reply) {
   var keys = reply.keys;
   keys.forEach(function (key) {
     console.log('key:', key)
@@ -165,7 +165,7 @@ client.getKeys({ bucket: 'test' }, function (reply) {
 The second form returns an event emitter that receives streamed keys:
 
 ```javascript
-client.getKeys({ bucket: 'test' }, true).on('data', function (reply) {
+client.getKeys({ bucket: 'test' }, true).on('data', function (err, reply) {
   console.log('batch of keys:', reply.keys);
 });
 ```
@@ -180,7 +180,7 @@ client.getKeys({ bucket: 'test' }, true).on('data', function (reply) {
 This method fetches an object from Riak.  Example:
 
 ```javascript
-client.get({ bucket: 'test', key: 'the-ballad-of-john-henry' }, function (reply) {
+client.get({ bucket: 'test', key: 'the-ballad-of-john-henry' }, function (err, reply) {
   console.log('found song:', reply.content.value);
 });
 ```
@@ -195,7 +195,7 @@ This method sends data to Riak for storage.  Use it like this:
 var song = { title: 'Jockey Full of Bourbon', writer: 'Tom Waits', performer: 'Joe Bonamassa' },
     request = { bucket: 'test', key: 'bourbon', content: { value: JSON.stringify(song), content_type: 'application/json' } };
 
-client.put(request, function (reply) {
+client.put(request, function (err, reply) {
   console.log(reply);
 });
 ```
@@ -216,7 +216,7 @@ documentation for an introduction to vector clocks.
 This method removes a key from a bucket.  Specify the bucket and the key:
 
 ```javascript
-client.del({ bucket: 'test', song: 'thriller' }, function (reply) {
+client.del({ bucket: 'test', song: 'thriller' }, function (err, reply) {
   console.log('it was totally overrated.');
 });
 ```
@@ -235,7 +235,7 @@ NB: the bucket containing the key must have the property `allow_mult` set to
 `true`.
 
 ```javascript
-client.updateCounter({ bucket: 'test', key: 'times-i-mispell-definitely', amount: 31415 }, function (reply) {
+client.updateCounter({ bucket: 'test', key: 'times-i-mispell-definitely', amount: 31415 }, function (err, reply) {
   console.log('how bad is it? this many:', reply.value);
 });
 ```
@@ -248,7 +248,7 @@ This method gets a counter value.  Specify the name of the bucket and key in the
 `params` object.  Example:
 
 ```javascript
-client.getCounter({ bucket: 'test', key: 'times-i-mispell-definitely' }, function (reply) {
+client.getCounter({ bucket: 'test', key: 'times-i-mispell-definitely' }, function (err, reply) {
   console.log('how bad is it? this many:', reply.value);
 });
 ```
@@ -289,7 +289,7 @@ var request = {
 With the request object, writing the map reduce call is more clear:
 
 ```javascript
-client.mapred({ request: JSON.stringify(request), content_type: 'application/json' }, function (reply) {
+client.mapred({ request: JSON.stringify(request), content_type: 'application/json' }, function (err, reply) {
   console.log('first map reduce reply: %s', reply[0]);
 });
 ```
@@ -308,7 +308,7 @@ index, and a query type:
 
 ```javascript
 var query = { bucket: 'friends', index: 'name_bin', qtype: 0, key: 'Joe' };
-client.getIndex(query, function (reply) {
+client.getIndex(query, function (err, reply) {
   console.log('found keys:', reply.keys);
 });
 ```
@@ -333,7 +333,7 @@ This method sends a search request to the server.  Specify the index name with
 the `index` key and the query with the `q` key.  Example:
 
 ```javascript
-client.search({ index: 'test', q: 'name:john' }, function (reply) {
+client.search({ index: 'test', q: 'name:john' }, function (err, reply) {
   console.log('searched and found:', reply);
 });
 ```
@@ -350,8 +350,8 @@ This method can be used to test availability of the server.  This method takes
 no parameters, only a callback.
 
 ```javascript
-client.ping(function (reply) {
-  if (!reply.errmsg) {
+client.ping(function (err, reply) {
+  if (!err) {
     console.log('pong');
   }
 });
@@ -365,8 +365,8 @@ This method sets the client identifier, which helps the server resolve conflicts
 and reduce vector clock bloat.
 
 ```javascript
-client.setClientId({ client_id: 'the man from uncle' }, function (reply) {
-  console.log(!reply.errmsg);
+client.setClientId({ client_id: 'the man from uncle' }, function (err, reply) {
+  console.log(!err);
 });
 ```
 
@@ -378,7 +378,7 @@ This method gets the client identifier. This method takes no parameters, only a
 callback.
 
 ```javascript
-client.getClientId(function (reply) {
+client.getClientId(function (err, reply) {
   console.log(reply);
 });
 ```
@@ -391,7 +391,7 @@ This method gets the node name and software version from the server. This method
 takes no parameters, only a callback.
 
 ```javascript
-client.getServerInfo(function (reply) {
+client.getServerInfo(function (err, reply) {
   console.log('node:', reply.node);
   console.log('server version:', reply.server_version);
 });
