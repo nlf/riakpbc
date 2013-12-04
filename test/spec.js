@@ -146,6 +146,24 @@ exports.getKeys = function (test) {
     });
 };
 
+exports.getKeysStream = function (test) {
+    var streaming = true;
+    var readStream = client.getKeys({ bucket: 'test' }, streaming);
+    readStream.on('data', function (err, reply) {
+        test.equal(err, undefined);
+        test.ok(Array.isArray(reply.keys));
+        var len = reply.keys.length;
+        reply.keys = reply.keys.filter(function (key) {
+            return (key.toString() === 'test' || key.toString() === 'test-large' || key.toString() === 'test-vclock' || key.toString() === 'test-put-index');
+        });
+        test.equal(reply.keys.length, len);
+    });
+
+    readStream.on('end', function () {
+        test.done();
+    });
+};
+
 exports.mapred = function (test) {
     var request = {
         inputs: [['test', 'test']],
