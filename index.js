@@ -88,15 +88,17 @@ function RiakPBC(options) {
     }
 
     self.client.on('data', function (chunk) {
+        var err;
         splitPacket(chunk);
         if (numBytesAwaiting > 0) {
             return;
         }
-        resBuffers.forEach(function (packet) {
+
+        for (var i = 0, l = resBuffers.length; i < l; i++) {
+            packet = resBuffers[i];
             mc = messageCodes['' + packet[0]];
 
             var response = self.translator.decode(mc, packet.slice(1));
-            var err;
             if (response.content && Array.isArray(response.content)) {
                 response.content.map(function (item) {
                     if (item.value && item.content_type) {
@@ -117,22 +119,25 @@ function RiakPBC(options) {
             }
 
             reply = _merge(reply, response);
-            if (!self.task.expectMultiple || reply.done || mc === 'RpbErrorResp') {
-                if (err) reply = undefined;
+        }
 
-                if (self.task.emitter) {
-                    self.task.emitter.emit('end', err, response);
-                } else {
-                    self.task.callback(err, reply);
-                }
-                mc = undefined;
-                self.task = undefined;
-                reply = {};
-                self.paused = false;
-                err = undefined;
-                self.processNext();
+        if (!self.task.expectMultiple || reply.done || mc === 'RpbErrorResp') {
+            if (err) reply = undefined;
+
+            var cb = self.task.callback;
+            var emitter = self.task.emitter;
+            self.task = undefined;
+            if (emitter) {
+                emitter.emit('end', err, response);
+            } else {
+                cb(err, reply);
             }
-        });
+            mc = undefined;
+            reply = {};
+            self.paused = false;
+            err = undefined;
+            setImmediate(self.processNext);
+        }
     });
 
     self.processNext = function () {
@@ -179,7 +184,7 @@ RiakPBC.prototype.makeRequest = function (type, data, callback, expectMultiple, 
     butils.writeInt(message, messageCodes[type], 4);
     message = message.concat(buffer);
     self.queue.push({ message: new Buffer(message), callback: callback, expectMultiple: expectMultiple, emitter: emitter });
-    process.nextTick(self.processNext);
+    setImmediate(self.processNext);
 };
 
 RiakPBC.prototype.getBuckets = function (callback) {
@@ -287,17 +292,14 @@ RiakPBC.prototype.ping = function (callback) {
 
 RiakPBC.prototype.connect = function (callback) {
     if (this.connected) return callback(null);
-    if (this.timeoutGuard) return;
     var self = this;
 
-    self.timeoutGuard = setTimeout(function () {
-        self.timeoutGuard = null;
+    var timeoutGuard = setTimeout(function () {
         callback(new Error('Connection timeout'));
     }, self.timeout);
 
     self.client.connect(self.port, self.host, function () {
-        clearTimeout(self.timeoutGuard);
-        self.timeoutGuard = null;
+        clearTimeout(timeoutGuard);
         self.connected = true;
         callback(null);
     });
