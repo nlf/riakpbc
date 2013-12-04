@@ -332,7 +332,7 @@ var query = { bucket: 'friends', index: 'name_bin', qtype: 0, key: 'Joe' };
 client.getIndex(query, true).on('data', function (err, reply) {
   console.log('found keys:', reply.keys);
 });
-
+```
 
 #### `client.search(params, callback)`
 [reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/search/)
