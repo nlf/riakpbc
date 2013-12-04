@@ -250,8 +250,19 @@ RiakPBC.prototype.updateCounter = function (params, callback) {
     this.makeRequest('RpbCounterUpdateReq', params, callback);
 };
 
-RiakPBC.prototype.getIndex = function (params, callback) {
-    this.makeRequest('RpbIndexReq', params, callback);
+RiakPBC.prototype.getIndex = function (params, callback, streaming) {
+    if (typeof streaming === 'function') {
+        callback = streaming;
+        streaming = false;
+    }
+
+    if (streaming) {
+        var emitter = new EventEmitter();
+        this.makeRequest('RpbIndexReq', params, callback, true, emitter);
+        return emitter;
+    } else {
+        this.makeRequest('RpbIndexReq', params, callback);
+    }
 };
 
 RiakPBC.prototype.search = function (params, callback) {

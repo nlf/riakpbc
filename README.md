@@ -300,7 +300,7 @@ and the
 doc for more details and examples.
 
 
-#### `client.getIndex(query, callback)`
+#### `client.getIndex(query, [streaming], callback)`
 [reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/secondary-indexes/)
 
 This method makes a secondary index query on the server.  Supply a bucket, an
@@ -325,6 +325,14 @@ client.put({ bucket: '...', content: { value: '...', indexes: [{ key: 'name_bin'
 });
 ```
 
+The second form returns an event emitter that receives streamed keys:
+
+```javascript
+var query = { bucket: 'friends', index: 'name_bin', qtype: 0, key: 'Joe' };
+client.getIndex(query, true).on('data', function (err, reply) {
+  console.log('found keys:', reply.keys);
+});
+```
 
 #### `client.search(params, callback)`
 [reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/search/)
