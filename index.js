@@ -287,20 +287,17 @@ RiakPBC.prototype.ping = function (callback) {
 
 RiakPBC.prototype.connect = function (callback) {
     if (this.connected) return callback(null);
-
+    if (this.timeoutGuard) return;
     var self = this;
 
-    var timeoutGuard = setTimeout(function () {
-        timeoutGuard = null;
+    self.timeoutGuard = setTimeout(function () {
         callback(new Error('Connection timeout'));
     }, self.timeout);
 
     self.client.connect(self.port, self.host, function () {
-        if (timeoutGuard) {
-            clearTimeout(timeoutGuard);
-            self.connected = true;
-            callback(null);
-        }
+        clearTimeout(self.timeoutGuard);
+        self.connected = true;
+        callback(null);
     });
 };
 
