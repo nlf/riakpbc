@@ -3,7 +3,9 @@ var net = require('net'),
     butils = require('butils'),
     util = require('util'),
     EventEmitter = require('events').EventEmitter,
-    path = require('path');
+    path = require('path'),
+    setImmediate = setImmediate || process.nextTick;
+
 
 var messageCodes = {
     '0': 'RpbErrorResp',
