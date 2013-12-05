@@ -1,7 +1,6 @@
 var net = require('net'),
     protobuf = require('protobuf.js'),
     butils = require('butils'),
-    util = require('util'),
     EventEmitter = require('events').EventEmitter,
     path = require('path'),
     nextTick = setImmediate || process.nextTick;
@@ -179,7 +178,6 @@ function _merge(obj1, obj2) {
 
 RiakPBC.prototype.makeRequest = function (type, data, callback, expectMultiple, streaming) {
     var self = this,
-        reply = {},
         buffer = this.translator.encode(type, data),
         message = [],
         emitter;
