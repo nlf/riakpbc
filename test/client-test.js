@@ -105,7 +105,8 @@ describe('Client test', function () {
   })
 
   describe('Secondary Index', function () {
-    var bucket = 'test'
+
+    var bucket = 'test_secondary_index'
     var value = '{"test":"data"}'
     var keyValue = 'test_put_key'
     savedKeys[keyValue] = bucket
@@ -146,7 +147,7 @@ describe('Client test', function () {
 
     it('getIndex for single value', function (done) {
       var opts = {
-        bucket: 'test',
+        bucket: bucket,
         index: binaryIndexKey,
         qtype: 0,
         key: binaryIndexValue
@@ -163,7 +164,7 @@ describe('Client test', function () {
 
     it('getIndex for binary range', function (done) {
       var opts = {
-        bucket: 'test',
+        bucket: bucket,
         index: binaryIndexKey,
         qtype: 1,
         range_min: '!',
@@ -181,7 +182,7 @@ describe('Client test', function () {
 
     it('getIndex for integer range', function (done) {
       var opts = {
-        bucket: 'test',
+        bucket: bucket,
         index: integerIndexKey,
         qtype: 1,
         range_min: -99999,
@@ -555,26 +556,20 @@ describe('Client test', function () {
         cb();
       });
     }
-    function removeRow(id, cb) {
-      client.del({ bucket: bucket, key: 'test-paging-' + id }, function (err) {
-        expect(err).to.not.exist
-        cb()
-      })
-    }
 
-    async.each(ids, saveRow, function (err) {
+    async.eachSeries(ids, saveRow, function (err) {
       expect(err).to.not.exist
       var cursor;
 
-      client.getIndex({ bucket: 'test', index: 'value_bin', qtype: 1, range_min: '0', range_max: '9', max_results: 3 }, function (err, reply) {
+      client.getIndex({ bucket: bucket, index: 'value_bin', qtype: 1, range_min: '0', range_max: '9', max_results: 3 }, function (err, reply) {
         expect(err).not.exist
         expect(reply).to.exist
-        expect(reply.keys).to.exist
+        expect(reply.keys, 'keys not set in reply').to.exist
         expect(reply.continuation).to.exist
         expect(reply.keys.length).to.equal(3)
         cursor = reply.continuation;
 
-        client.getIndex({ bucket: 'test', index: 'value_bin', qtype: 1, range_min: '0', range_max: '9', max_results: 3, continuation: cursor }, function (err, reply) {
+        client.getIndex({ bucket: bucket, index: 'value_bin', qtype: 1, range_min: '0', range_max: '9', max_results: 3, continuation: cursor }, function (err, reply) {
           expect(err).not.exist
           expect(reply).to.exist
           expect(reply.keys).to.exist
@@ -582,21 +577,17 @@ describe('Client test', function () {
           expect(reply.keys.length).to.equal(3)
           cursor = reply.continuation;
 
-          client.getIndex({ bucket: 'test', index: 'value_bin', qtype: 1, range_min: '0', range_max: '9', max_results: 3, continuation: cursor }, function (err, reply) {
+          client.getIndex({ bucket: bucket, index: 'value_bin', qtype: 1, range_min: '0', range_max: '9', max_results: 3, continuation: cursor }, function (err, reply) {
             expect(err).not.exist
             expect(reply).to.exist
             expect(reply.keys).to.exist
             expect(reply.continuation).to.not.exist
             expect(reply.keys.length).to.equal(1)
-
-            async.each(ids, removeRow, function (err) {
-              expect(err).to.not.exist
-              done()
-            });
-          });
-        });
-      });
-    });
+            done()
+          })
+        })
+      })
+    })
   })
 })
 
