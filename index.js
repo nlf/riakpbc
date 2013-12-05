@@ -117,11 +117,32 @@ RiakPBC.prototype._processPacket = function (chunk) {
     if (self.numBytesAwaiting > 0) {
         return;
     }
+    processAllResBuffers(self.resBuffers);
 
-    for (var i = 0, l = self.resBuffers.length; i < l; i++) {
-        packet = self.resBuffers[i];
+    function processAllResBuffers(resBuffers) {
+        resBuffers.forEach(processSingleResBuffer);
+        if (!self.task.expectMultiple || self.reply.done || mc === 'RpbErrorResp') {
+            if (err) {
+                self.reply = undefined;
+            }
+
+            var cb = self.task.callback;
+            self.task = undefined;
+            if (stream) {
+                stream.end();
+            } else {
+                cb(err, self.reply);
+            }
+            mc = undefined;
+            self.reply = {};
+            self.paused = false;
+            err = undefined;
+            self._processNext();
+        }
+    }
+
+    function processSingleResBuffer(packet) {
         mc = messageCodes['' + packet[0]];
-
         response = self.translator.decode(mc, packet.slice(1));
         if (response.content && Array.isArray(response.content)) {
             response.content.forEach(parseContent);
@@ -145,25 +166,6 @@ RiakPBC.prototype._processPacket = function (chunk) {
         else {
             self.reply = _merge(self.reply, response);
         }
-    }
-    if (!self.task.expectMultiple || self.reply.done || mc === 'RpbErrorResp') {
-        if (err) {
-            self.reply = undefined;
-        }
-
-        var cb = self.task.callback;
-        var emitter = self.task.emitter;
-        self.task = undefined;
-        if (stream) {
-            stream.end();
-        } else {
-            cb(err, self.reply);
-        }
-        mc = undefined;
-        self.reply = {};
-        self.paused = false;
-        err = undefined;
-        self._processNext();
     }
 };
 
@@ -347,9 +349,4 @@ function parseMapReduceStream(rawStream) {
     });
     rawStream.pipe(liner);
     return liner;
-}
-
-
-function parseMapRedStream() {
-
 }
