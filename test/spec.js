@@ -257,7 +257,9 @@ exports.search = function (test) {
 };
 
 exports.counters = function (test) {
+    console.log('run counters test');
     client.updateCounter({ bucket: 'test', key: 'counter', amount: 3  }, function (err, reply) {
+        console.log('update counter 1');
         if (err) {
             console.log('error updating counter');
             console.dir(err);
@@ -267,6 +269,7 @@ exports.counters = function (test) {
         }
         test.notEqual(reply, undefined);
         client.getCounter({ bucket: 'test', key: 'counter' }, function (err, reply) {
+            console.log('update counter 2');
             if (err) {
                 console.log('error getting counter');
                 console.dir(err);
@@ -280,6 +283,7 @@ exports.counters = function (test) {
             }
             test.equal(reply.value, 3);
             client.updateCounter({ bucket: 'test', key: 'counter', amount: 100, returnvalue: true }, function (err, reply) {
+                console.log('update counter 3');
                 if (err) {
                     console.log('error updating counter');
                     console.dir(err);
@@ -293,6 +297,7 @@ exports.counters = function (test) {
                 test.notEqual(reply, undefined);
                 test.equal(reply.value, 103);
                 client.updateCounter({ bucket: 'test', key: 'counter', returnvalue: true, amount: -100 }, function (err, reply) {
+                    console.log('update counter 4');
                     if (err) {
                         console.log('error updating counter');
                         console.dir(err);
