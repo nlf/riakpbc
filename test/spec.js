@@ -262,11 +262,17 @@ exports.counters = function (test) {
             console.log('error updating counter');
             console.dir(err);
         }
+        if (!reply) {
+            console.log('reply should not be undefined');
+        }
         test.notEqual(reply, undefined);
         client.getCounter({ bucket: 'test', key: 'counter' }, function (err, reply) {
             if (err) {
                 console.log('error getting counter');
                 console.dir(err);
+            }
+            if (!reply) {
+                console.log('reply should not be undefined');
             }
             test.notEqual(reply, undefined);
             if (reply.value !== 3) {
@@ -278,6 +284,9 @@ exports.counters = function (test) {
                     console.log('error updating counter');
                     console.dir(err);
                 }
+                if (!reply) {
+                    console.log('reply should not be undefined');
+                }
                 if (reply.value !== 103) {
                     console.log('invalid counter value, desired: ' + 103, ', actual: ' + reply.value);
                 }
@@ -287,6 +296,9 @@ exports.counters = function (test) {
                     if (err) {
                         console.log('error updating counter');
                         console.dir(err);
+                    }
+                    if (!reply) {
+                        console.log('reply should not be undefined');
                     }
                     if (reply.value !== 3) {
                         console.log('invalid counter value, desired: ' + 3, ', actual: ' + reply.value);
