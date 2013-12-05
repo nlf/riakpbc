@@ -234,7 +234,8 @@ describe('Client test', function () {
     });
 
     it('putLarge', function (done) {
-        this.slow('.5s');
+        this.slow('5s');
+        this.timeout('10s');
         var bucket = 'test';
         var value = {}, i;
         for (i = 0; i < 5000; i += 1) {
