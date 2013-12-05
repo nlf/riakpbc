@@ -50,6 +50,13 @@ Object.keys(messageCodes).forEach(function (key) {
     messageCodes[messageCodes[key]] = Number(key);
 });
 
+function contentMap(item) {
+    if (item.value && item.content_type) {
+        if (item.content_type.match(/^(text\/\*)|(application\/json)$/)) item.value = item.value.toString();
+    }
+    return item;
+}
+
 function RiakPBC(options) {
     var self = this;
     options = options || {};
@@ -60,99 +67,98 @@ function RiakPBC(options) {
     self.translator = protobuf.loadSchema(path.join(__dirname, './spec/riak_kv.proto'));
     self.client = new net.Socket();
     self.connected = false;
-    self.client.on('end', self.disconnect);
-    self.client.on('error', self.disconnect);
+    self.client.on('end', self.disconnect.bind(this));
+    self.client.on('error', self.disconnect.bind(this));
+    self.client.on('data', self._processPacket.bind(this));
     self.paused = false;
     self.queue = [];
-    var mc, reply = {}, resBuffers = [], numBytesAwaiting = 0;
+    self.reply = {};
+    self.resBuffers = [];
+    self.numBytesAwaiting = 0;
+}
 
-    function splitPacket(pkt) {
-        var pos = 0, len;
-        if (numBytesAwaiting > 0) {
-            len = Math.min(pkt.length, numBytesAwaiting);
-            var oldBuf = resBuffers[resBuffers.length - 1];
-            var newBuf = new Buffer(oldBuf.length + len);
-            oldBuf.copy(newBuf, 0);
-            pkt.slice(0, len).copy(newBuf, oldBuf.length);
-            resBuffers[resBuffers.length - 1] = newBuf;
-            pos = len;
-            numBytesAwaiting -= len;
-        } else {
-            resBuffers = [];
-        }
-        while (pos < pkt.length) {
-            len = butils.readInt32(pkt, pos);
-            numBytesAwaiting = len + 4 - pkt.length;
-            resBuffers.push(pkt.slice(pos + 4, Math.min(pos + len + 4, pkt.length)));
-            pos += len + 4;
-        }
+RiakPBC.prototype._splitPacket = function (pkt) {
+    var self = this;
+    var pos = 0, len;
+    if (self.numBytesAwaiting > 0) {
+        len = Math.min(pkt.length, self.numBytesAwaiting);
+        var oldBuf = self.resBuffers[self.resBuffers.length - 1];
+        var newBuf = new Buffer(oldBuf.length + len);
+        oldBuf.copy(newBuf, 0);
+        pkt.slice(0, len).copy(newBuf, oldBuf.length);
+        self.resBuffers[self.resBuffers.length - 1] = newBuf;
+        pos = len;
+        self.numBytesAwaiting -= len;
+    } else {
+        self.resBuffers = [];
+    }
+    while (pos < pkt.length) {
+        len = butils.readInt32(pkt, pos);
+        self.numBytesAwaiting = len + 4 - pkt.length;
+        self.resBuffers.push(pkt.slice(pos + 4, Math.min(pos + len + 4, pkt.length)));
+        pos += len + 4;
+    }
+};
+
+RiakPBC.prototype._processPacket = function (chunk) {
+    var self = this;
+    var err, response, packet, mc;
+
+    self._splitPacket(chunk);
+    if (self.numBytesAwaiting > 0) {
+        return;
     }
 
-    self.client.on('data', function (chunk) {
-        var err, response, packet;
+    for (var i = 0, l = self.resBuffers.length; i < l; i++) {
+        packet = self.resBuffers[i];
+        mc = messageCodes['' + packet[0]];
 
-        splitPacket(chunk);
-        if (numBytesAwaiting > 0) {
-            return;
+        response = self.translator.decode(mc, packet.slice(1));
+        if (response.content && Array.isArray(response.content)) response.content.map(contentMap);
+
+        if (response.errmsg) {
+            err = new Error(response.errmsg);
+            err.code = response.errcode;
         }
 
-        for (var i = 0, l = resBuffers.length; i < l; i++) {
-            packet = resBuffers[i];
-            mc = messageCodes['' + packet[0]];
-
-            response = self.translator.decode(mc, packet.slice(1));
-            if (response.content && Array.isArray(response.content)) {
-                response.content.map(function (item) {
-                    if (item.value && item.content_type) {
-                        if (item.content_type.match(/^(text\/\*)|(application\/json)$/)) item.value = item.value.toString();
-                    }
-                    return item;
-                });
-            }
-
-            if (response.errmsg) {
-                err = new Error(response.errmsg);
-                err.code = response.errcode;
-            }
-
-            if (self.task.emitter && !response.done) {
-                if (err) response = undefined;
-                self.task.emitter.emit('data', err, response);
-            }
-
-            reply = _merge(reply, response);
+        if (self.task.emitter && !response.done) {
+            if (err) response = undefined;
+            self.task.emitter.emit('data', err, response);
         }
 
-        if (!self.task.expectMultiple || reply.done || mc === 'RpbErrorResp') {
-            if (err) reply = undefined;
+        self.reply = _merge(self.reply, response);
+    }
 
-            var cb = self.task.callback;
-            var emitter = self.task.emitter;
-            self.task = undefined;
-            if (emitter) {
-                emitter.emit('end', err, response);
-            } else {
-                cb(err, reply);
-            }
-            mc = undefined;
-            reply = {};
-            self.paused = false;
-            err = undefined;
-            nextTick(self.processNext);
-        }
-    });
+    if (!self.task.expectMultiple || self.reply.done || mc === 'RpbErrorResp') {
+        if (err) self.reply = undefined;
 
-    self.processNext = function () {
-        if (self.queue.length && !self.paused) {
-            self.paused = true;
-            self.connect(function (err) {
-                self.task = self.queue.shift();
-                if (err) return self.task.callback(err);
-                self.client.write(self.task.message);
-            });
+        var cb = self.task.callback;
+        var emitter = self.task.emitter;
+        self.task = undefined;
+        if (emitter) {
+            emitter.emit('end', err, response);
+        } else {
+            cb(err, self.reply);
         }
-    };
-}
+        mc = undefined;
+        self.reply = {};
+        self.paused = false;
+        err = undefined;
+        self._processNext();
+    }
+};
+
+RiakPBC.prototype._processNext = function () {
+    var self = this;
+    if (self.queue.length && !self.paused) {
+        self.paused = true;
+        self.connect(function (err) {
+            self.task = self.queue.shift();
+            if (err) return self.task.callback(err);
+            self.client.write(self.task.message);
+        });
+    }
+};
 
 function _merge(obj1, obj2) {
     var obj = {};
@@ -192,7 +198,7 @@ RiakPBC.prototype.makeRequest = function (type, data, callback, expectMultiple, 
     butils.writeInt(message, messageCodes[type], 4);
     message = message.concat(buffer);
     self.queue.push({ message: new Buffer(message), callback: callback, expectMultiple: expectMultiple, emitter: emitter });
-    nextTick(self.processNext);
+    self._processNext();
     return emitter;
 };
 
