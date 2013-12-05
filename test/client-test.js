@@ -7,7 +7,6 @@ var q = require('q');
 var client = riakpbc.createClient();
 var sinon = require('sinon');
 var async = require('async');
-
 var savedKeys = {};
 
 describe('Client test', function () {
