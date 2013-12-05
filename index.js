@@ -305,6 +305,7 @@ RiakPBC.prototype.mapred = function (params, streaming, callback) {
     var stream, requestOpts, parsedStream;
 
     function cb(err, reply) {
+        delete reply.done;
         var phaseKeys = Object.keys(reply);
         var rows = [];
         var phase;
@@ -313,14 +314,11 @@ RiakPBC.prototype.mapred = function (params, streaming, callback) {
             return callback(err);
         }
 
-        delete reply.done;
         phaseKeys.forEach(function (key) {
             phase = reply[key];
-            if (phase) {
-                phase.forEach(function (row) {
-                    rows.push(row);
-                });
-            }
+            phase.forEach(function (row) {
+                rows.push(row);
+            });
         });
         callback(null, rows);
     }
