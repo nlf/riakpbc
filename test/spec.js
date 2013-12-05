@@ -256,22 +256,41 @@ exports.search = function (test) {
     });
 };
 
-
 exports.counters = function (test) {
-    var msg = 'error updating counter';
     client.updateCounter({ bucket: 'test', key: 'counter', amount: 3  }, function (err, reply) {
-        expect(err, msg).to.not.exist;
+        if (err) {
+            console.log('error updating counter');
+            console.dir(err);
+        }
         test.notEqual(reply, undefined);
         client.getCounter({ bucket: 'test', key: 'counter' }, function (err, reply) {
-            expect(err, msg).to.not.exist;
+            if (err) {
+                console.log('error getting counter');
+                console.dir(err);
+            }
             test.notEqual(reply, undefined);
+            if (reply.value !== 3) {
+                console.log('invalid counter value, desired: ' + 3, ', actual: ' + reply.value);
+            }
             test.equal(reply.value, 3);
             client.updateCounter({ bucket: 'test', key: 'counter', amount: 100, returnvalue: true }, function (err, reply) {
-                expect(err, msg).to.not.exist;
+                if (err) {
+                    console.log('error updating counter');
+                    console.dir(err);
+                }
+                if (reply.value !== 103) {
+                    console.log('invalid counter value, desired: ' + 103, ', actual: ' + reply.value);
+                }
                 test.notEqual(reply, undefined);
                 test.equal(reply.value, 103);
                 client.updateCounter({ bucket: 'test', key: 'counter', returnvalue: true, amount: -100 }, function (err, reply) {
-                    expect(err, msg).to.not.exist;
+                    if (err) {
+                        console.log('error updating counter');
+                        console.dir(err);
+                    }
+                    if (reply.value !== 3) {
+                        console.log('invalid counter value, desired: ' + 3, ', actual: ' + reply.value);
+                    }
                     test.notEqual(reply, undefined);
                     test.equal(reply.value, 3);
                     test.done();
@@ -358,7 +377,7 @@ exports.del = function (test) {
     // Uncomment the next line and the disconnect line below
     // for cleanup of failed tests.
     //
-    //var client = require('../index').createClient();
+    var client = require('../index').createClient();
 
     client.del({ bucket: 'test', key: 'test' }, function (err, reply) {
         test.equal(err, undefined);
@@ -370,7 +389,7 @@ exports.del = function (test) {
                     test.equal(err, undefined);
                     client.del({ bucket: 'test', key: 'counter' }, function (err, reply) {
                         test.equal(err, undefined);
-                        //client.disconnect();
+                        client.disconnect();
                         test.done();
                     });
                 });
