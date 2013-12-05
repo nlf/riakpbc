@@ -1,13 +1,20 @@
 {
-    "asi": false,
+    "asi": true,
     "expr": true,
     "loopfunc": true,
     "curly": false,
     "evil": true,
     "white": true,
     "undef": true,
+    "indent": 2,
     "browser": true,
     "maxparams": 8,
     "curly": true,
-    "node": true
+    "node": true,
+    "globals": {
+      "it": true,
+      "describe": true,
+      "before": true,
+      "after": true
+    }
 }
