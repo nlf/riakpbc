@@ -4,7 +4,7 @@ var net = require('net'),
     util = require('util'),
     EventEmitter = require('events').EventEmitter,
     path = require('path'),
-    setImmediate = setImmediate || process.nextTick;
+    nextTick = setImmediate || process.nextTick;
 
 
 var messageCodes = {
@@ -139,7 +139,7 @@ function RiakPBC(options) {
             reply = {};
             self.paused = false;
             err = undefined;
-            setImmediate(self.processNext);
+            nextTick(self.processNext);
         }
     });
 
@@ -187,7 +187,7 @@ RiakPBC.prototype.makeRequest = function (type, data, callback, expectMultiple, 
     butils.writeInt(message, messageCodes[type], 4);
     message = message.concat(buffer);
     self.queue.push({ message: new Buffer(message), callback: callback, expectMultiple: expectMultiple, emitter: emitter });
-    setImmediate(self.processNext);
+    nextTick(self.processNext);
 };
 
 RiakPBC.prototype.getBuckets = function (callback) {
