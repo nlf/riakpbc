@@ -8,5 +8,6 @@
     "undef": true,
     "browser": true,
     "maxparams": 8,
+    "curly": true,
     "node": true
 }
