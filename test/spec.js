@@ -1,5 +1,6 @@
 var riakpbc = require('../index'),
     expect = require('chai').expect,
+    q = require('q'),
     client = riakpbc.createClient(),
     sinon = require('sinon'),
     async = require('async');
@@ -257,64 +258,62 @@ exports.search = function (test) {
 };
 
 exports.counters = function (test) {
-    console.log('run counters test');
-    client.updateCounter({ bucket: 'test', key: 'counter', amount: 3  }, function (err, reply) {
-        console.log('update counter 1');
-        if (err) {
-            console.log('error updating counter');
-            console.dir(err);
-        }
-        if (!reply) {
-            console.log('reply should not be undefined');
-        }
-        test.notEqual(reply, undefined);
-        client.getCounter({ bucket: 'test', key: 'counter' }, function (err, reply) {
-            console.log('update counter 2');
-            if (err) {
-                console.log('error getting counter');
-                console.dir(err);
-            }
-            if (!reply) {
-                console.log('reply should not be undefined');
-            }
-            test.notEqual(reply, undefined);
-            if (reply.value !== 3) {
-                console.log('invalid counter value, desired: ' + 3, ', actual: ' + reply.value);
-            }
-            test.equal(reply.value, 3);
-            client.updateCounter({ bucket: 'test', key: 'counter', amount: 100, returnvalue: true }, function (err, reply) {
-                console.log('update counter 3');
-                if (err) {
-                    console.log('error updating counter');
-                    console.dir(err);
-                }
-                if (!reply) {
-                    console.log('reply should not be undefined');
-                }
-                if (reply.value !== 103) {
-                    console.log('invalid counter value, desired: ' + 103, ', actual: ' + reply.value);
-                }
-                test.notEqual(reply, undefined);
-                test.equal(reply.value, 103);
-                client.updateCounter({ bucket: 'test', key: 'counter', returnvalue: true, amount: -100 }, function (err, reply) {
-                    console.log('update counter 4');
-                    if (err) {
-                        console.log('error updating counter');
-                        console.dir(err);
-                    }
-                    if (!reply) {
-                        console.log('reply should not be undefined');
-                    }
-                    if (reply.value !== 3) {
-                        console.log('invalid counter value, desired: ' + 3, ', actual: ' + reply.value);
-                    }
-                    test.notEqual(reply, undefined);
-                    test.equal(reply.value, 3);
-                    test.done();
-                });
-            });
-        });
-    });
+    var currentValue = 3;
+    var setOpts = {
+        bucket: 'test',
+        key: 'counter',
+        amount: currentValue
+    };
+    var getOpts = {
+        bucket: 'test',
+        key: 'counter'
+    };
+    var promise;
+    try {
+        promise = q.ninvoke(client, 'updateCounter', setOpts);
+    }
+    catch (err) {
+        failHandler(err);
+    }
+    promise.then(function (reply) {
+        expect(reply).to.exist;
+    })
+    .then(function () {
+        var promise = q.ninvoke(client, 'getCounter', getOpts);
+        return promise;
+    })
+    .then(function (reply) {
+        expect(reply).to.exist;
+        expect(reply.value).to.equal(currentValue);
+    })
+    .then(function () {
+        setOpts.amount = 100;
+        setOpts.returnvalue = true;
+        currentValue += setOpts.amount;
+        var promise = q.ninvoke(client, 'updateCounter', setOpts);
+        return promise;
+    })
+    .then(function (reply) {
+        expect(reply.value).to.equal(currentValue);
+    })
+    .then(function () {
+        setOpts.amount = -100;
+        currentValue += setOpts.amount;
+        var promise = q.ninvoke(client, 'updateCounter', setOpts);
+        return promise;
+    })
+    .then(function (reply) {
+        expect(reply.value).to.equal(currentValue);
+    })
+    .then(function () {
+        test.done();
+    }).fail(failHandler).done();
+
+    function failHandler(err) {
+        console.log('counter test err');
+        console.dir(err);
+        throw err;
+    }
 };
 
 exports.secondaryIndexPaging = function (test) {

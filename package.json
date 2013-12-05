@@ -12,7 +12,8 @@
     "nodeunit": "",
     "async": "~0.2.9",
     "sinon": "~1.7.3",
-    "chai": "~1.8.1"
+    "chai": "~1.8.1",
+    "q": "~0.9.7"
   },
   "scripts": {
     "test": "node test"
