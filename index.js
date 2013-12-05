@@ -90,7 +90,8 @@ function RiakPBC(options) {
     }
 
     self.client.on('data', function (chunk) {
-        var err;
+        var err, response, packet;
+
         splitPacket(chunk);
         if (numBytesAwaiting > 0) {
             return;
@@ -100,7 +101,7 @@ function RiakPBC(options) {
             packet = resBuffers[i];
             mc = messageCodes['' + packet[0]];
 
-            var response = self.translator.decode(mc, packet.slice(1));
+            response = self.translator.decode(mc, packet.slice(1));
             if (response.content && Array.isArray(response.content)) {
                 response.content.map(function (item) {
                     if (item.value && item.content_type) {
