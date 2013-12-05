@@ -1,11 +1,10 @@
-var inspect = require('eyespect').inspector();
-var net = require('net'),
-    Stream = require('stream'),
-    protobuf = require('protobuf.js'),
-    butils = require('butils'),
-    through = require('through'),
-    path = require('path'),
-    _merge = require('./lib/merge');
+var net = require('net');
+var Stream = require('stream');
+var protobuf = require('protobuf.js');
+var butils = require('butils');
+var through = require('through');
+var path = require('path');
+var _merge = require('./lib/merge');
 var parseContent = require('./lib/parse-content');
 
 var messageCodes = {
@@ -75,7 +74,9 @@ function RiakPBC(options) {
 
 RiakPBC.prototype._splitPacket = function (pkt) {
     var self = this;
-    var pos = 0, len;
+    var pos = 0;
+    var len;
+
     if (self.numBytesAwaiting > 0) {
         len = Math.min(pkt.length, self.numBytesAwaiting);
         var oldBuf = self.resBuffers[self.resBuffers.length - 1];
@@ -88,6 +89,7 @@ RiakPBC.prototype._splitPacket = function (pkt) {
     } else {
         self.resBuffers = [];
     }
+
     while (pos < pkt.length) {
         len = butils.readInt32(pkt, pos);
         self.numBytesAwaiting = len + 4 - pkt.length;
@@ -98,6 +100,7 @@ RiakPBC.prototype._splitPacket = function (pkt) {
 
 RiakPBC.prototype._processPacket = function (chunk) {
     var self = this;
+
     self._splitPacket(chunk);
     if (self.numBytesAwaiting > 0) {
         return;
@@ -108,16 +111,20 @@ RiakPBC.prototype._processPacket = function (chunk) {
 function processAllResBuffers(resBuffers) {
     var self = this;
     var stream = self.task.stream;
-    var mc, err;
+    var mc, err, cb;
+
     resBuffers.forEach(processSingleResBuffer);
+
     if (!self.task.expectMultiple || self.reply.done || mc === 'RpbErrorResp') {
-        var cb = self.task.callback;
+        cb = self.task.callback;
         self.task = undefined;
+
         if (stream) {
             stream.end();
         } else {
             cb(err, self.reply);
         }
+
         mc = undefined;
         self.reply = {};
         self.paused = false;
@@ -126,6 +133,7 @@ function processAllResBuffers(resBuffers) {
 
     function processSingleResBuffer(packet) {
         var response;
+
         mc = messageCodes['' + packet[0]];
         response = self.translator.decode(mc, packet.slice(1));
         if (response.content && Array.isArray(response.content)) {
@@ -144,6 +152,7 @@ function processAllResBuffers(resBuffers) {
         if (stream && !response.done) {
             stream.write(response);
         }
+
         if (stream) {
             self.reply = response;
         } else {
@@ -154,13 +163,16 @@ function processAllResBuffers(resBuffers) {
 
 RiakPBC.prototype._processNext = function () {
     var self = this;
+
     if (self.queue.length && !self.paused) {
         self.paused = true;
         self.connect(function (err) {
             self.task = self.queue.shift();
+
             if (err) {
                 return self.task.callback(err);
             }
+
             self.client.write(self.task.message);
         });
     }
@@ -176,15 +188,16 @@ RiakPBC.prototype.makeRequest = function (opts) {
     var expectMultiple = opts.expectMultiple;
     var buffer = this.translator.encode(type, params);
     var message = [];
-    var stream;
+    var stream, queueOpts;
 
     if (streaming) {
         stream = writableStream();
     }
+
     butils.writeInt32(message, buffer.length + 1);
     butils.writeInt(message, messageCodes[type], 4);
     message = message.concat(buffer);
-    var queueOpts = {
+    queueOpts = {
         message: new Buffer(message),
         callback: callback,
         expectMultiple: expectMultiple,
@@ -201,6 +214,7 @@ RiakPBC.prototype.getBuckets = function (callback) {
         params: null,
         callback: callback
     };
+
     return this.makeRequest(opts);
 };
 
@@ -210,6 +224,7 @@ RiakPBC.prototype.getBucket = function (params, callback) {
         params: params,
         callback: callback
     };
+
     return this.makeRequest(opts);
 };
 
@@ -219,6 +234,7 @@ RiakPBC.prototype.setBucket = function (params, callback) {
         params: params,
         callback: callback
     };
+
     return this.makeRequest(opts);
 };
 
@@ -228,6 +244,7 @@ RiakPBC.prototype.resetBucket = function (params, callback) {
         params: params,
         callback: callback
     };
+
     return this.makeRequest(opts);
 };
 
@@ -236,6 +253,8 @@ RiakPBC.prototype.getKeys = function (params, streaming, callback) {
         callback = streaming;
         streaming = false;
     }
+
+    var stream;
     var opts = {
         type: 'RpbListKeysReq',
         params: params,
@@ -243,11 +262,12 @@ RiakPBC.prototype.getKeys = function (params, streaming, callback) {
         callback: callback,
         streaming: streaming
     };
+
     if (!streaming) {
         this.makeRequest(opts);
         return;
     }
-    var stream = this.makeRequest(opts);
+    stream = this.makeRequest(opts);
     return stream;
 };
 
@@ -257,6 +277,7 @@ RiakPBC.prototype.put = function (params, callback) {
         params: params,
         callback: callback
     };
+
     return this.makeRequest(opts);
 };
 
@@ -266,6 +287,7 @@ RiakPBC.prototype.get = function (params, callback) {
         params: params,
         callback: callback
     };
+
     return this.makeRequest(opts);
 };
 
@@ -275,44 +297,53 @@ RiakPBC.prototype.del = function (params, callback) {
         params: params,
         callback: callback
     };
+
     return this.makeRequest(opts);
 };
 
 RiakPBC.prototype.mapred = function (params, streaming, callback) {
+    var stream, requestOpts, parsedStream;
+
     function cb(err, reply) {
-        if (err) {
-            return callback(err);
-        }
         delete reply.done;
         var phaseKeys = Object.keys(reply);
         var rows = [];
+        var phase;
+
+        if (err) {
+            return callback(err);
+        }
+
         phaseKeys.forEach(function (key) {
-            var phase = reply[key];
+            phase = reply[key];
             phase.forEach(function (row) {
                 rows.push(row);
             });
         });
         callback(null, rows);
     }
+
     if (typeof streaming === 'function') {
         callback = streaming;
         streaming = false;
     }
-    var requestOpts = {
+
+    requestOpts = {
         type: 'RpbMapRedReq',
         params: params,
         callback: cb,
         expectMultiple: true,
         streaming: streaming
     };
+
     if (!streaming) {
         this.makeRequest(requestOpts);
         return;
     }
-    var stream = this.makeRequest(requestOpts);
-    var parsedStream = parseMapReduceStream(stream);
-    return parsedStream;
 
+    stream = this.makeRequest(requestOpts);
+    parsedStream = parseMapReduceStream(stream);
+    return parsedStream;
 };
 
 
@@ -322,6 +353,7 @@ RiakPBC.prototype.getCounter = function (params, callback) {
         params: params,
         callback: callback
     };
+
     this.makeRequest(opts);
 };
 
@@ -332,29 +364,34 @@ RiakPBC.prototype.updateCounter = function (params, callback) {
         params: params,
         callback: callback
     };
+
     this.makeRequest(opts);
 };
 
 RiakPBC.prototype.getIndex = function (params, streaming, callback) {
     var expectMultiple = true;
+    var stream, opts;
+
     if (typeof streaming === 'function') {
         callback = streaming;
         streaming = false;
         expectMultiple = false;
     }
 
-    var opts = {
+    opts = {
         type: 'RpbIndexReq',
         params: params,
         streaming: streaming,
         expectMultiple: expectMultiple,
         callback: callback
     };
+
     if (!streaming) {
         this.makeRequest(opts);
         return;
     }
-    var stream = this.makeRequest(opts);
+
+    stream = this.makeRequest(opts);
     return stream;
 };
 
@@ -364,6 +401,7 @@ RiakPBC.prototype.search = function (params, callback) {
         params: params,
         callback: callback
     };
+
     this.makeRequest(opts);
 };
 
@@ -373,6 +411,7 @@ RiakPBC.prototype.getClientId = function (callback) {
         params: null,
         callback: callback
     };
+
     this.makeRequest(opts);
 };
 
@@ -382,6 +421,7 @@ RiakPBC.prototype.setClientId = function (params, callback) {
         params: params,
         callback: callback
     };
+
     this.makeRequest(opts);
 };
 
@@ -391,6 +431,7 @@ RiakPBC.prototype.getServerInfo = function (callback) {
         params: null,
         callback: callback
     };
+
     this.makeRequest(opts);
 };
 
@@ -400,6 +441,7 @@ RiakPBC.prototype.ping = function (callback) {
         params: null,
         callback: callback
     };
+
     this.makeRequest(opts);
 };
 
@@ -407,8 +449,8 @@ RiakPBC.prototype.connect = function (callback) {
     if (this.connected) {
         return callback(null);
     }
-    var self = this;
 
+    var self = this;
     var timeoutGuard = setTimeout(function () {
         callback(new Error('Connection timeout'));
     }, self.timeout);
@@ -424,8 +466,10 @@ RiakPBC.prototype.disconnect = function () {
     if (!this.connected) {
         return;
     }
+
     this.client.end();
     this.connected = false;
+
     if (this.task) {
         this.queue.unshift(this.task);
         this.task = undefined;
@@ -440,6 +484,7 @@ function writableStream() {
     var stream = through(function write(data) {
         this.queue(data);
     });
+
     return stream;
 }
 function parseMapReduceStream(rawStream) {
@@ -451,6 +496,7 @@ function parseMapReduceStream(rawStream) {
         var response = chunk.response;
         var json = JSON.parse(response);
         var self = this;
+
         json.forEach(function (row) {
             self.push(row);
         });
@@ -460,6 +506,7 @@ function parseMapReduceStream(rawStream) {
     rawStream.on('error', function (err) {
         liner.emit('error', err);
     });
+
     rawStream.pipe(liner);
     return liner;
 }
