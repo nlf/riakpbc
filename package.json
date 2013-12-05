@@ -5,12 +5,12 @@
   "main": "index.js",
   "dependencies": {
     "protobuf.js": ">=0.0.19",
-    "butils": "0.0.5"
+    "butils": "0.0.5",
+    "through": "~2.3.4"
   },
   "devDependencies": {
     "nodeunit": "",
     "async": "~0.2.9",
-    "eyespect": "~0.1.10",
     "sinon": "~1.7.3"
   },
   "scripts": {

@@ -1,7 +1,6 @@
 var riakpbc = require('../index'),
     client = riakpbc.createClient(),
     sinon = require('sinon'),
-    inspect = require('eyespect').inspector(),
     async = require('async');
 
 exports.setClientId = function (test) {
