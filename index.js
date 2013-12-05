@@ -316,9 +316,11 @@ RiakPBC.prototype.mapred = function (params, streaming, callback) {
         delete reply.done;
         phaseKeys.forEach(function (key) {
             phase = reply[key];
-            phase.forEach(function (row) {
-                rows.push(row);
-            });
+            if (phase) {
+                phase.forEach(function (row) {
+                    rows.push(row);
+                });
+            }
         });
         callback(null, rows);
     }
