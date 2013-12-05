@@ -1,4 +1,5 @@
 var riakpbc = require('../index'),
+    expect = require('chai').expect,
     client = riakpbc.createClient(),
     sinon = require('sinon'),
     async = require('async');
@@ -257,15 +258,20 @@ exports.search = function (test) {
 
 
 exports.counters = function (test) {
+    var msg = 'error updating counter';
     client.updateCounter({ bucket: 'test', key: 'counter', amount: 3  }, function (err, reply) {
+        expect(err, msg).to.not.exist;
         test.notEqual(reply, undefined);
         client.getCounter({ bucket: 'test', key: 'counter' }, function (err, reply) {
+            expect(err, msg).to.not.exist;
             test.notEqual(reply, undefined);
             test.equal(reply.value, 3);
             client.updateCounter({ bucket: 'test', key: 'counter', amount: 100, returnvalue: true }, function (err, reply) {
+                expect(err, msg).to.not.exist;
                 test.notEqual(reply, undefined);
                 test.equal(reply.value, 103);
                 client.updateCounter({ bucket: 'test', key: 'counter', returnvalue: true, amount: -100 }, function (err, reply) {
+                    expect(err, msg).to.not.exist;
                     test.notEqual(reply, undefined);
                     test.equal(reply.value, 3);
                     test.done();
