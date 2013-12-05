@@ -177,16 +177,19 @@ function _merge(obj1, obj2) {
     return obj;
 }
 
-RiakPBC.prototype.makeRequest = function (type, data, callback, expectMultiple, emitter) {
+RiakPBC.prototype.makeRequest = function (type, data, callback, expectMultiple, streaming) {
     var self = this,
         reply = {},
         buffer = this.translator.encode(type, data),
-        message = [];
+        message = [],
+        emitter;
 
+    if (streaming) emitter = new EventEmitter();
     butils.writeInt32(message, buffer.length + 1);
     butils.writeInt(message, messageCodes[type], 4);
     message = message.concat(buffer);
     self.queue.push({ message: new Buffer(message), callback: callback, expectMultiple: expectMultiple, emitter: emitter });
+    return emitter;
     nextTick(self.processNext);
 };
 
@@ -212,13 +215,7 @@ RiakPBC.prototype.getKeys = function (params, streaming, callback) {
         streaming = false;
     }
 
-    if (streaming) {
-        var emitter = new EventEmitter();
-        this.makeRequest('RpbListKeysReq', params, callback, true, emitter);
-        return emitter;
-    } else {
-        this.makeRequest('RpbListKeysReq', params, callback, true);
-    }
+    return this.makeRequest('RpbListKeysReq', params, callback, true, streaming);
 };
 
 RiakPBC.prototype.put = function (params, callback) {
@@ -239,13 +236,7 @@ RiakPBC.prototype.mapred = function (params, streaming, callback) {
         streaming = false;
     }
 
-    if (streaming) {
-        var emitter = new EventEmitter();
-        this.makeRequest('RpbMapRedReq', params, callback, true, emitter);
-        return emitter;
-    } else {
-        this.makeRequest('RpbMapRedReq', params, callback, true);
-    }
+    return this.makeRequest('RpbMapRedReq', params, callback, true, streaming);
 };
 
 
