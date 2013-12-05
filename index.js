@@ -7,8 +7,6 @@ var net = require('net'),
     _merge = require('./lib/merge'),
     nextTick = setImmediate || process.nextTick;
 
-
-var inspect = require('eyespect').inspector();
 var messageCodes = {
     '0': 'RpbErrorResp',
     '1': 'RpbPingReq',
