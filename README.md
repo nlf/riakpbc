@@ -186,6 +186,7 @@ client.get({ bucket: 'test', key: 'the-ballad-of-john-henry' }, function (err, r
 });
 ```
 
+If the object is saved with `content-type: application/json`, then `JSON.parse` will be called as the item is fetched from riak and an actual javascript object will be returned.
 
 #### `client.put(params, callback)`
 [reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/store-object/)

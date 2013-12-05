@@ -69,7 +69,7 @@ exports.get = function (test) {
         test.equal(err, undefined);
         test.ok(Array.isArray(reply.content));
         test.equal(reply.content.length, 1);
-        test.equal(reply.content[0].value, '{"test":"data"}');
+        test.deepEqual(reply.content[0].value, {test: "data"});
         test.done();
     });
 };
@@ -94,7 +94,7 @@ exports.getLarge = function (test) {
         test.equal(err, undefined);
         test.ok(Array.isArray(reply.content));
         test.equal(reply.content.length, 1);
-        test.equal(reply.content[0].value, JSON.stringify(value));
+        test.deepEqual(reply.content[0].value, value);
         test.done();
     });
 };

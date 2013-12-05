@@ -4,8 +4,7 @@ var net = require('net'),
     butils = require('butils'),
     through = require('through'),
     path = require('path'),
-    _merge = require('./lib/merge'),
-    nextTick = setImmediate || process.nextTick;
+    _merge = require('./lib/merge');
 
 var messageCodes = {
     '0': 'RpbErrorResp',
@@ -51,9 +50,17 @@ Object.keys(messageCodes).forEach(function (key) {
     messageCodes[messageCodes[key]] = Number(key);
 });
 
-function contentMap(item) {
-    if (item.value && item.content_type) {
-        if (item.content_type.match(/^(text\/\*)|(application\/json)$/)) item.value = item.value.toString();
+function parseContent(item) {
+    if (!item.value || !item.content_type) {
+        return;
+    }
+    if (item.content_type.match(/^text\/\*/)) {
+        item.value = item.value.toString();
+        return;
+    }
+
+    if (item.content_type.toLowerCase() === 'application/json') {
+        item.value = JSON.parse(item.value.toString());
     }
     return item;
 }
@@ -116,7 +123,9 @@ RiakPBC.prototype._processPacket = function (chunk) {
         mc = messageCodes['' + packet[0]];
 
         response = self.translator.decode(mc, packet.slice(1));
-        if (response.content && Array.isArray(response.content)) response.content.map(contentMap);
+        if (response.content && Array.isArray(response.content)) {
+            response.content.forEach(parseContent);
+        }
 
         if (response.errmsg) {
             err = new Error(response.errmsg);
@@ -138,7 +147,9 @@ RiakPBC.prototype._processPacket = function (chunk) {
         }
     }
     if (!self.task.expectMultiple || self.reply.done || mc === 'RpbErrorResp') {
-        if (err) self.reply = undefined;
+        if (err) {
+            self.reply = undefined;
+        }
 
         var cb = self.task.callback;
         var emitter = self.task.emitter;
@@ -162,7 +173,9 @@ RiakPBC.prototype._processNext = function () {
         self.paused = true;
         self.connect(function (err) {
             self.task = self.queue.shift();
-            if (err) return self.task.callback(err);
+            if (err) {
+                return self.task.callback(err);
+            }
             self.client.write(self.task.message);
         });
     }
@@ -276,7 +289,9 @@ RiakPBC.prototype.ping = function (callback) {
 };
 
 RiakPBC.prototype.connect = function (callback) {
-    if (this.connected) return callback(null);
+    if (this.connected) {
+        return callback(null);
+    }
     var self = this;
 
     var timeoutGuard = setTimeout(function () {
@@ -291,7 +306,9 @@ RiakPBC.prototype.connect = function (callback) {
 };
 
 RiakPBC.prototype.disconnect = function () {
-    if (!this.connected) return;
+    if (!this.connected) {
+        return;
+    }
     this.client.end();
     this.connected = false;
     if (this.task) {
