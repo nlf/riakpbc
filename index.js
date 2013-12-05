@@ -184,6 +184,11 @@ RiakPBC.prototype.makeRequest = function (type, data, callback, expectMultiple, 
         message = [],
         emitter;
 
+    if (typeof streaming === 'function') {
+        callback = streaming;
+        streaming = false;
+    }
+
     if (streaming) emitter = new EventEmitter();
     butils.writeInt32(message, buffer.length + 1);
     butils.writeInt(message, messageCodes[type], 4);
@@ -210,11 +215,6 @@ RiakPBC.prototype.resetBucket = function (params, callback) {
 };
 
 RiakPBC.prototype.getKeys = function (params, streaming, callback) {
-    if (typeof streaming === 'function') {
-        callback = streaming;
-        streaming = false;
-    }
-
     return this.makeRequest('RpbListKeysReq', params, callback, true, streaming);
 };
 
@@ -231,11 +231,6 @@ RiakPBC.prototype.del = function (params, callback) {
 };
 
 RiakPBC.prototype.mapred = function (params, streaming, callback) {
-    if (typeof streaming === 'function') {
-        callback = streaming;
-        streaming = false;
-    }
-
     return this.makeRequest('RpbMapRedReq', params, callback, true, streaming);
 };
 
