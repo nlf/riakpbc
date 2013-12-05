@@ -9,7 +9,9 @@
   },
   "devDependencies": {
     "nodeunit": "",
-    "async": "~0.2.9"
+    "async": "~0.2.9",
+    "eyespect": "~0.1.10",
+    "sinon": "~1.7.3"
   },
   "scripts": {
     "test": "node test"
@@ -26,6 +28,6 @@
   "author": "Nathan <quitlahok@gmail.com> (https://github.com/nlf)",
   "license": "MIT",
   "engines": {
-      "node": ">= 0.10.0 < 0.11"
+    "node": ">= 0.10.0 < 0.11"
   }
 }

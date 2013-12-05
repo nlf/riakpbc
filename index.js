@@ -1,11 +1,13 @@
 var net = require('net'),
+    Stream = require('stream'),
     protobuf = require('protobuf.js'),
     butils = require('butils'),
-    EventEmitter = require('events').EventEmitter,
+    through = require('through'),
     path = require('path'),
     nextTick = setImmediate || process.nextTick;
 
 
+var inspect = require('eyespect').inspector();
 var messageCodes = {
     '0': 'RpbErrorResp',
     '1': 'RpbPingReq',
@@ -102,6 +104,7 @@ RiakPBC.prototype._splitPacket = function (pkt) {
 
 RiakPBC.prototype._processPacket = function (chunk) {
     var self = this;
+    var stream = self.task.stream;
     var err, response, packet, mc;
 
     self._splitPacket(chunk);
@@ -119,24 +122,30 @@ RiakPBC.prototype._processPacket = function (chunk) {
         if (response.errmsg) {
             err = new Error(response.errmsg);
             err.code = response.errcode;
+            if (stream) {
+                stream.emit('error', err);
+                return;
+            }
         }
 
-        if (self.task.emitter && !response.done) {
-            if (err) response = undefined;
-            self.task.emitter.emit('data', err, response);
+        if (stream && !response.done) {
+            stream.write(response);
         }
-
-        self.reply = _merge(self.reply, response);
+        if (stream) {
+            self.reply = response;
+        }
+        else {
+            self.reply = _merge(self.reply, response);
+        }
     }
-
     if (!self.task.expectMultiple || self.reply.done || mc === 'RpbErrorResp') {
         if (err) self.reply = undefined;
 
         var cb = self.task.callback;
         var emitter = self.task.emitter;
         self.task = undefined;
-        if (emitter) {
-            emitter.emit('end', err, response);
+        if (stream) {
+            stream.end();
         } else {
             cb(err, self.reply);
         }
@@ -186,24 +195,26 @@ RiakPBC.prototype.makeRequest = function (type, data, callback, expectMultiple, 
     var self = this,
         buffer = this.translator.encode(type, data),
         message = [],
-        emitter;
+        stream;
 
     if (typeof streaming === 'function') {
         callback = streaming;
         streaming = false;
     }
 
-    if (streaming) emitter = new EventEmitter();
+    if (streaming) {
+        stream = writableStream();
+    }
     butils.writeInt32(message, buffer.length + 1);
     butils.writeInt(message, messageCodes[type], 4);
     message = message.concat(buffer);
-    self.queue.push({ message: new Buffer(message), callback: callback, expectMultiple: expectMultiple, emitter: emitter });
+    self.queue.push({ message: new Buffer(message), callback: callback, expectMultiple: expectMultiple, stream: stream});
     self._processNext();
-    return emitter;
+    return stream;
 };
 
 RiakPBC.prototype.getBuckets = function (callback) {
-    this.makeRequest('RpbListBucketsReq', null, callback);
+    return this.makeRequest('RpbListBucketsReq', null, callback);
 };
 
 RiakPBC.prototype.getBucket = function (params, callback) {
@@ -235,7 +246,12 @@ RiakPBC.prototype.del = function (params, callback) {
 };
 
 RiakPBC.prototype.mapred = function (params, streaming, callback) {
-    return this.makeRequest('RpbMapRedReq', params, callback, true, streaming);
+    var stream = this.makeRequest('RpbMapRedReq', params, callback, true, streaming);
+    if (!stream) {
+        return;
+    }
+    var parsedStream = parseMapReduceStream(stream);
+    return parsedStream;
 };
 
 
@@ -248,16 +264,15 @@ RiakPBC.prototype.updateCounter = function (params, callback) {
     this.makeRequest('RpbCounterUpdateReq', params, callback);
 };
 
-RiakPBC.prototype.getIndex = function (params, callback, streaming) {
+RiakPBC.prototype.getIndex = function (params, streaming, callback) {
     if (typeof streaming === 'function') {
         callback = streaming;
         streaming = false;
     }
 
     if (streaming) {
-        var emitter = new EventEmitter();
-        this.makeRequest('RpbIndexReq', params, callback, true, emitter);
-        return emitter;
+        var stream = this.makeRequest('RpbIndexReq', params, callback, true, streaming);
+        return stream;
     } else {
         this.makeRequest('RpbIndexReq', params, callback);
     }
@@ -311,3 +326,36 @@ RiakPBC.prototype.disconnect = function () {
 exports.createClient = function (options) {
     return new RiakPBC(options);
 };
+
+function writableStream() {
+    var stream = through(function write(data) {
+        this.queue(data);
+    });
+    return stream;
+}
+function parseMapReduceStream(rawStream) {
+    var liner = new Stream.Transform({
+        objectMode: true
+    });
+
+    liner._transform = function (chunk, encoding, done) {
+        var response = chunk.response;
+        var json = JSON.parse(response);
+        var self = this;
+        json.forEach(function (row) {
+            self.push(row);
+        });
+        done();
+    };
+
+    rawStream.on('error', function (err) {
+        liner.emit('error', err);
+    });
+    rawStream.pipe(liner);
+    return liner;
+}
+
+
+function parseMapRedStream() {
+
+}

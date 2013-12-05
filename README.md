@@ -300,6 +300,27 @@ and the
 doc for more details and examples.
 
 
+To stream back map reduce results specify true for the streaming parameter. This synchronously returns a readable stream with the results of the map reduce query. Errors are handled via an `error` event on the readable stream.
+
+```javascript
+var readStream = client.mapred({ request: JSON.stringify(request), content_type: 'application/json' });
+
+readStream.on('data', dataHandler);
+readStream.on('end', endHandler);
+readStream.on('error', errorHandler);
+
+function dataHandler(data) {
+  console.dir(data)
+}
+function endHandler() {
+  console.log('map reduce stream ended');
+}
+function errorHandler(err) {
+  console.log('error getting keys in a stream');
+  console.dir(err);
+}
+```
+
 #### `client.getIndex(query, [streaming], callback)`
 [reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/secondary-indexes/)
 
@@ -325,13 +346,24 @@ client.put({ bucket: '...', content: { value: '...', indexes: [{ key: 'name_bin'
 });
 ```
 
-The second form returns an event emitter that receives streamed keys:
+The second form returns a stream of received keys. Errors are handled via an `error` event on the stream.
 
 ```javascript
 var query = { bucket: 'friends', index: 'name_bin', qtype: 0, key: 'Joe' };
-client.getIndex(query, true).on('data', function (err, reply) {
+var keyStream = client.getIndex(query, true)
+
+keyStream.on('data', dataHandler)
+
+function dataHandler(reply) {
   console.log('found keys:', reply.keys);
-});
+}
+function endHandler() {
+  console.log('got all keys')
+}
+function errorHandler(err) {
+  console.log('error getting keys in a stream');
+  console.dir(err);
+}
 ```
 
 #### `client.search(params, callback)`

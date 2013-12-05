@@ -1,5 +1,7 @@
 var riakpbc = require('../index'),
     client = riakpbc.createClient(),
+    sinon = require('sinon'),
+    inspect = require('eyespect').inspector(),
     async = require('async');
 
 exports.setClientId = function (test) {
@@ -148,20 +150,26 @@ exports.getKeys = function (test) {
 
 exports.getKeysStream = function (test) {
     var streaming = true;
+    var keysFound = 0;
     var readStream = client.getKeys({ bucket: 'test' }, streaming);
-    readStream.on('data', function (err, reply) {
-        test.equal(err, undefined);
+    readStream.on('data', dataHandler);
+    readStream.on('end', endHandler);
+
+    function dataHandler(reply) {
         test.ok(Array.isArray(reply.keys));
         var len = reply.keys.length;
         reply.keys = reply.keys.filter(function (key) {
             return (key.toString() === 'test' || key.toString() === 'test-large' || key.toString() === 'test-vclock' || key.toString() === 'test-put-index');
         });
+        keysFound += len;
         test.equal(reply.keys.length, len);
-    });
+    }
 
-    readStream.on('end', function () {
+    function endHandler() {
+        test.ok(keysFound > 0, 'no keys found');
         test.done();
-    });
+    }
+
 };
 
 exports.mapred = function (test) {
@@ -197,6 +205,49 @@ exports.mapred = function (test) {
         test.done();
     });
 };
+
+exports.mapredStream = function (test) {
+    var request = {
+        inputs: [['test', 'test']],
+        query: [
+            {
+                map: {
+                    source: 'function (v) { return [[v.bucket, v.key]]; }',
+                    language: 'javascript',
+                    keep: false
+                }
+            },
+            {
+                map: {
+                    name: 'Riak.mapValuesJson',
+                    language: 'javascript',
+                    keep: true
+                }
+            }
+        ]
+    };
+    var readStream = client.mapred({ request: JSON.stringify(request), content_type: 'application/json' }, true);
+    var dataHandlerSpy = sinon.spy(dataHandler);
+    readStream.on('data', dataHandlerSpy);
+    readStream.on('end', endHandler);
+
+    function endHandler() {
+        test.equal(dataHandlerSpy.callCount, 1, 'wrong number of data events');
+        test.done();
+    }
+
+    function dataHandler(reply) {
+        test.ok(typeof reply, 'object');
+        var keys = Object.keys(reply);
+        var key = keys[0];
+        var value = reply[key];
+
+        test.equal(key, 'test');
+        test.equal(value, 'data');
+    }
+
+};
+
 
 exports.search = function (test) {
     client.search({ index: 'test', q: 'test:data' }, function (err, reply) {
