@@ -110,38 +110,34 @@ RiakPBC.prototype._splitPacket = function (pkt) {
 
 RiakPBC.prototype._processPacket = function (chunk) {
     var self = this;
-    var stream = self.task.stream;
-    var err, response, packet, mc;
-
     self._splitPacket(chunk);
     if (self.numBytesAwaiting > 0) {
         return;
     }
-    processAllResBuffers(self.resBuffers);
+    processAllResBuffers.call(self, self.resBuffers);
+};
 
-    function processAllResBuffers(resBuffers) {
-        resBuffers.forEach(processSingleResBuffer);
-        if (!self.task.expectMultiple || self.reply.done || mc === 'RpbErrorResp') {
-            if (err) {
-                self.reply = undefined;
-            }
-
-            var cb = self.task.callback;
-            self.task = undefined;
-            if (stream) {
-                stream.end();
-            } else {
-                cb(err, self.reply);
-            }
-            mc = undefined;
-            self.reply = {};
-            self.paused = false;
-            err = undefined;
-            self._processNext();
+function processAllResBuffers(resBuffers) {
+    var self = this;
+    var stream = self.task.stream;
+    var mc, err;
+    resBuffers.forEach(processSingleResBuffer);
+    if (!self.task.expectMultiple || self.reply.done || mc === 'RpbErrorResp') {
+        var cb = self.task.callback;
+        self.task = undefined;
+        if (stream) {
+            stream.end();
+        } else {
+            cb(err, self.reply);
         }
+        mc = undefined;
+        self.reply = {};
+        self.paused = false;
+        self._processNext();
     }
 
     function processSingleResBuffer(packet) {
+        var response;
         mc = messageCodes['' + packet[0]];
         response = self.translator.decode(mc, packet.slice(1));
         if (response.content && Array.isArray(response.content)) {
@@ -167,7 +163,7 @@ RiakPBC.prototype._processPacket = function (chunk) {
             self.reply = _merge(self.reply, response);
         }
     }
-};
+}
 
 RiakPBC.prototype._processNext = function () {
     var self = this;
