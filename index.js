@@ -194,8 +194,8 @@ RiakPBC.prototype.makeRequest = function (type, data, callback, expectMultiple, 
     butils.writeInt(message, messageCodes[type], 4);
     message = message.concat(buffer);
     self.queue.push({ message: new Buffer(message), callback: callback, expectMultiple: expectMultiple, emitter: emitter });
-    return emitter;
     nextTick(self.processNext);
+    return emitter;
 };
 
 RiakPBC.prototype.getBuckets = function (callback) {
