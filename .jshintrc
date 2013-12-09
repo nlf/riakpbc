@@ -1,20 +1,18 @@
 {
-    "asi": false,
-    "expr": true,
-    "loopfunc": true,
-    "curly": false,
-    "evil": true,
-    "white": true,
-    "undef": true,
-    "indent": 4,
-    "browser": true,
-    "maxparams": 8,
-    "curly": true,
-    "node": true,
-    "globals": {
-      "it": true,
-      "describe": true,
-      "before": true,
-      "after": true
-    }
+  "asi": false,
+  "expr": true,
+  "loopfunc": true,
+  "evil": true,
+  "white": true,
+  "undef": true,
+  "indent": 4,
+  "maxparams": 8,
+  "curly": true,
+  "node": true,
+  "globals": {
+    "it": true,
+    "describe": true,
+    "before": true,
+    "after": true
+  }
 }
