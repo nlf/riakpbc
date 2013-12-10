@@ -195,6 +195,33 @@ describe('Client test', function () {
             });
         });
 
+        it('getIndex streaming for binary range', function (done) {
+            var opts = {
+                bucket: bucket,
+                index: binaryIndexKey,
+                qtype: 1,
+                range_min: '!',
+                range_max: '~'
+            };
+            var streaming = true;
+            var readStream = client.getIndex(opts, streaming);
+            var dataHandlerSpy = sinon.spy(dataHandler);
+            readStream.on('data', dataHandlerSpy);
+            readStream.on('end', endHandler);
+
+            function dataHandler(reply) {
+                expect(reply).to.exist;
+                expect(reply).to.have.ownProperty('keys');
+                expect(reply.keys).to.be.an('array');
+                expect(reply.keys[0]).to.equal(keyValue);
+            }
+
+            function endHandler() {
+                expect(dataHandlerSpy.callCount).to.be.above(0);
+                done();
+            }
+        });
+
         it('getIndex for integer range', function (done) {
             var opts = {
                 bucket: bucket,
