@@ -377,6 +377,9 @@ RiakPBC.prototype.getIndex = function (params, streaming, callback) {
         streaming = false;
         expectMultiple = false;
     }
+    else {
+        params.stream = true;
+    }
 
     opts = {
         type: 'RpbIndexReq',
