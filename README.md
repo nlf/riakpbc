@@ -1,29 +1,50 @@
-[![build status](https://secure.travis-ci.org/nlf/riakpbc.png)](http://travis-ci.org/nlf/riakpbc)
-[![NPM version](https://badge.fury.io/js/riakpbc.png)](http://badge.fury.io/js/riakpbc)
-[![Dependency Status](https://gemnasium.com/natural/riakpbc.png)](https://gemnasium.com/natural/riakpbc)
-[![Code Climate](https://codeclimate.com/github/nlf/riakpbc.png)](https://codeclimate.com/github/nlf/riakpbc)
-
 # RiakPBC
 RiakPBC is a low-level [Riak 1.4](http://basho.com/riak)
 [protocol buffer](https://developers.google.com/protocol-buffers/docs/overview) client for
 [Node.js](http://nodejs.org/).  RiakPBC implements all of the API methods listed in the
 [Basho Riak Documentation](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/).
 
+[![build status](https://secure.travis-ci.org/nlf/riakpbc.png)](http://travis-ci.org/nlf/riakpbc)
+[![NPM version](https://badge.fury.io/js/riakpbc.png)](http://badge.fury.io/js/riakpbc)
+[![Dependency Status](https://gemnasium.com/natural/riakpbc.png)](https://gemnasium.com/natural/riakpbc)
+[![Code Climate](https://codeclimate.com/github/nlf/riakpbc.png)](https://codeclimate.com/github/nlf/riakpbc)
+
 
 ## Contents
-  * [Install](#install)
-  * [Usage](#usage)
-  * [API](#api)
-    * [Bucket Methods](#bucket-methods)
-    * [Object/Key Methods](#objectkey-methods)
-    * [Query Methods](#query-methods)
-    * [Server Methods](#server-methods)
-    * [Connection Methods](#connection-methods)
-  * [License](#license)
+
+- [RiakPBC](#riakpbc)
+  - [Contents](#contents)
+  - [Install](#install)
+  - [Usage](#usage)
+  - [API](#api)
+  - [Bucket Methods](#bucket-methods)
+    - [client.getBuckets(callback)](#clientgetbucketscallback)
+    - [client.getBucket(params, callback)](#clientgetbucketparams-callback)
+    - [client.setBucket(params, callback)](#clientsetbucketparams-callback)
+    - [client.resetBucket(params, callback)](#clientresetbucketparams-callback)
+    - [client.getKeys(params, [streaming], callback)](#clientgetkeysparams-streaming-callback)
+  - [Object/Key Methods](#objectkey-methods)
+    - [client.get(params, callback)](#clientgetparams-callback)
+    - [client.put(params, callback)](#clientputparams-callback)
+    - [client.del(params, callback)](#clientdelparams-callback)
+    - [client.updateCounter(params, callback)](#clientupdatecounterparams-callback)
+    - [client.getCounter(params, callback)](#clientgetcounterparams-callback)
+  - [Query Methods](#query-methods)
+    - [client.mapred(params, callback)](#clientmapredparams-callback)
+    - [client.getIndex(query, [streaming], callback)](#clientgetindexquery-streaming-callback)
+    - [client.search(params, callback)](#clientsearchparams-callback)
+  - [Server Methods](#server-methods)
+    - [client.ping(callback)](#clientpingcallback)
+      - [client.setClientId(params, callback)](#clientsetclientidparams-callback)
+    - [client.getClientId(callback)](#clientgetclientidcallback)
+    - [client.getServerInfo(callback)](#clientgetserverinfocallback)
+  - [Connection Methods](#connection-methods)
+    - [client.connect(callback)](#clientconnectcallback)
+    - [client.disconnect()](#clientdisconnect)
+  - [License](#license)
 
 
-<a id="install"></a>
-### Install
+## Install
 
 Installation is easy:
 ```sh
@@ -31,14 +52,13 @@ $ npm install riakpbc --save
 ```
 
 
-<a id="usage"></a>
-### Usage
+## Usage
 Make sure you've got a working Riak server and then connect to it in your
 program like this:
 
 ```javascript
-var riakpbc = require('riakpbc'),
-    client = riakpbc.createClient();
+var riakpbc = require('riakpbc');
+var client = riakpbc.createClient();
 ```
 
 You can specify host and port if your Riak server isn't local or if it's running
@@ -49,7 +69,6 @@ var client = riakpbc.createClient({host: 'riak.somewhere-else.com', port: 8086})
 ```
 
 
-<a id="api"></a>
 ## API
 
 Making requests to Riak is straight-forward.  You call methods on the client,
@@ -64,11 +83,10 @@ set of parameters .  You should also be familiar with the Riak
 [CAP Controls](http://docs.basho.com/riak/latest/dev/advanced/cap-controls/).
 
 
-<a id="bucket-methods"></a>
 ## Bucket Methods
 
 
-#### `client.getBuckets(callback)`
+### client.getBuckets(callback)
 [reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/list-buckets/)
 
 This method retrieves a list of buckets available on the server.  You shouldn't
@@ -89,7 +107,7 @@ array of bucket names, each a string:
 ```
 
 
-#### `client.getBucket(params, callback)`
+### client.getBucket(params, callback)
 [reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/get-bucket-props/)
 
 This call retrieves the properties of a bucket.  The `params` object should have
@@ -114,7 +132,7 @@ This will output something like this:
 ```
 
 
-#### `client.setBucket(params, callback)`
+### client.setBucket(params, callback)
 [reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/set-bucket-props/)
 
 This method changes the bucket properties.  Supply the bucket name via `bucket`
@@ -130,7 +148,7 @@ client.setBucket({ bucket: 'test', props: { allow_mult: true }}, function (err, 
 The callback response will be empty on success.
 
 
-#### `client.resetBucket(params, callback)`
+### client.resetBucket(params, callback)
 [reference](http://docs.basho.com/riak/latest/dev/references/http/reset-bucket-props/)
 
 This method resets the bucket properties to default values.  Supply a bucket
@@ -146,7 +164,7 @@ client.resetBucket({ bucket: 'test' }, function (err, reply) {
 The callback response will be empty on success.
 
 
-#### `client.getKeys(params, [streaming], callback)`
+### client.getKeys(params, [streaming], callback)
 [reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/list-keys/)
 
 This method retrieves keys from the specified bucket.  Don't use it in
@@ -172,10 +190,9 @@ client.getKeys({ bucket: 'test' }, true).on('data', function (err, reply) {
 ```
 
 
-<a id="objectkey-methods"></a>
 ## Object/Key Methods
 
-#### `client.get(params, callback)`
+### client.get(params, callback)
 [reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/fetch-object/)
 
 This method fetches an object from Riak.  Example:
@@ -188,14 +205,22 @@ client.get({ bucket: 'test', key: 'the-ballad-of-john-henry' }, function (err, r
 
 If the object is saved with `content-type: application/json`, then `JSON.parse` will be called as the item is fetched from riak and an actual javascript object will be returned.
 
-#### `client.put(params, callback)`
+### client.put(params, callback)
 [reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/store-object/)
 
 This method sends data to Riak for storage.  Use it like this:
 
 ```javascript
-var song = { title: 'Jockey Full of Bourbon', writer: 'Tom Waits', performer: 'Joe Bonamassa' },
-    request = { bucket: 'test', key: 'bourbon', content: { value: JSON.stringify(song), content_type: 'application/json' } };
+var song = { title: 'Jockey Full of Bourbon', writer: 'Tom Waits', performer: 'Joe Bonamassa' }
+var content = {
+  value: JSON.stringify(song),
+  content_type: 'application/json'
+}
+var request = {
+  bucket: 'test',
+  key: 'bourbon',
+  content: content
+}
 
 client.put(request, function (err, reply) {
   console.log(reply);
@@ -212,7 +237,40 @@ request or a `put` request with `return_body: true`.  You should send the
 documentation for an introduction to vector clocks.
 
 
-#### `client.del(params, callback)`
+To put with secondary indices, set the `content.indexes` to an array of secondary index key value pairs.
+
+```javascript
+var song = { title: 'Jockey Full of Bourbon', writer: 'Tom Waits', performer: 'Joe Bonamassa' }
+var genreSecondaryIndex = {
+  key: 'genre_bin',
+  value: 'rock'
+}
+var yearSecondaryIndex= {
+  key: 'year_int',
+  value: 1990
+}
+var content = {
+  value: JSON.stringify(song),
+  content_type: 'application/json',
+  indexes: [genreSecondaryIndex, yearSecondaryIndex]
+}
+var request = {
+  bucket: 'test',
+  key: 'bourbon',
+  content: content
+}
+
+client.put(request, function (err, reply) {
+  if (err) {
+    console.error(err)
+    return
+  }
+  console.dir(reply);
+});
+```
+
+
+### client.del(params, callback)
 [reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/delete-object/)
 
 This method removes a key from a bucket.  Specify the bucket and the key:
@@ -224,7 +282,7 @@ client.del({ bucket: 'test', song: 'thriller' }, function (err, reply) {
 ```
 
 
-#### `client.updateCounter(params, callback)`
+### client.updateCounter(params, callback)
 (no reference docs)
 
 This method sets or updates a counter (a nifty type of
@@ -243,7 +301,7 @@ client.updateCounter({ bucket: 'test', key: 'times-i-mispell-definitely', amount
 ```
 
 
-#### `client.getCounter(params, callback)`
+### client.getCounter(params, callback)
 (no reference docs)
 
 This method gets a counter value.  Specify the name of the bucket and key in the
@@ -256,10 +314,9 @@ client.getCounter({ bucket: 'test', key: 'times-i-mispell-definitely' }, functio
 ```
 
 
-<a id="query-methods"></a>
 ## Query Methods
 
-#### `client.mapred(params, callback)`
+### client.mapred(params, callback)
 [reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/mapreduce/)
 
 This method invokes a map reduce query on the Riak server.  The parameters to
@@ -323,7 +380,7 @@ function errorHandler(err) {
 }
 ```
 
-#### `client.getIndex(query, [streaming], callback)`
+### client.getIndex(query, [streaming], callback)
 [reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/secondary-indexes/)
 
 This method makes a secondary index query on the server.  Supply a bucket, an
@@ -351,7 +408,13 @@ client.put({ bucket: '...', content: { value: '...', indexes: [{ key: 'name_bin'
 The second form returns a stream of received keys. Errors are handled via an `error` event on the stream.
 
 ```javascript
-var query = { bucket: 'friends', index: 'name_bin', qtype: 0, key: 'Joe' };
+var query = {
+  bucket: 'friends',
+  index: 'name_bin',
+  qtype: 1,
+  range_min: '!',
+  range_max: '~'
+}
 var keyStream = client.getIndex(query, true)
 
 keyStream.on('data', dataHandler)
@@ -368,7 +431,41 @@ function errorHandler(err) {
 }
 ```
 
-#### `client.search(params, callback)`
+If you want to get both the keys and secondary index values, set `return_terms: true` in the query object
+
+```javascript
+var query = {
+  bucket: 'friends',
+  index: 'name_bin',
+  qtype: 1,
+  range_min: '!',
+  range_max: '~',
+  return_terms: true
+}
+var keyStream = client.getIndex(query, true)
+
+keyStream.on('data', dataHandler)
+
+function dataHandler(reply) {
+  var results = reply.results // results is an array of { key: keyData, value: valueData} objects
+
+  results.forEach(function(item) {
+    var key = item.key
+    var secondaryIndexValue = item.value
+    console.dir(key)
+    console.dir(value)
+  })
+}
+function endHandler() {
+  console.log('got all keys')
+}
+function errorHandler(err) {
+  console.log('error getting keys in a stream');
+  console.dir(err);
+}
+```
+
+### client.search(params, callback)
 [reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/search/)
 
 This method sends a search request to the server.  Specify the index name with
@@ -381,11 +478,10 @@ client.search({ index: 'test', q: 'name:john' }, function (err, reply) {
 ```
 
 
-<a id="server-methods"></a>
 ## Server Methods
 
 
-#### `client.ping(callback)`
+### client.ping(callback)
 [reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/ping/)
 
 This method can be used to test availability of the server.  This method takes
@@ -400,7 +496,7 @@ client.ping(function (err, reply) {
 ```
 
 
-#### `client.setClientId(params, callback)`
+### client.setClientId(params, callback)
 [reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/set-client-id/)
 
 This method sets the client identifier, which helps the server resolve conflicts
@@ -408,12 +504,16 @@ and reduce vector clock bloat.
 
 ```javascript
 client.setClientId({ client_id: 'the man from uncle' }, function (err, reply) {
+  if (err) {
+    console.error(err);
+    return;
+  }
   console.log(!err);
 });
 ```
 
 
-#### `client.getClientId(callback)`
+### client.getClientId(callback)
 [reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/get-client-id/)
 
 This method gets the client identifier. This method takes no parameters, only a
@@ -421,12 +521,16 @@ callback.
 
 ```javascript
 client.getClientId(function (err, reply) {
+  if (err) {
+    console.error(err);
+    return;
+  }
   console.log(reply);
 });
 ```
 
 
-#### `client.getServerInfo(callback)`
+### client.getServerInfo(callback)
 [reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/server-info/)
 
 This method gets the node name and software version from the server. This method
@@ -434,30 +538,36 @@ takes no parameters, only a callback.
 
 ```javascript
 client.getServerInfo(function (err, reply) {
+  if (err) {
+    console.error(err);
+    return;
+  }
   console.log('node:', reply.node);
   console.log('server version:', reply.server_version);
 });
 ```
 
-<a id="connection-methods"></a>
 ## Connection Methods
 
-#### `client.connect(callback)`
+### client.connect(callback)
 
 This method connects the client to the server.  The callback function will be
 called when the connection is established:
 
 ```javascript
 client.connect(function (err) {
-  if (!err)
-    console.log('connected to %s on port %s', client.host, client.port);
+  if (err) {
+    console.error(err);
+    return;
+  }
+  console.log('connected to %s on port %s', client.host, client.port);
 });
 ```
 
 This method has no effect if the client is already connected.
 
 
-#### `client.disconnect()`
+### client.disconnect()
 
 This method disconnects the client from the server.  It takes no parameters and
 returns no value.  If the client is not connected, this method has no effect.
@@ -467,8 +577,7 @@ client.disconnect();
 ```
 
 
-<a id="license"></a>
-### License
+## License
 
 [The MIT License (MIT)](http://opensource.org/licenses/MIT)
 
