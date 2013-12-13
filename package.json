@@ -16,7 +16,8 @@
     "q": "~0.9.7",
     "mocha": "~1.15.1",
     "eyespect": "~0.1.10",
-    "precommit-hook": "~0.3.8"
+    "precommit-hook": "~0.3.8",
+    "lodash-node": "~2.4.1"
   },
   "scripts": {
     "test": "make test"
