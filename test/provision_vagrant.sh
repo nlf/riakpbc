@@ -41,9 +41,5 @@ function install_node {
   exit 1
 }
 
-function npm_rebuild {
-  su -c "cd /vagrant && npm rebuild" -s /bin/sh "vagrant"
-}
 install_from_apt "curl"
 install_node
-npm_rebuild
