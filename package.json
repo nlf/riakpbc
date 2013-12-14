@@ -1,6 +1,6 @@
 {
   "name": "riakpbc",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "RiakPBC is a low-level Riak 1.4 proto buffer client.",
   "main": "index.js",
   "dependencies": {
