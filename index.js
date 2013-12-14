@@ -170,7 +170,18 @@ RiakPBC.prototype._processNext = function () {
             self.task = self.queue.shift();
 
             if (err) {
-                return self.task.callback(err);
+                if (self.task.callback) {
+                    self.task.callback(err);
+                    return;
+                }
+                if (self.task.stream) {
+                    self.task.stream.emit('error', err);
+                    return;
+                }
+
+                // unhandled error, throw it
+                throw err;
+
             }
 
             self.client.write(self.task.message);
