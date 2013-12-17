@@ -105,18 +105,18 @@ RiakPBC.prototype._processPacket = function (chunk) {
     if (self.numBytesAwaiting > 0) {
         return;
     }
-    processAllResBuffers.call(self, self.resBuffers);
+    self._processAllResBuffers();
 };
 
-function processAllResBuffers(resBuffers) {
+RiakPBC.prototype._processAllResBuffers = function () {
     var self = this;
     var stream = self.task.stream;
-    var mc, err, cb;
+    var cb = self.task.callback;
+    var mc, err;
 
-    resBuffers.forEach(processSingleResBuffer);
+    self.resBuffers.forEach(processSingleResBuffer);
 
     if (!self.task.expectMultiple || self.reply.done || mc === 'RpbErrorResp') {
-        cb = self.task.callback;
         self.task = undefined;
 
         if (stream) {
@@ -159,7 +159,7 @@ function processAllResBuffers(resBuffers) {
             self.reply = _merge(self.reply, response);
         }
     }
-}
+};
 
 RiakPBC.prototype._processNext = function () {
     var self = this;
@@ -168,6 +168,10 @@ RiakPBC.prototype._processNext = function () {
         self.paused = true;
         self.connect(function (err) {
             self.task = self.queue.shift();
+
+            if (!self.task) {
+                return;
+            }
 
             if (err) {
                 if (self.task.callback) {
