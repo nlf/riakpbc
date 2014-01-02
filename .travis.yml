@@ -7,6 +7,7 @@ before_install:
   - 'sudo bash -c "echo deb http://apt.basho.com $(lsb_release -sc) main > /etc/apt/sources.list.d/basho.list"'
   - "sudo apt-get update"
   - "yes n | sudo apt-get install riak --force-yes"
+  - "./bin/enable-riak-search.sh"
   - "sudo service riak start"
 
 before_script:
