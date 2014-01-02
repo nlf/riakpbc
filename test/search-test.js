@@ -1,4 +1,3 @@
-
 var _ = require('lodash-node');
 var chai = require('chai');
 chai.Assertion.includeStack = true; // defaults to false
