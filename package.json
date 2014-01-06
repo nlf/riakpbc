@@ -5,7 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "protobuf.js": ">=0.0.19",
-    "butils": "0.0.5",
+    "butils": "0.0.7",
     "through": "~2.3.4"
   },
   "devDependencies": {
