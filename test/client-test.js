@@ -381,6 +381,7 @@ describe('Client test', function () {
     });
 
     it('mapred', function (done) {
+        this.slow('.5s');
         var mapOpts = {
             map: {
                 source: 'function (v) { return [[v.bucket, v.key]]; }',
@@ -467,18 +468,6 @@ describe('Client test', function () {
             expect(key).to.equal('test');
             expect(value).to.equal('data');
         }
-    });
-
-
-    it('search', function (done) {
-        client.search({
-            index: 'test',
-            q: 'test:data'
-        }, function (err, reply) {
-            expect(err).to.not.exist;
-            expect(reply).to.exist;
-            done();
-        });
     });
 
     it('counters', function (done) {
