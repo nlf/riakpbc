@@ -224,43 +224,35 @@ RiakPBC.prototype.makeRequest = function (opts) {
 };
 
 RiakPBC.prototype.getBuckets = function (callback) {
-    var opts = {
+    return this.makeRequest({
         type: 'RpbListBucketsReq',
         params: null,
         callback: callback
-    };
-
-    return this.makeRequest(opts);
+    });
 };
 
 RiakPBC.prototype.getBucket = function (params, callback) {
-    var opts = {
+    return this.makeRequest({
         type: 'RpbGetBucketReq',
         params: params,
         callback: callback
-    };
-
-    return this.makeRequest(opts);
+    });
 };
 
 RiakPBC.prototype.setBucket = function (params, callback) {
-    var opts = {
+    return this.makeRequest({
         type: 'RpbSetBucketReq',
         params: params,
         callback: callback
-    };
-
-    return this.makeRequest(opts);
+    });
 };
 
 RiakPBC.prototype.resetBucket = function (params, callback) {
-    var opts = {
+    return this.makeRequest({
         type: 'RpbResetBucketReq',
         params: params,
         callback: callback
-    };
-
-    return this.makeRequest(opts);
+    });
 };
 
 RiakPBC.prototype.getKeys = function (params, streaming, callback) {
@@ -287,33 +279,27 @@ RiakPBC.prototype.getKeys = function (params, streaming, callback) {
 };
 
 RiakPBC.prototype.put = function (params, callback) {
-    var opts = {
+    return this.makeRequest({
         type: 'RpbPutReq',
         params: params,
         callback: callback
-    };
-
-    return this.makeRequest(opts);
+    });
 };
 
 RiakPBC.prototype.get = function (params, callback) {
-    var opts = {
+    return this.makeRequest({
         type: 'RpbGetReq',
         params: params,
         callback: callback
-    };
-
-    return this.makeRequest(opts);
+    });
 };
 
 RiakPBC.prototype.del = function (params, callback) {
-    var opts = {
+    return this.makeRequest({
         type: 'RpbDelReq',
         params: params,
         callback: callback
-    };
-
-    return this.makeRequest(opts);
+    });
 };
 
 RiakPBC.prototype.mapred = function (params, streaming, callback) {
@@ -363,24 +349,20 @@ RiakPBC.prototype.mapred = function (params, streaming, callback) {
 
 
 RiakPBC.prototype.getCounter = function (params, callback) {
-    var opts = {
+    return this.makeRequest({
         type: 'RpbCounterGetReq',
         params: params,
         callback: callback
-    };
-
-    this.makeRequest(opts);
+    });
 };
 
 
 RiakPBC.prototype.updateCounter = function (params, callback) {
-    var opts = {
+    return this.makeRequest({
         type: 'RpbCounterUpdateReq',
         params: params,
         callback: callback
-    };
-
-    this.makeRequest(opts);
+    });
 };
 
 RiakPBC.prototype.getIndex = function (params, streaming, callback) {
@@ -414,53 +396,43 @@ RiakPBC.prototype.getIndex = function (params, streaming, callback) {
 };
 
 RiakPBC.prototype.search = function (params, callback) {
-    var opts = {
+    return this.makeRequest({
         type: 'RpbSearchQueryReq',
         params: params,
         callback: callback
-    };
-
-    this.makeRequest(opts);
+    });
 };
 
 RiakPBC.prototype.getClientId = function (callback) {
-    var opts = {
+    return this.makeRequest({
         type: 'RpbGetClientIdReq',
         params: null,
         callback: callback
-    };
-
-    this.makeRequest(opts);
+    });
 };
 
 RiakPBC.prototype.setClientId = function (params, callback) {
-    var opts = {
+    return this.makeRequest({
         type: 'RpbSetClientIdReq',
         params: params,
         callback: callback
-    };
-
-    this.makeRequest(opts);
+    });
 };
 
 RiakPBC.prototype.getServerInfo = function (callback) {
-    var opts = {
+    return this.makeRequest({
         type: 'RpbGetServerInfoReq',
         params: null,
         callback: callback
-    };
-
-    this.makeRequest(opts);
+    });
 };
 
 RiakPBC.prototype.ping = function (callback) {
-    var opts = {
+    return this.makeRequest({
         type: 'RpbPingReq',
         params: null,
         callback: callback
-    };
-
-    this.makeRequest(opts);
+    });
 };
 
 RiakPBC.prototype.connect = function (callback) {
