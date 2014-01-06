@@ -261,21 +261,13 @@ RiakPBC.prototype.getKeys = function (params, streaming, callback) {
         streaming = false;
     }
 
-    var stream;
-    var opts = {
+    return this.makeRequest({
         type: 'RpbListKeysReq',
         params: params,
         expectMultiple: true,
         callback: callback,
         streaming: streaming
-    };
-
-    if (!streaming) {
-        this.makeRequest(opts);
-        return;
-    }
-    stream = this.makeRequest(opts);
-    return stream;
+    });
 };
 
 RiakPBC.prototype.put = function (params, callback) {
@@ -303,17 +295,17 @@ RiakPBC.prototype.del = function (params, callback) {
 };
 
 RiakPBC.prototype.mapred = function (params, streaming, callback) {
-    var stream, requestOpts, parsedStream;
+    var stream;
 
     function cb(err, reply) {
+        if (err) {
+            return callback(err);
+        }
+
         delete reply.done;
         var phaseKeys = Object.keys(reply);
         var rows = [];
         var phase;
-
-        if (err) {
-            return callback(err);
-        }
 
         phaseKeys.forEach(function (key) {
             phase = reply[key];
@@ -321,6 +313,7 @@ RiakPBC.prototype.mapred = function (params, streaming, callback) {
                 rows.push(row);
             });
         });
+
         callback(null, rows);
     }
 
@@ -329,22 +322,15 @@ RiakPBC.prototype.mapred = function (params, streaming, callback) {
         streaming = false;
     }
 
-    requestOpts = {
+    stream = this.makeRequest({
         type: 'RpbMapRedReq',
         params: params,
         callback: cb,
         expectMultiple: true,
         streaming: streaming
-    };
+    });
 
-    if (!streaming) {
-        this.makeRequest(requestOpts);
-        return;
-    }
-
-    stream = this.makeRequest(requestOpts);
-    parsedStream = parseMapReduceStream(stream);
-    return parsedStream;
+    return streaming ? parseMapReduceStream(stream) : stream;
 };
 
 
@@ -367,32 +353,22 @@ RiakPBC.prototype.updateCounter = function (params, callback) {
 
 RiakPBC.prototype.getIndex = function (params, streaming, callback) {
     var expectMultiple = true;
-    var stream, opts;
 
     if (typeof streaming === 'function') {
         callback = streaming;
         streaming = false;
         expectMultiple = false;
-    }
-    else {
+    } else {
         params.stream = true;
     }
 
-    opts = {
+    return this.makeRequest({
         type: 'RpbIndexReq',
         params: params,
         streaming: streaming,
         expectMultiple: expectMultiple,
         callback: callback
-    };
-
-    if (!streaming) {
-        this.makeRequest(opts);
-        return;
-    }
-
-    stream = this.makeRequest(opts);
-    return stream;
+    });
 };
 
 RiakPBC.prototype.search = function (params, callback) {
