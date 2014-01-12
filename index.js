@@ -137,11 +137,6 @@ RiakPBC.prototype._processAllResBuffers = function () {
 
         mc = messageCodes['' + packet[0]];
 
-        if (!riakproto.messages[mc] && messageCodes[mc]) {
-            self.reply = { done: true };
-            return;
-        }
-
         response = self.translator.decode(mc, packet.slice(1));
         if (response) {
             response = parseResponse(response);
