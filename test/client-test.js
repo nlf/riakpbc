@@ -497,7 +497,7 @@ describe('Client test', function () {
             return promise;
         }).then(function (reply) {
             expect(reply).to.exist;
-            expect(reply.value).to.equal(currentValue);
+            expect(reply.value.toNumber()).to.equal(currentValue);
         }).then(function () {
             setOpts.amount = 100;
             setOpts.returnvalue = true;
@@ -505,14 +505,14 @@ describe('Client test', function () {
             var promise = q.ninvoke(client, 'updateCounter', setOpts);
             return promise;
         }).then(function (reply) {
-            expect(reply.value).to.equal(currentValue);
+            expect(reply.value.toNumber()).to.equal(currentValue);
         }).then(function () {
             setOpts.amount = -100;
             currentValue += setOpts.amount;
             var promise = q.ninvoke(client, 'updateCounter', setOpts);
             return promise;
         }).then(function (reply) {
-            expect(reply.value).to.equal(currentValue);
+            expect(reply.value.toNumber()).to.equal(currentValue);
         }).then(function () {
             done();
         }).fail(failHandler).done();
@@ -610,8 +610,8 @@ describe('Client test', function () {
             var request = {
                 bucket: bucket,
                 key: key,
-                content_type: 'application/json',
                 content: {
+                    content_type: 'application/json',
                     value: JSON.stringify(payload),
                     indexes: indexes
                 }

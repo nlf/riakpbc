@@ -1,11 +1,12 @@
 var net = require('net');
 var Stream = require('stream');
 var protobuf = require('protobuf.js');
+var riakproto = require('riakproto');
 var butils = require('butils');
 var through = require('through');
 var path = require('path');
 var _merge = require('./lib/merge');
-var parseContent = require('./lib/parse-content');
+var parseResponse = require('./lib/parse-response');
 
 var messageCodes = {
     '0': 'RpbErrorResp',
@@ -59,7 +60,7 @@ function RiakPBC(options) {
     self.port = options.port || 8087;
     self.timeout = options.timeout || 1000;
     self.bucket = options.bucket || undefined;
-    self.translator = protobuf.loadSchema(path.join(__dirname, './spec/riak_kv.proto'));
+    self.translator = new protobuf(riakproto);
     self.client = new net.Socket();
     self.connected = false;
     self.client.on('end', self.disconnect.bind(this));
@@ -135,9 +136,15 @@ RiakPBC.prototype._processAllResBuffers = function () {
         var response;
 
         mc = messageCodes['' + packet[0]];
+
+        if (!riakproto.messages[mc] && messageCodes[mc]) {
+            self.reply = { done: true };
+            return;
+        }
+
         response = self.translator.decode(mc, packet.slice(1));
-        if (response.content && Array.isArray(response.content)) {
-            response.content.forEach(parseContent);
+        if (response) {
+            response = parseResponse(response);
         }
 
         if (response.errmsg) {
@@ -201,7 +208,12 @@ RiakPBC.prototype.makeRequest = function (opts) {
     var streaming = opts.streaming;
     var callback = opts.callback;
     var expectMultiple = opts.expectMultiple;
-    var buffer = this.translator.encode(type, params);
+    var buffer;
+    if (riakproto.messages[type]) {
+        buffer = this.translator.encode(type, params);
+    } else {
+        buffer = [];
+    }
     var message = [];
     var stream, queueOpts;
 
@@ -211,7 +223,7 @@ RiakPBC.prototype.makeRequest = function (opts) {
 
     butils.writeInt32(message, buffer.length + 1);
     butils.writeInt(message, messageCodes[type], 4);
-    message = message.concat(buffer);
+    message = message.concat(Array.prototype.slice.call(buffer));
     queueOpts = {
         message: new Buffer(message),
         callback: callback,
