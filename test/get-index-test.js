@@ -39,7 +39,8 @@ describe('getIndex', function getIndexSuite() {
                 range_min: 0,
                 range_max: 999999,
                 index: indexKey,
-                bucket: bucket
+                bucket: bucket,
+                pagination_sort: true
             };
             var streaming = true;
             var numKeys = 0;
@@ -130,7 +131,8 @@ describe('getIndex', function getIndexSuite() {
                 range_min: '!',
                 range_max: '~',
                 index: indexKey,
-                bucket: bucket
+                bucket: bucket,
+                pagination_sort: true
             };
             var streaming = true;
             var numKeys = 0;
@@ -173,7 +175,8 @@ describe('getIndex', function getIndexSuite() {
                 range_max: '~',
                 index: indexKey,
                 return_terms: true,
-                bucket: bucket
+                bucket: bucket,
+                pagination_sort: true
             };
             var streaming = true;
             var numKeys = 0;
