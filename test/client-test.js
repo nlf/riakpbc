@@ -566,6 +566,15 @@ describe('Client test', function () {
         done();
     });
 
+    it('prevents reconnections', function (done) {
+        client.ping(function (err) {
+            expect(err, 'should error after disconnect').to.exist;
+            // create a new client so it will automatically connect again
+            client = riakpbc.createClient();
+            done();
+        });
+    });
+
     describe('time sensitive', function () {
         var clock;
         before(function () {

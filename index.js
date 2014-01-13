@@ -60,11 +60,12 @@ function RiakPBC(options) {
     self.port = options.port || 8087;
     self.timeout = options.timeout || 1000;
     self.bucket = options.bucket || undefined;
+    self.auto_connect = options.hasOwnProperty('auto_connect') ? options.auto_connect : true;
     self.translator = new protobuf(riakproto);
     self.client = new net.Socket();
     self.connected = false;
-    self.client.on('end', self.disconnect.bind(this));
-    self.client.on('error', self.disconnect.bind(this));
+    self.client.on('end', self.disconnect(true).bind(this));
+    self.client.on('error', self.disconnect(true).bind(this));
     self.client.on('data', self._processPacket.bind(this));
     self.paused = false;
     self.queue = [];
@@ -166,32 +167,41 @@ RiakPBC.prototype._processAllResBuffers = function () {
 RiakPBC.prototype._processNext = function () {
     var self = this;
 
-    if (self.queue.length && !self.paused) {
-        self.paused = true;
-        self.connect(function (err) {
-            self.task = self.queue.shift();
+    function runTask(err) {
+        var self = this;
 
-            if (!self.task) {
+        self.task = self.queue.shift();
+
+        if (!self.task) {
+            return;
+        }
+
+        if (!self.connected) {
+            err = err || new Error('Not connected');
+        }
+
+        if (err) {
+            if (self.task.callback) {
+                self.task.callback(err);
                 return;
             }
-
-            if (err) {
-                if (self.task.callback) {
-                    self.task.callback(err);
-                    return;
-                }
-                if (self.task.stream) {
-                    self.task.stream.emit('error', err);
-                    return;
-                }
-
-                // unhandled error, throw it
-                throw err;
-
+            if (self.task.stream) {
+                self.task.stream.emit('error', err);
+                return;
             }
+            throw err;
+        }
 
-            self.client.write(self.task.message);
-        });
+        self.client.write(self.task.message);
+    }
+
+    if (self.queue.length && !self.paused) {
+        self.paused = true;
+        if (self.auto_connect) {
+            self.connect(runTask.bind(self));
+        } else {
+            runTask.call(self);
+        }
     }
 };
 
@@ -436,16 +446,25 @@ RiakPBC.prototype.connect = function (callback) {
 };
 
 RiakPBC.prototype.disconnect = function () {
-    if (!this.connected) {
-        return;
+    function handler() {
+        if (!this.connected) {
+            return;
+        }
+
+        this.client.end();
+        this.connected = false;
+
+        if (this.task) {
+            this.queue.unshift(this.task);
+            this.task = undefined;
+        }
     }
 
-    this.client.end();
-    this.connected = false;
-
-    if (this.task) {
-        this.queue.unshift(this.task);
-        this.task = undefined;
+    if (arguments.length) {
+        return handler;
+    } else {
+        this.auto_connect = false;
+        return handler.call(this);
     }
 };
 
