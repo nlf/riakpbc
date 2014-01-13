@@ -68,6 +68,10 @@ on a different port:
 var client = riakpbc.createClient({host: 'riak.somewhere-else.com', port: 8086});
 ```
 
+There is also an ```auto_connect``` option to define if the client should automatically
+connect to the Riak server before running any commands. If the ```disconnect``` method
+is called, ```auto_connect``` will be automatically set to ```false``` to prevent
+future connections and all subsequent client calls will result in an error.
 
 ## API
 
@@ -571,6 +575,8 @@ This method has no effect if the client is already connected.
 
 This method disconnects the client from the server.  It takes no parameters and
 returns no value.  If the client is not connected, this method has no effect.
+This method also explicitly sets the ```auto_connect``` option to false to prevent
+the client reconnecting automatically.
 
 ```javascript
 client.disconnect();
