@@ -1,7 +1,6 @@
 var Stream = require('stream');
 var Protobuf = require('protobuf.js');
 var riakproto = require('riakproto');
-var through = require('through');
 var _merge = require('./lib/merge');
 var parseResponse = require('./lib/parse-response');
 var ConnectionManager = require('./lib/connection-manager');
@@ -433,16 +432,17 @@ exports.createClient = function (options) {
 };
 
 function writableStream() {
-    var stream = through(function write(data) {
-        this.queue(data);
-    });
+    var stream = new Stream.Transform({ objectMode: true });
+
+    stream._transform = function (chunk, encoding, done) {
+        this.push(chunk);
+        done();
+    };
 
     return stream;
 }
 function parseMapReduceStream(rawStream) {
-    var liner = new Stream.Transform({
-        objectMode: true
-    });
+    var liner = new Stream.Transform({ objectMode: true });
 
     liner._transform = function (chunk, encoding, done) {
         var response = chunk.response;
@@ -452,6 +452,7 @@ function parseMapReduceStream(rawStream) {
         json.forEach(function (row) {
             self.push(row);
         });
+
         done();
     };
 
