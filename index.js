@@ -2,7 +2,6 @@ var Stream = require('stream');
 var Protobuf = require('protobuf.js');
 var riakproto = require('riakproto');
 var through = require('through');
-var path = require('path');
 var _merge = require('./lib/merge');
 var parseResponse = require('./lib/parse-response');
 var ConnectionManager = require('./lib/connection-manager');
