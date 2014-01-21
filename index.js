@@ -1,7 +1,6 @@
 var Stream = require('stream');
 var Protobuf = require('protobuf.js');
 var riakproto = require('riakproto');
-var butils = require('butils');
 var through = require('through');
 var path = require('path');
 var _merge = require('./lib/merge');
@@ -93,7 +92,7 @@ RiakPBC.prototype._splitPacket = function (pkt) {
     }
 
     while (pos < pkt.length) {
-        len = butils.readInt32(pkt, pos);
+        len = pkt.readInt32BE(pos);
         self.numBytesAwaiting = len + 4 - pkt.length;
         self.resBuffers.push(pkt.slice(pos + 4, Math.min(pos + len + 4, pkt.length)));
         pos += len + 4;
@@ -201,20 +200,21 @@ RiakPBC.prototype.makeRequest = function (opts) {
     if (riakproto.messages[type]) {
         buffer = this.translator.encode(type, params);
     } else {
-        buffer = [];
+        buffer = new Buffer(0);
     }
-    var message = [];
+    var message = new Buffer(buffer.length + 5);
     var stream, queueOpts;
 
     if (streaming) {
         stream = writableStream();
     }
 
-    butils.writeInt32(message, buffer.length + 1);
-    butils.writeInt(message, messageCodes[type], 4);
-    message = message.concat(Array.prototype.slice.call(buffer));
+    message.writeInt32BE(buffer.length + 1, 0);
+    message.writeInt8(messageCodes[type], 4);
+    buffer.copy(message, 5);
+    
     queueOpts = {
-        message: new Buffer(message),
+        message: message,
         callback: callback,
         expectMultiple: expectMultiple,
         stream: stream
