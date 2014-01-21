@@ -144,36 +144,33 @@ RiakPBC.prototype._processNext = function () {
 // RiakPBC.prototype.makeRequest = function (type, data, callback, expectMultiple, streaming) {
 RiakPBC.prototype.makeRequest = function (opts) {
     var self = this;
-    var type = opts.type;
-    var params = opts.params;
-    var streaming = opts.streaming;
-    var callback = opts.callback;
-    var expectMultiple = opts.expectMultiple;
-    var buffer;
-    if (riakproto.messages[type]) {
-        buffer = this.translator.encode(type, params);
+    var buffer, message, stream;
+
+    if (riakproto.messages[opts.type]) {
+        buffer = this.translator.encode(opts.type, opts.params);
     } else {
         buffer = new Buffer(0);
     }
-    var message = new Buffer(buffer.length + 5);
-    var stream, queueOpts;
 
-    if (streaming) {
+    message = new Buffer(buffer.length + 5);
+
+    if (opts.streaming) {
         stream = writableStream();
     }
 
     message.writeInt32BE(buffer.length + 1, 0);
-    message.writeInt8(riakproto.codes[type], 4);
+    message.writeInt8(riakproto.codes[opts.type], 4);
     buffer.copy(message, 5);
     
-    queueOpts = {
+    self.queue.push({
         message: message,
-        callback: callback,
-        expectMultiple: expectMultiple,
+        callback: opts.callback,
+        expectMultiple: opts.expectMultiple,
         stream: stream
-    };
-    self.queue.push(queueOpts);
+    });
+
     self._processNext();
+
     return stream;
 };
 
