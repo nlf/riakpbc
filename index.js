@@ -393,11 +393,10 @@ function parseMapReduceStream(rawStream) {
     liner._transform = function (chunk, encoding, done) {
         var response = chunk.response;
         var json = JSON.parse(response);
-        var self = this;
 
         json.forEach(function (row) {
-            self.push(row);
-        });
+            this.push(row);
+        }.bind(this));
 
         done();
     };
