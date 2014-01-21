@@ -6,24 +6,22 @@ var parseResponse = require('./lib/parse-response');
 var ConnectionManager = require('./lib/connection-manager');
 
 function RiakPBC(options) {
-    var self = this;
-
     options = options || {};
     options.host = options.host || '127.0.0.1';
     options.port = options.port || 8087;
     options.timeout = options.timeout || 1000;
     options.auto_connect = options.hasOwnProperty('auto_connect') ? options.auto_connect : true;
 
-    self.connection = new ConnectionManager(options);
-    self.connection.receive = self._processPacket.bind(this);
+    this.connection = new ConnectionManager(options);
+    this.connection.receive = this._processPacket.bind(this);
 
-    self.translator = new Protobuf(riakproto);
+    this.translator = new Protobuf(riakproto);
 
-    self.paused = false;
-    self.queue = [];
-    self.reply = {};
-    self.resBuffers = [];
-    self.numBytesAwaiting = 0;
+    this.paused = false;
+    this.queue = [];
+    this.reply = {};
+    this.resBuffers = [];
+    this.numBytesAwaiting = 0;
 }
 
 RiakPBC.prototype._splitPacket = function (pkt) {
@@ -143,7 +141,6 @@ RiakPBC.prototype._processNext = function () {
 
 // RiakPBC.prototype.makeRequest = function (type, data, callback, expectMultiple, streaming) {
 RiakPBC.prototype.makeRequest = function (opts) {
-    var self = this;
     var buffer, message, stream;
 
     if (riakproto.messages[opts.type]) {
@@ -162,14 +159,14 @@ RiakPBC.prototype.makeRequest = function (opts) {
     message.writeInt8(riakproto.codes[opts.type], 4);
     buffer.copy(message, 5);
     
-    self.queue.push({
+    this.queue.push({
         message: message,
         callback: opts.callback,
         expectMultiple: opts.expectMultiple,
         stream: stream
     });
 
-    self._processNext();
+    this._processNext();
 
     return stream;
 };
@@ -363,20 +360,16 @@ RiakPBC.prototype.ping = function (callback) {
 };
 
 RiakPBC.prototype.connect = function (callback) {
-    var self = this;
-
-    self.connection.connect(callback);
+    this.connection.connect(callback);
 };
 
 RiakPBC.prototype.disconnect = function () {
-    var self = this;
-
-    if (self.task) {
-        self.queue.unshift(self.task);
-        self.task = undefined;
+    if (this.task) {
+        this.queue.unshift(this.task);
+        this.task = undefined;
     }
 
-    self.connection.disconnect();
+    this.connection.disconnect();
 };
 
 exports.createClient = function (options) {
@@ -393,6 +386,7 @@ function writableStream() {
 
     return stream;
 }
+
 function parseMapReduceStream(rawStream) {
     var liner = new Stream.Transform({ objectMode: true });
 
