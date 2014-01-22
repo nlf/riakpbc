@@ -39,9 +39,7 @@ RiakPBC.prototype._processMessage = function (data) {
 
             if (this.task.callback) {
                 this.task.callback(err);
-            }
-
-            if (this.task.stream.listeners('error').length) {
+            } else {
                 this.task.stream.emit('error', err);
             }
 
