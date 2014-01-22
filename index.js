@@ -20,8 +20,6 @@ function RiakPBC(options) {
     this.paused = false;
     this.queue = [];
     this.reply = {};
-    this.resBuffers = [];
-    this.numBytesAwaiting = 0;
 }
 
 RiakPBC.prototype._processMessage = function (data) {
