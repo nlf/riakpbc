@@ -203,8 +203,7 @@ describe('Client test', function () {
                 range_min: '!',
                 range_max: '~'
             };
-            var streaming = true;
-            var readStream = client.getIndex(opts, streaming);
+            var readStream = client.getIndex(opts);
             var dataHandlerSpy = sinon.spy(dataHandler);
             readStream.on('data', dataHandlerSpy);
             readStream.on('end', endHandler);
@@ -358,11 +357,10 @@ describe('Client test', function () {
 
 
     it('getKeys streaming', function (done) {
-        var streaming = true;
         var keysFound = 0;
         var readStream = client.getKeys({
             bucket: 'test'
-        }, streaming);
+        });
         readStream.on('data', dataHandler);
         readStream.on('end', endHandler);
 
@@ -448,7 +446,7 @@ describe('Client test', function () {
             request: JSON.stringify(request),
             content_type: 'application/json',
         };
-        var readStream = client.mapred(opts, true);
+        var readStream = client.mapred(opts);
 
         var dataHandlerSpy = sinon.spy(dataHandler);
         readStream.on('data', dataHandlerSpy);
@@ -632,7 +630,7 @@ describe('Client test', function () {
             client.put(request, function (err, reply) {
                 expect(err).to.not.exist;
                 expect(reply).to.exist;
-                cb();
+                cb(err);
             });
         }
 

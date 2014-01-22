@@ -22,7 +22,7 @@ RiakPBC is a low-level [Riak 1.4](http://basho.com/riak)
     - [client.getBucket(params, callback)](#clientgetbucketparams-callback)
     - [client.setBucket(params, callback)](#clientsetbucketparams-callback)
     - [client.resetBucket(params, callback)](#clientresetbucketparams-callback)
-    - [client.getKeys(params, [streaming], callback)](#clientgetkeysparams-streaming-callback)
+    - [client.getKeys(params, callback)](#clientgetkeysparams-streaming-callback)
   - [Object/Key Methods](#objectkey-methods)
     - [client.get(params, callback)](#clientgetparams-callback)
     - [client.put(params, callback)](#clientputparams-callback)
@@ -31,7 +31,7 @@ RiakPBC is a low-level [Riak 1.4](http://basho.com/riak)
     - [client.getCounter(params, callback)](#clientgetcounterparams-callback)
   - [Query Methods](#query-methods)
     - [client.mapred(params, callback)](#clientmapredparams-callback)
-    - [client.getIndex(query, [streaming], callback)](#clientgetindexquery-streaming-callback)
+    - [client.getIndex(query, callback)](#clientgetindexquery-streaming-callback)
     - [client.search(params, callback)](#clientsearchparams-callback)
   - [Server Methods](#server-methods)
     - [client.ping(callback)](#clientpingcallback)
@@ -168,13 +168,13 @@ client.resetBucket({ bucket: 'test' }, function (err, reply) {
 The callback response will be empty on success.
 
 
-### client.getKeys(params, [streaming], callback)
+### client.getKeys(params, callback)
 [reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/list-keys/)
 
 This method retrieves keys from the specified bucket.  Don't use it in
 production.
 
-The first form retrieves the keys in one call:
+If you specify a callback, the client retrieves the keys all at once:
 
 ```javascript
 client.getKeys({ bucket: 'test' }, function (err, reply) {
@@ -185,10 +185,10 @@ client.getKeys({ bucket: 'test' }, function (err, reply) {
 });
 ```
 
-The second form returns an event emitter that receives streamed keys:
+A readable stream is also returned that will emit several data events:
 
 ```javascript
-client.getKeys({ bucket: 'test' }, true).on('data', function (err, reply) {
+client.getKeys({ bucket: 'test' }).on('data', function (err, reply) {
   console.log('batch of keys:', reply.keys);
 });
 ```
@@ -363,7 +363,7 @@ and the
 doc for more details and examples.
 
 
-To stream back map reduce results specify true for the streaming parameter. This synchronously returns a readable stream with the results of the map reduce query. Errors are handled via an `error` event on the readable stream.
+This method synchronously returns a readable stream with the results of the map reduce query. Errors are handled via an `error` event on the readable stream.
 
 ```javascript
 var readStream = client.mapred({ request: JSON.stringify(request), content_type: 'application/json' });
@@ -384,7 +384,7 @@ function errorHandler(err) {
 }
 ```
 
-### client.getIndex(query, [streaming], callback)
+### client.getIndex(query, callback)
 [reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/secondary-indexes/)
 
 This method makes a secondary index query on the server.  Supply a bucket, an
@@ -409,7 +409,7 @@ client.put({ bucket: '...', content: { value: '...', indexes: [{ key: 'name_bin'
 });
 ```
 
-The second form returns a stream of received keys. Errors are handled via an `error` event on the stream.
+This method also returns a readable stream. Errors are handled via an `error` event on the stream.
 
 ```javascript
 var query = {
@@ -419,7 +419,7 @@ var query = {
   range_min: '!',
   range_max: '~'
 }
-var keyStream = client.getIndex(query, true)
+var keyStream = client.getIndex(query)
 
 keyStream.on('data', dataHandler)
 
@@ -446,7 +446,7 @@ var query = {
   range_max: '~',
   return_terms: true
 }
-var keyStream = client.getIndex(query, true)
+var keyStream = client.getIndex(query)
 
 keyStream.on('data', dataHandler)
 

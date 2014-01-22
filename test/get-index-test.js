@@ -42,9 +42,8 @@ describe('getIndex', function getIndexSuite() {
                 bucket: bucket,
                 pagination_sort: true
             };
-            var streaming = true;
             var numKeys = 0;
-            var readStream = client.getIndex(queryOpts, streaming);
+            var readStream = client.getIndex(queryOpts);
             expect(readStream).to.exist;
             var dataHandlerSpy = sinon.spy(dataHandler);
             readStream.on('data', dataHandlerSpy);
@@ -134,9 +133,8 @@ describe('getIndex', function getIndexSuite() {
                 bucket: bucket,
                 pagination_sort: true
             };
-            var streaming = true;
             var numKeys = 0;
-            var readStream = client.getIndex(queryOpts, streaming);
+            var readStream = client.getIndex(queryOpts);
             expect(readStream).to.exist;
             var dataHandlerSpy = sinon.spy(dataHandler);
             readStream.on('data', dataHandlerSpy);
@@ -178,9 +176,8 @@ describe('getIndex', function getIndexSuite() {
                 bucket: bucket,
                 pagination_sort: true
             };
-            var streaming = true;
             var numKeys = 0;
-            var readStream = client.getIndex(queryOpts, streaming);
+            var readStream = client.getIndex(queryOpts);
             expect(readStream).to.exist;
             var dataHandlerSpy = sinon.spy(dataHandler);
             readStream.on('data', dataHandlerSpy);

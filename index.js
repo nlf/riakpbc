@@ -1,242 +1,127 @@
-var net = require('net');
 var Stream = require('stream');
-var protobuf = require('protobuf.js');
+var Protobuf = require('protobuf.js');
 var riakproto = require('riakproto');
-var butils = require('butils');
-var through = require('through');
-var path = require('path');
 var _merge = require('./lib/merge');
 var parseResponse = require('./lib/parse-response');
-
-var messageCodes = {
-    '0': 'RpbErrorResp',
-    '1': 'RpbPingReq',
-    '2': 'RpbPingResp',
-    '3': 'RpbGetClientIdReq',
-    '4': 'RpbGetClientIdResp',
-    '5': 'RpbSetClientIdReq',
-    '6': 'RpbSetClientIdResp',
-    '7': 'RpbGetServerInfoReq',
-    '8': 'RpbGetServerInfoResp',
-    '9': 'RpbGetReq',
-    '10': 'RpbGetResp',
-    '11': 'RpbPutReq',
-    '12': 'RpbPutResp',
-    '13': 'RpbDelReq',
-    '14': 'RpbDelResp',
-    '15': 'RpbListBucketsReq',
-    '16': 'RpbListBucketsResp',
-    '17': 'RpbListKeysReq',
-    '18': 'RpbListKeysResp',
-    '19': 'RpbGetBucketReq',
-    '20': 'RpbGetBucketResp',
-    '21': 'RpbSetBucketReq',
-    '22': 'RpbSetBucketResp',
-    '23': 'RpbMapRedReq',
-    '24': 'RpbMapRedResp',
-    '25': 'RpbIndexReq',
-    '26': 'RpbIndexResp',
-    '27': 'RpbSearchQueryReq',
-    '28': 'RpbSearchQueryResp',
-    // 1.4
-    '29': 'RpbResetBucketReq',
-    '30': 'RpbResetBucketResp',
-    '40': 'RpbCSBucketReq',
-    '41': 'RpbCSBucketResp',
-    '50': 'RpbCounterUpdateReq',
-    '51': 'RpbCounterUpdateResp',
-    '52': 'RpbCounterGetReq',
-    '53': 'RpbCounterGetResp',
-};
-
-Object.keys(messageCodes).forEach(function (key) {
-    messageCodes[messageCodes[key]] = Number(key);
-});
+var ConnectionManager = require('./lib/connection-manager');
 
 function RiakPBC(options) {
-    var self = this;
     options = options || {};
-    self.host = options.host || '127.0.0.1';
-    self.port = options.port || 8087;
-    self.timeout = options.timeout || 1000;
-    self.bucket = options.bucket || undefined;
-    self.auto_connect = options.hasOwnProperty('auto_connect') ? options.auto_connect : true;
-    self.translator = new protobuf(riakproto);
-    self.client = new net.Socket();
-    self.connected = false;
-    self.client.on('end', self.disconnect(true).bind(this));
-    self.client.on('error', self.disconnect(true).bind(this));
-    self.client.on('data', self._processPacket.bind(this));
-    self.paused = false;
-    self.queue = [];
-    self.reply = {};
-    self.resBuffers = [];
-    self.numBytesAwaiting = 0;
+    options.host = options.host || '127.0.0.1';
+    options.port = options.port || 8087;
+    options.timeout = options.timeout || 1000;
+    options.auto_connect = options.hasOwnProperty('auto_connect') ? options.auto_connect : true;
+
+    this.connection = new ConnectionManager(options);
+    this.connection.receive = this._processMessage.bind(this);
+
+    this.translator = new Protobuf(riakproto);
+
+    this.paused = false;
+    this.queue = [];
+    this.reply = {};
 }
 
-RiakPBC.prototype._splitPacket = function (pkt) {
-    var self = this;
-    var pos = 0;
-    var len;
+RiakPBC.prototype._processMessage = function (data) {
+    var response, messageCode, err;
 
-    if (self.numBytesAwaiting > 0) {
-        len = Math.min(pkt.length, self.numBytesAwaiting);
-        var oldBuf = self.resBuffers[self.resBuffers.length - 1];
-        var newBuf = new Buffer(oldBuf.length + len);
-        oldBuf.copy(newBuf, 0);
-        pkt.slice(0, len).copy(newBuf, oldBuf.length);
-        self.resBuffers[self.resBuffers.length - 1] = newBuf;
-        pos = len;
-        self.numBytesAwaiting -= len;
-    } else {
-        self.resBuffers = [];
-    }
+    messageCode = riakproto.codes['' + data[0]];
+    response = this.translator.decode(messageCode, data.slice(1));
 
-    while (pos < pkt.length) {
-        len = butils.readInt32(pkt, pos);
-        self.numBytesAwaiting = len + 4 - pkt.length;
-        self.resBuffers.push(pkt.slice(pos + 4, Math.min(pos + len + 4, pkt.length)));
-        pos += len + 4;
-    }
-};
-
-RiakPBC.prototype._processPacket = function (chunk) {
-    var self = this;
-
-    self._splitPacket(chunk);
-    if (self.numBytesAwaiting > 0) {
-        return;
-    }
-    self._processAllResBuffers();
-};
-
-RiakPBC.prototype._processAllResBuffers = function () {
-    var self = this;
-    var stream = self.task.stream;
-    var cb = self.task.callback;
-    var mc, err;
-
-    self.resBuffers.forEach(processSingleResBuffer);
-
-    if (!self.task.expectMultiple || self.reply.done || mc === 'RpbErrorResp') {
-        self.task = undefined;
-
-        if (stream) {
-            stream.end();
-        } else {
-            cb(err, self.reply);
-        }
-
-        mc = undefined;
-        self.reply = {};
-        self.paused = false;
-        self._processNext();
-    }
-
-    function processSingleResBuffer(packet) {
-        var response;
-
-        mc = messageCodes['' + packet[0]];
-
-        response = self.translator.decode(mc, packet.slice(1));
-        if (response) {
-            response = parseResponse(response);
-        }
+    if (response) {
+        response = parseResponse(response);
 
         if (response.errmsg) {
             err = new Error(response.errmsg);
             err.code = response.errcode;
-            if (stream) {
-                stream.emit('error', err);
-                return;
+
+            if (this.task.callback) {
+                this.task.callback(err);
+            } else {
+                this.task.stream.emit('error', err);
             }
+
+            this._cleanup();
+            return;
+        }
+    }
+
+    if (!response.done) {
+        this.task.stream.write(response);
+    }
+
+    if (this.task.callback) {
+        this.reply = _merge(this.reply, response);
+    }
+
+    if (response.done || !this.task.expectMultiple || messageCode === 'RpbErrorResp') {
+        this.task.stream.end();
+
+        if (this.task.callback) {
+            this.task.callback(undefined, this.reply);
         }
 
-        if (stream && !response.done) {
-            stream.write(response);
-        }
-
-        if (stream) {
-            self.reply = response;
-        } else {
-            self.reply = _merge(self.reply, response);
-        }
+        this._cleanup();
     }
 };
 
+RiakPBC.prototype._cleanup = function () {
+    this.task = undefined;
+    this.reply = {};
+    this.paused = false;
+    this._processNext();
+};
+
 RiakPBC.prototype._processNext = function () {
-    var self = this;
+    if (!this.queue.length || this.paused) {
+        return;
+    }
 
-    function runTask(err) {
-        var self = this;
+    this.paused = true;
+    this.task = this.queue.shift();
 
-        self.task = self.queue.shift();
+    if (!this.task) {
+        return;
+    }
 
-        if (!self.task) {
-            return;
-        }
-
-        if (!self.connected) {
-            err = err || new Error('Not connected');
-        }
-
+    this.connection.send(this.task.message, function (err) {
         if (err) {
-            if (self.task.callback) {
-                self.task.callback(err);
-                return;
-            }
-            if (self.task.stream) {
-                self.task.stream.emit('error', err);
-                return;
-            }
-            throw err;
-        }
 
-        self.client.write(self.task.message);
-    }
+            if (this.task.callback) {
+                return this.task.callback(err);
+            }
 
-    if (self.queue.length && !self.paused) {
-        self.paused = true;
-        if (self.auto_connect) {
-            self.connect(runTask.bind(self));
-        } else {
-            runTask.call(self);
+            return this.task.stream.emit('error', err);
         }
-    }
+    }.bind(this));
 };
 
 // RiakPBC.prototype.makeRequest = function (type, data, callback, expectMultiple, streaming) {
 RiakPBC.prototype.makeRequest = function (opts) {
-    var self = this;
-    var type = opts.type;
-    var params = opts.params;
-    var streaming = opts.streaming;
-    var callback = opts.callback;
-    var expectMultiple = opts.expectMultiple;
-    var buffer;
-    if (riakproto.messages[type]) {
-        buffer = this.translator.encode(type, params);
+    var buffer, message, stream;
+
+    if (riakproto.messages[opts.type]) {
+        buffer = this.translator.encode(opts.type, opts.params);
     } else {
-        buffer = [];
-    }
-    var message = [];
-    var stream, queueOpts;
-
-    if (streaming) {
-        stream = writableStream();
+        buffer = new Buffer(0);
     }
 
-    butils.writeInt32(message, buffer.length + 1);
-    butils.writeInt(message, messageCodes[type], 4);
-    message = message.concat(Array.prototype.slice.call(buffer));
-    queueOpts = {
-        message: new Buffer(message),
-        callback: callback,
-        expectMultiple: expectMultiple,
+    message = new Buffer(buffer.length + 5);
+    stream = writableStream();
+
+    message.writeInt32BE(buffer.length + 1, 0);
+    message.writeInt8(riakproto.codes[opts.type], 4);
+    buffer.copy(message, 5);
+    
+    this.queue.push({
+        message: message,
+        callback: opts.callback,
+        expectMultiple: opts.expectMultiple,
         stream: stream
-    };
-    self.queue.push(queueOpts);
-    self._processNext();
+    });
+
+    this._processNext();
+
     return stream;
 };
 
@@ -272,18 +157,12 @@ RiakPBC.prototype.resetBucket = function (params, callback) {
     });
 };
 
-RiakPBC.prototype.getKeys = function (params, streaming, callback) {
-    if (typeof streaming === 'function') {
-        callback = streaming;
-        streaming = false;
-    }
-
+RiakPBC.prototype.getKeys = function (params, callback) {
     return this.makeRequest({
         type: 'RpbListKeysReq',
         params: params,
         expectMultiple: true,
-        callback: callback,
-        streaming: streaming
+        callback: callback
     });
 };
 
@@ -311,9 +190,7 @@ RiakPBC.prototype.del = function (params, callback) {
     });
 };
 
-RiakPBC.prototype.mapred = function (params, streaming, callback) {
-    var stream;
-
+RiakPBC.prototype.mapred = function (params, callback) {
     function cb(err, reply) {
         if (err) {
             return callback(err);
@@ -331,23 +208,15 @@ RiakPBC.prototype.mapred = function (params, streaming, callback) {
             });
         });
 
-        callback(null, rows);
+        callback(undefined, rows);
     }
 
-    if (typeof streaming === 'function') {
-        callback = streaming;
-        streaming = false;
-    }
-
-    stream = this.makeRequest({
+    return parseMapReduceStream(this.makeRequest({
         type: 'RpbMapRedReq',
         params: params,
-        callback: cb,
-        expectMultiple: true,
-        streaming: streaming
-    });
-
-    return streaming ? parseMapReduceStream(stream) : stream;
+        callback: callback ? cb : undefined,
+        expectMultiple: true
+    }));
 };
 
 
@@ -368,22 +237,13 @@ RiakPBC.prototype.updateCounter = function (params, callback) {
     });
 };
 
-RiakPBC.prototype.getIndex = function (params, streaming, callback) {
-    var expectMultiple = true;
-
-    if (typeof streaming === 'function') {
-        callback = streaming;
-        streaming = false;
-        expectMultiple = false;
-    } else {
-        params.stream = true;
-    }
+RiakPBC.prototype.getIndex = function (params, callback) {
+    params.stream = true;
 
     return this.makeRequest({
         type: 'RpbIndexReq',
         params: params,
-        streaming: streaming,
-        expectMultiple: expectMultiple,
+        expectMultiple: true,
         callback: callback
     });
 };
@@ -429,43 +289,16 @@ RiakPBC.prototype.ping = function (callback) {
 };
 
 RiakPBC.prototype.connect = function (callback) {
-    if (this.connected) {
-        return callback(null);
-    }
-
-    var self = this;
-    var timeoutGuard = setTimeout(function () {
-        callback(new Error('Connection timeout'));
-    }, self.timeout);
-
-    self.client.connect(self.port, self.host, function () {
-        clearTimeout(timeoutGuard);
-        self.connected = true;
-        callback(null);
-    });
+    this.connection.connect(callback);
 };
 
 RiakPBC.prototype.disconnect = function () {
-    function handler() {
-        if (!this.connected) {
-            return;
-        }
-
-        this.client.end();
-        this.connected = false;
-
-        if (this.task) {
-            this.queue.unshift(this.task);
-            this.task = undefined;
-        }
+    if (this.task) {
+        this.queue.unshift(this.task);
+        this.task = undefined;
     }
 
-    if (arguments.length) {
-        return handler;
-    } else {
-        this.auto_connect = false;
-        return handler.call(this);
-    }
+    this.connection.disconnect();
 };
 
 exports.createClient = function (options) {
@@ -473,25 +306,20 @@ exports.createClient = function (options) {
 };
 
 function writableStream() {
-    var stream = through(function write(data) {
-        this.queue(data);
-    });
-
-    return stream;
+    return new Stream.PassThrough({ objectMode: true });
 }
+
 function parseMapReduceStream(rawStream) {
-    var liner = new Stream.Transform({
-        objectMode: true
-    });
+    var liner = new Stream.Transform({ objectMode: true });
 
     liner._transform = function (chunk, encoding, done) {
         var response = chunk.response;
         var json = JSON.parse(response);
-        var self = this;
 
         json.forEach(function (row) {
-            self.push(row);
-        });
+            this.push(row);
+        }.bind(this));
+
         done();
     };
 
