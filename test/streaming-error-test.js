@@ -20,8 +20,7 @@ describe('Streaming error test', function () {
             index: 'name_bin',
             bucket: 'test'
         };
-        var streaming = true;
-        var readStream = client.getIndex(queryOpts, streaming);
+        var readStream = client.getIndex(queryOpts);
         readStream.on('error', errorHandler);
 
         function errorHandler(err) {
