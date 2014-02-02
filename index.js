@@ -46,7 +46,7 @@ RiakPBC.prototype._processMessage = function (data) {
         }
     }
 
-    if (!response.done) {
+    if (!response.done || response.continuation) {
         this.task.stream.write(response);
     }
 

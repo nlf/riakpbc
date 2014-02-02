@@ -689,6 +689,68 @@ describe('Client test', function () {
             });
         });
     });
+    it('secondaryIndexPagingStreaming', function (done) {
+        var bucket = 'paging_test';
+        var ids = [0, 1, 2];
+        function saveRow(id, cb) {
+            var indexRow = {
+                key: 'value_bin',
+                value: String(id)
+            };
+            var key = 'test-paging-' + id;
+            var payload = {
+                value: id
+            };
+            var indexes = [indexRow];
+            var request = {
+                bucket: bucket,
+                key: key,
+                content: {
+                    content_type: 'application/json',
+                    value: JSON.stringify(payload),
+                    indexes: indexes
+                }
+            };
+
+            savedKeys[key] = bucket;
+
+
+            client.put(request, function (err, reply) {
+                expect(err).to.not.exist;
+                expect(reply).to.exist;
+                cb(err);
+            });
+        }
+
+        async.eachSeries(ids, saveRow, function (err) {
+            expect(err).to.not.exist;
+            var cursor, results = {};
+
+            var stream = client.getIndex({
+                bucket: bucket,
+                index: 'value_bin',
+                qtype: 1,
+                range_min: '0',
+                range_max: '3',
+                max_results: 2
+            });
+            stream.on('data', function (reply) {
+                expect(reply).to.exist;
+                if (reply && reply.keys) {
+                    results.keys = (results.keys || []).concat(reply.keys);
+                }
+                if (reply && reply.continuation) {
+                    results.continuation = reply.continuation;
+                }
+            });
+            stream.on('end', function () {
+                expect(results.keys, 'keys not set in results').to.exist;
+                expect(results.continuation, 'continuation not set in results').to.exist;
+                expect(results.keys.length).to.equal(2);
+                done();
+            });
+        });
+    });
 });
 
 function deleteKey(key, cb) {
