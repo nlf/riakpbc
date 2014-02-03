@@ -280,7 +280,7 @@ client.put(request, function (err, reply) {
 This method removes a key from a bucket.  Specify the bucket and the key:
 
 ```javascript
-client.del({ bucket: 'test', song: 'thriller' }, function (err, reply) {
+client.del({ bucket: 'songs', key: 'thriller' }, function (err, reply) {
   console.log('it was totally overrated.');
 });
 ```

@@ -736,17 +736,13 @@ describe('Client test', function () {
             });
             stream.on('data', function (reply) {
                 expect(reply).to.exist;
-                if (reply && reply.keys) {
-                    results.keys = (results.keys || []).concat(reply.keys);
-                }
-                if (reply && reply.continuation) {
-                    results.continuation = reply.continuation;
-                }
+                if (reply.continuation) results.continuation = reply.continuation;
+                results.keys = (results.keys || []).concat(reply.keys);
             });
-            stream.on('end', function () {
+            stream.on('end', function (reply) {
                 expect(results.keys, 'keys not set in results').to.exist;
-                expect(results.continuation, 'continuation not set in results').to.exist;
-                expect(results.keys.length).to.equal(2);
+                expect(results.keys.length).to.equal(3);
+                expect(results.continuation, 'continuation not set in end reply').to.exist;
                 done();
             });
         });

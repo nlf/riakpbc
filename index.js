@@ -23,7 +23,7 @@ function RiakPBC(options) {
 }
 
 RiakPBC.prototype._processMessage = function (data) {
-    var response, messageCode, err;
+    var response, messageCode, err, done;
 
     messageCode = riakproto.codes['' + data[0]];
     response = this.translator.decode(messageCode, data.slice(1));
@@ -46,7 +46,12 @@ RiakPBC.prototype._processMessage = function (data) {
         }
     }
 
-    if (!response.done || response.continuation) {
+    if (response.done) {
+        done = true;
+        delete response.done;
+    }
+
+    if (Object.keys(response).length) {
         this.task.stream.write(response);
     }
 
@@ -54,7 +59,7 @@ RiakPBC.prototype._processMessage = function (data) {
         this.reply = _merge(this.reply, response);
     }
 
-    if (response.done || !this.task.expectMultiple || messageCode === 'RpbErrorResp') {
+    if (done || !this.task.expectMultiple || messageCode === 'RpbErrorResp') {
         this.task.stream.end();
 
         if (this.task.callback) {
