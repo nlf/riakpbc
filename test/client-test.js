@@ -736,7 +736,9 @@ describe('Client test', function () {
             });
             stream.on('data', function (reply) {
                 expect(reply).to.exist;
-                if (reply.continuation) results.continuation = reply.continuation;
+                if (reply.continuation) {
+                    results.continuation = reply.continuation;
+                }
                 results.keys = (results.keys || []).concat(reply.keys);
             });
             stream.on('end', function (reply) {
