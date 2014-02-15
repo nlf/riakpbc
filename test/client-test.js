@@ -342,6 +342,29 @@ describe('Client test', function () {
         });
     });
 
+    it('setBucket converts quorum values', function (done) {
+        var opts = {
+            bucket: 'test',
+            props: {
+                r: 'quorum',
+                w: 'all'
+            }
+        };
+        client.setBucket(opts, function (err, reply) {
+            expect(err).to.not.exist;
+            done();
+        });
+    });
+
+    it('getBucket converts quorum values', function (done) {
+        client.getBucket({ bucket: 'test' }, function (err, reply) {
+            expect(err).to.not.exist;
+            expect(reply.props.r).to.equal('quorum');
+            expect(reply.props.w).to.equal('all');
+            done();
+        });
+    });
+
     it('getKeys', function (done) {
         client.getKeys({
             bucket: 'test'
