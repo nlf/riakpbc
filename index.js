@@ -2,6 +2,7 @@ var Stream = require('stream');
 var Protobuf = require('protobuf.js');
 var riakproto = require('riakproto');
 var _merge = require('./lib/merge');
+var quorum = require('./lib/quorum');
 var parseResponse = require('./lib/parse-response');
 var ConnectionManager = require('./lib/connection-manager');
 
@@ -147,6 +148,10 @@ RiakPBC.prototype.getBucket = function (params, callback) {
 };
 
 RiakPBC.prototype.setBucket = function (params, callback) {
+    if (params.props) {
+        params.props = quorum.convert(params.props);
+    }
+
     return this.makeRequest({
         type: 'RpbSetBucketReq',
         params: params,
