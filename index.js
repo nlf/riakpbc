@@ -18,7 +18,6 @@ function RiakPBC(options) {
 
     this.translator = new Protobuf(riakproto);
 
-    this.paused = false;
     this.queue = [];
     this.reply = {};
 }
@@ -45,28 +44,32 @@ RiakPBC.prototype._processMessage = function (data) {
             this._cleanup();
             return;
         }
-    }
 
-    if (response.done) {
-        done = true;
-        delete response.done;
-    }
-
-    if (Object.keys(response).length) {
-        this.task.stream.write(response);
-    }
-
-    if (this.task.callback) {
-        this.reply = _merge(this.reply, response);
-    }
-
-    if (done || !this.task.expectMultiple || messageCode === 'RpbErrorResp') {
-        this.task.stream.end();
-
-        if (this.task.callback) {
-            this.task.callback(undefined, this.reply);
+        if (response.done) {
+            done = true;
+            delete response.done;
         }
 
+        if (this.task.callback) {
+            this.reply = _merge(this.reply, response);
+        } else if (Object.keys(response).length) {
+            this.task.stream.write(response);
+        }
+
+        if (done || !this.task.expectMultiple || messageCode === 'RpbErrorResp') {
+            if (this.task.callback) {
+                this.task.callback(undefined, this.reply);
+            } else {
+                this.task.stream.end();
+            }
+            this._cleanup();
+        }
+    } else {
+        if (this.task.callback) {
+            this.task.callback(new Error('Failed to decode response message'));
+        } else {
+            this.task.stream.emit('error', new Error('Failed to decode response message'));
+        }
         this._cleanup();
     }
 };
@@ -74,37 +77,32 @@ RiakPBC.prototype._processMessage = function (data) {
 RiakPBC.prototype._cleanup = function () {
     this.task = undefined;
     this.reply = {};
-    this.paused = false;
     this._processNext();
 };
 
 RiakPBC.prototype._processNext = function () {
-    if (!this.queue.length || this.paused) {
+    var self = this;
+
+    if (!self.queue.length || self.task) {
         return;
     }
 
-    this.paused = true;
-    this.task = this.queue.shift();
+    self.task = self.queue.shift();
 
-    if (!this.task) {
-        return;
-    }
-
-    this.connection.send(this.task.message, function (err) {
+    self.connection.send(self.task.message, function (err) {
         if (err) {
-
-            if (this.task.callback) {
-                return this.task.callback(err);
+            if (self.task.callback) {
+                self.task.callback(err);
+            } else {
+                self.task.stream.emit('error', err);
             }
-
-            return this.task.stream.emit('error', err);
         }
-    }.bind(this));
+    });
 };
 
 // RiakPBC.prototype.makeRequest = function (type, data, callback, expectMultiple, streaming) {
 RiakPBC.prototype.makeRequest = function (opts) {
-    var buffer, message, stream;
+    var buffer, message, stream = null;
 
     if (riakproto.messages[opts.type]) {
         buffer = this.translator.encode(opts.type, opts.params);
@@ -113,7 +111,10 @@ RiakPBC.prototype.makeRequest = function (opts) {
     }
 
     message = new Buffer(buffer.length + 5);
-    stream = writableStream();
+
+    if (typeof opts.callback !== 'function') {
+        stream = writableStream();
+    }
 
     message.writeInt32BE(buffer.length + 1, 0);
     message.writeInt8(riakproto.codes[opts.type], 4);
@@ -121,7 +122,7 @@ RiakPBC.prototype.makeRequest = function (opts) {
     
     this.queue.push({
         message: message,
-        callback: opts.callback,
+        callback: typeof opts.callback === 'function' ? opts.callback : null,
         expectMultiple: opts.expectMultiple,
         stream: stream
     });
@@ -320,6 +321,10 @@ function writableStream() {
 }
 
 function parseMapReduceStream(rawStream) {
+    if (!rawStream) {
+        return null;
+    }
+
     var liner = new Stream.Transform({ objectMode: true });
 
     liner._transform = function (chunk, encoding, done) {
