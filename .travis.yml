@@ -3,12 +3,14 @@ node_js:
   - "0.10"
 
 before_install:
+  - "sudo apt-get purge riak"
   - "curl http://apt.basho.com/gpg/basho.apt.key | sudo apt-key add -"
   - 'sudo bash -c "echo deb http://apt.basho.com $(lsb_release -sc) main > /etc/apt/sources.list.d/basho.list"'
   - "sudo apt-get update"
   - "yes n | sudo apt-get install riak --force-yes"
   - "./bin/enable-riak-search.sh"
   - "sudo service riak start"
+  - "sleep 10"
 
 before_script:
   - sudo /usr/sbin/search-cmd install test
