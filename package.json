@@ -4,7 +4,7 @@
   "description": "RiakPBC is a low-level Riak 1.4 proto buffer client.",
   "main": "index.js",
   "dependencies": {
-    "protobuf.js": "~1.1.0",
+    "protobuf.js": "~1.1.2",
     "riakproto": "~1.4.7"
   },
   "devDependencies": {
