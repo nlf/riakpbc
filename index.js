@@ -127,7 +127,6 @@ RiakPBC.prototype.makeRequest = function (opts) {
     });
 
     setImmediate(this._processNext.bind(this));
-    // this._processNext();
 
     return stream;
 };

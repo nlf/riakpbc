@@ -5,21 +5,19 @@
   "main": "index.js",
   "dependencies": {
     "protobuf.js": "~1.1.2",
-    "riakproto": "~1.4.7"
+    "riakproto": "~1.4.7",
+    "lab": "^2.0.1"
   },
   "devDependencies": {
-    "nodeunit": "",
     "async": "~0.2.9",
     "sinon": "~1.7.3",
-    "chai": "~1.8.1",
     "q": "~0.9.7",
-    "mocha": "~1.15.1",
     "eyespect": "~0.1.10",
     "precommit-hook": "~0.3.8",
     "lodash-node": "~2.4.1"
   },
   "scripts": {
-    "test": "make test"
+    "test": "lab"
   },
   "repository": {
     "type": "git",

@@ -1,6 +1,9 @@
-var chai = require('chai');
-chai.Assertion.includeStack = true; // defaults to false
-var expect = chai.expect;
+var Lab = require('lab');
+var expect = Lab.expect;
+var describe = Lab.experiment;
+var it = Lab.test;
+var before = Lab.before;
+var after = Lab.after;
 
 var riakpbc = require('../index');
 

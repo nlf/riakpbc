@@ -1,18 +1,10 @@
-MOCHA?=node_modules/.bin/mocha
-REPORTER?=spec
-GROWL?=--growl
-FLAGS=$(GROWL) --reporter $(REPORTER) --colors
-
 test:
-	$(MOCHA) $(shell find test -name "*-test.js") $(FLAGS)
+	@node node_modules/lab/bin/lab
 
-one:
-	$(MOCHA) $(NAME) $(FLAGS)
+test-cov:
+	@node node_modules/lab/bin/lab -r threshold -t 100
 
-unit:
-	$(MOCHA) $(shell find test/unit -name "*-test.js") $(FLAGS)
+test-cov-html:
+	@node node_modules/lab/bin/lab -r html -o coverage.html
 
-integration:
-	$(MOCHA) $(shell find test/integration -name "*-test.js") $(FLAGS)
-
-.PHONY: test
+.PHONY: test test-cov test-cov-html
