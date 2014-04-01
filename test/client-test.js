@@ -1,7 +1,11 @@
+var Lab = require('lab');
+var expect = Lab.expect;
+var describe = Lab.experiment;
+var it = Lab.test;
+var before = Lab.before;
+var after = Lab.after;
+
 var riakpbc = require('../index');
-var chai = require('chai');
-chai.Assertion.includeStack = true; // defaults to false
-var expect = chai.expect;
 var inspect = require('eyespect').inspector();
 var q = require('q');
 var client = riakpbc.createClient();
@@ -10,8 +14,6 @@ var async = require('async');
 var savedKeys = {};
 
 describe('Client test', function () {
-
-    this.slow('.2s');
 
     after(function (done) {
         async.each(Object.keys(savedKeys), deleteKey, done);
@@ -259,9 +261,7 @@ describe('Client test', function () {
         }
     });
 
-    it('putLarge', function (done) {
-        this.slow('5s');
-        this.timeout('10s');
+    it('putLarge', { timeout: 3000 }, function (done) {
         var bucket = 'test';
         var value = {}, i;
         for (i = 0; i < 5000; i += 1) {
@@ -285,7 +285,6 @@ describe('Client test', function () {
     });
 
     it('getLarge', function (done) {
-        this.slow('.5s');
         var value = {}, i;
         for (i = 0; i < 5000; i += 1) {
             value['test_key_' + i] = 'test_value_' + i;
@@ -402,7 +401,6 @@ describe('Client test', function () {
     });
 
     it('mapred', function (done) {
-        this.slow('.5s');
         var mapOpts = {
             map: {
                 source: 'function (v) { return [[v.bucket, v.key]]; }',
@@ -597,20 +595,12 @@ describe('Client test', function () {
     });
 
     describe('time sensitive', function () {
-        var clock;
-        before(function () {
-            clock = sinon.useFakeTimers();
-        });
-        after(function () {
-            clock.restore();
-        });
-
         it('connectionTimeout', function (done) {
             var client = riakpbc.createClient({
-                port: 1337
+                port: 1337,
+                timeout: 1
             });
             client.connect(connectCB);
-            clock.tick(21000);
 
             function connectCB(err) {
                 expect(err).to.exist;

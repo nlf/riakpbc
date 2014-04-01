@@ -29,13 +29,9 @@ RiakPBC.prototype._processMessage = function (data) {
     response = this.translator.decode(messageCode, data.slice(1));
 
     if (!response) {
-        if (this.task.callback) {
-            this.task.callback(new Error('Failed to decode response message'));
-        } else {
-            this.task.stream.emit('error', new Error('Failed to decode response message'));
-        }
-        this._cleanup();
-        return;
+        err = new Error('Failed to decode response message');
+
+        return this._cleanup(err);
     }
 
     response = parseResponse(response);
@@ -44,14 +40,7 @@ RiakPBC.prototype._processMessage = function (data) {
         err = new Error(response.errmsg);
         err.code = response.errcode;
 
-        if (this.task.callback) {
-            this.task.callback(err);
-        } else {
-            this.task.stream.emit('error', err);
-        }
-
-        this._cleanup();
-        return;
+        return this._cleanup(err);
     }
 
     if (response.done) {
@@ -66,19 +55,30 @@ RiakPBC.prototype._processMessage = function (data) {
     }
 
     if (done || !this.task.expectMultiple || messageCode === 'RpbErrorResp') {
-        if (this.task.callback) {
-            this.task.callback(undefined, this.reply);
-        } else {
-            this.task.stream.end();
-        }
-        this._cleanup();
+        this._cleanup(undefined, this.reply);
     }
 };
 
-RiakPBC.prototype._cleanup = function () {
-    this.task = undefined;
+RiakPBC.prototype._cleanup = function (err, reply) {
+    var callback, stream;
+
+    setImmediate(this._processNext.bind(this));
+
     this.reply = {};
-    this._processNext();
+
+    if (this.task.callback) {
+        callback = this.task.callback;
+        this.task = undefined;
+        callback(err, reply);
+    } else {
+        stream = this.task.stream;
+        this.task = undefined;
+        if (err) {
+            stream.emit('error', err);
+        } else {
+            stream.end();
+        }
+    }
 };
 
 RiakPBC.prototype._processNext = function () {
@@ -126,7 +126,7 @@ RiakPBC.prototype.makeRequest = function (opts) {
         stream: stream
     });
 
-    this._processNext();
+    setImmediate(this._processNext.bind(this));
 
     return stream;
 };

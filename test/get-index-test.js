@@ -1,8 +1,11 @@
-var _ = require('lodash-node');
-var chai = require('chai');
-chai.Assertion.includeStack = true; // defaults to false
+var Lab = require('lab');
+var expect = Lab.expect;
+var describe = Lab.experiment;
+var it = Lab.test;
+var before = Lab.before;
+var after = Lab.after;
 
-var expect = chai.expect;
+var _ = require('lodash-node');
 var inspect = require('eyespect').inspector();
 var q = require('q');
 var sinon = require('sinon');
@@ -13,14 +16,12 @@ var client = riakpbc.createClient({ host: 'localhost', port: 8087 });
 var numRows = 400;
 var keysSaved = [];
 describe('getIndex', function getIndexSuite() {
-    this.slow('1s');
     before(function beforeBlock(done) {
         var promise = connectClient();
         promise.nodeify(done);
     });
 
     after(function afterBlock(done) {
-        this.timeout('10s');
         deleteKeysSaved(done);
     });
 

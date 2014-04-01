@@ -1,8 +1,11 @@
-var _ = require('lodash-node');
-var chai = require('chai');
-chai.Assertion.includeStack = true; // defaults to false
+var Lab = require('lab');
+var expect = Lab.expect;
+var describe = Lab.experiment;
+var it = Lab.test;
+var before = Lab.before;
+var after = Lab.after;
 
-var expect = chai.expect;
+var _ = require('lodash-node');
 var inspect = require('eyespect').inspector();
 var q = require('q');
 var sinon = require('sinon');
@@ -15,14 +18,12 @@ var key = 'text_content_key_1';
 var value = 'value_1';
 
 describe('Text Content Type', function searchSuite() {
-    this.slow('1s');
     before(function beforeBlock(done) {
         var promise = connectClient();
         promise.then(setupFixtures).nodeify(done);
     });
 
     after(function afterBlock(done) {
-        this.timeout('10s');
         return done();
     });
 
