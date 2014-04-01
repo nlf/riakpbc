@@ -6,7 +6,7 @@
   "dependencies": {
     "protobuf.js": "~1.1.2",
     "riakproto": "~1.4.7",
-    "lab": "^2.0.1"
+    "lab": "^3.0.0"
   },
   "devDependencies": {
     "async": "~0.2.9",
@@ -28,7 +28,7 @@
     "pbc",
     "protobuf"
   ],
-  "author": "Nathan <quitlahok@gmail.com> (https://github.com/nlf)",
+  "author": "Nathan LaFreniere <quitlahok@gmail.com> (https://github.com/nlf)",
   "license": "MIT",
   "engines": {
     "node": ">= 0.10.0 < 0.11"

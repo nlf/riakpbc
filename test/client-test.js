@@ -261,7 +261,7 @@ describe('Client test', function () {
         }
     });
 
-    it('putLarge', function (done) {
+    it('putLarge', { timeout: 3000 }, function (done) {
         var bucket = 'test';
         var value = {}, i;
         for (i = 0; i < 5000; i += 1) {
