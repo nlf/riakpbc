@@ -5,10 +5,10 @@
   "main": "index.js",
   "dependencies": {
     "protobuf.js": "~1.1.2",
-    "riakproto": "~1.4.7",
-    "lab": "^3.0.0"
+    "riakproto": "~1.4.7"
   },
   "devDependencies": {
+    "lab": "^3.0.0",
     "async": "~0.2.9",
     "sinon": "~1.7.3",
     "q": "~0.9.7",
@@ -17,7 +17,7 @@
     "lodash-node": "~2.4.1"
   },
   "scripts": {
-    "test": "lab"
+    "test": "make test"
   },
   "repository": {
     "type": "git",
