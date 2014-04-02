@@ -108,9 +108,10 @@ RiakPBC.prototype.makeRequest = function (opts) {
     message = new Buffer(buffer.length + 5);
 
     if (typeof opts.callback === 'function') {
+        var _cb = opts.callback;
         cb = function (_err, _reply) {
             process.nextTick(function () {
-                opts.callback(_err, _reply);
+                _cb(_err, _reply);
             });
         };
     } else {
