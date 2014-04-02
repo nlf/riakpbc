@@ -60,48 +60,44 @@ RiakPBC.prototype._processMessage = function (data) {
 };
 
 RiakPBC.prototype._cleanup = function (err, reply) {
-    var callback, stream;
-
-    setImmediate(this._processNext.bind(this));
-
     this.reply = {};
 
     if (this.task.callback) {
-        callback = this.task.callback;
-        this.task = undefined;
-        callback(err, reply);
+        this.task.callback(err, reply);
     } else {
-        stream = this.task.stream;
-        this.task = undefined;
         if (err) {
-            stream.emit('error', err);
+            this.task.stream.emit('error', err);
         } else {
-            stream.end();
+            this.task.stream.end();
         }
     }
+
+    this.task = undefined;
+    this._processNext();
 };
 
 RiakPBC.prototype._processNext = function () {
-    if (!this.queue.length || this.task) {
+    var self = this;
+    if (!self.queue.length || self.task) {
         return;
     }
 
-    this.task = this.queue.shift();
+    self.task = self.queue.shift();
 
-    this.connection.send(this.task.message, function (err) {
+    self.connection.send(self.task.message, function (err) {
         if (err) {
-            if (this.task.callback) {
-                this.task.callback(err);
+            if (self.task.callback) {
+                self.task.callback(err);
             } else {
-                this.task.stream.emit('error', err);
+                self.task.stream.emit('error', err);
             }
         }
-    }.bind(this));
+    });
 };
 
 // RiakPBC.prototype.makeRequest = function (type, data, callback, expectMultiple, streaming) {
 RiakPBC.prototype.makeRequest = function (opts) {
-    var buffer, message, stream = null;
+    var buffer, message, stream = null, cb = null;
 
     if (riakproto.messages[opts.type]) {
         buffer = this.translator.encode(opts.type, opts.params);
@@ -111,22 +107,29 @@ RiakPBC.prototype.makeRequest = function (opts) {
 
     message = new Buffer(buffer.length + 5);
 
-    if (typeof opts.callback !== 'function') {
+    if (typeof opts.callback === 'function') {
+        var _cb = opts.callback;
+        cb = function (_err, _reply) {
+            process.nextTick(function () {
+                _cb(_err, _reply);
+            });
+        };
+    } else {
         stream = writableStream();
     }
 
     message.writeInt32BE(buffer.length + 1, 0);
     message.writeInt8(riakproto.codes[opts.type], 4);
     buffer.copy(message, 5);
-    
+
     this.queue.push({
         message: message,
-        callback: typeof opts.callback === 'function' ? opts.callback : null,
+        callback: cb,
         expectMultiple: opts.expectMultiple,
         stream: stream
     });
 
-    setImmediate(this._processNext.bind(this));
+    this._processNext();
 
     return stream;
 };
@@ -331,8 +334,8 @@ function parseMapReduceStream(rawStream) {
         var json = JSON.parse(response);
 
         json.forEach(function (row) {
-            this.push(row);
-        }.bind(this));
+            liner.push(row);
+        });
 
         done();
     };
