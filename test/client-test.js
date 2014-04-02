@@ -261,7 +261,7 @@ describe('Client test', function () {
         }
     });
 
-    it('putLarge', { timeout: 3000 }, function (done) {
+    it('putLarge', { timeout: 4000 }, function (done) {
         var bucket = 'test';
         var value = {}, i;
         for (i = 0; i < 5000; i += 1) {
@@ -284,7 +284,7 @@ describe('Client test', function () {
         });
     });
 
-    it('getLarge', function (done) {
+    it('getLarge', { timeout: 3000 }, function (done) {
         var value = {}, i;
         for (i = 0; i < 5000; i += 1) {
             value['test_key_' + i] = 'test_value_' + i;
