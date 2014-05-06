@@ -73,6 +73,10 @@ connect to the Riak server before running any commands. If the ```disconnect``` 
 is called, ```auto_connect``` will be automatically set to ```false``` to prevent
 future connections and all subsequent client calls will result in an error.
 
+Additionally, you may set the `parse_values` option to false to prevent the default behavior
+of attempting to automatically parse content values based on content-type. If the option
+is set to `false` buffers will always be returned.
+
 ## API
 
 Making requests to Riak is straight-forward.  You call methods on the client,

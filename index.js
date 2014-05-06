@@ -12,6 +12,7 @@ function RiakPBC(options) {
     options.port = options.port || 8087;
     options.timeout = options.timeout || 1000;
     options.auto_connect = options.hasOwnProperty('auto_connect') ? options.auto_connect : true;
+    this.parse_values = options.hasOwnProperty('parse_values') ? options.parse_values : true;
 
     this.connection = new ConnectionManager(options);
     this.connection.receive = this._processMessage.bind(this);
@@ -34,7 +35,7 @@ RiakPBC.prototype._processMessage = function (data) {
         return this._cleanup(err);
     }
 
-    response = parseResponse(response);
+    response = parseResponse(response, this.parse_values);
 
     if (response.errmsg) {
         err = new Error(response.errmsg);
