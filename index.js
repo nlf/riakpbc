@@ -24,6 +24,11 @@ function RiakPBC(options) {
 }
 
 RiakPBC.prototype._processMessage = function (data) {
+
+    if (!this.task) {
+        return this._processNext();
+    }
+
     var response, messageCode, err, done;
 
     messageCode = riakproto.codes['' + data[0]];
