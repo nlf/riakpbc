@@ -4,17 +4,14 @@
   "description": "RiakPBC is a low-level Riak 1.4 proto buffer client.",
   "main": "index.js",
   "dependencies": {
-    "protobuf.js": "~1.1.2",
-    "riakproto": "~1.4.7"
+    "generic-pool": "^2.1.0",
+    "protobuf.js": "^1.1.2",
+    "riakproto": "^1.4.7"
   },
   "devDependencies": {
     "lab": "^3.0.0",
-    "async": "~0.2.9",
-    "sinon": "~1.7.3",
-    "q": "~0.9.7",
-    "eyespect": "~0.1.10",
-    "precommit-hook": "~0.3.8",
-    "lodash-node": "~2.4.1"
+    "async": "^0.9.0",
+    "precommit-hook": "^1.0.2"
   },
   "scripts": {
     "test": "make test"
