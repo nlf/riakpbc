@@ -1,6 +1,6 @@
 var Stream = require('stream');
 var Quorum = require('./lib/quorum');
-var ConnectionManager = require('./lib/connection-manager');
+var Connection= require('./lib/connection');
 var Pool = require('generic-pool').Pool;
 
 function RiakPBC(options) {
@@ -28,7 +28,7 @@ function RiakPBC(options) {
         refreshIdle: false,
         create: function (callback) {
 
-            var client = new ConnectionManager(options);
+            var client = new Connection(options);
             client.connect(function () {
 
                 callback(null, client);
