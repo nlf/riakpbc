@@ -114,6 +114,36 @@ describe('Parser', function () {
         done();
     });
 
+    it('parses index values when parse = true', function (done) {
+
+        var obj = {
+            key: 'test_bin',
+            value: new Buffer('test')
+        };
+
+        expect(Parser.parse(obj, true)).to.deep.equal({
+            key: 'test_bin',
+            value: 'test'
+        });
+
+        done();
+    });
+
+    it('does not parse index values when parse = false', function (done) {
+
+        var obj = {
+            key: 'test_bin',
+            value: new Buffer('test')
+        };
+
+        expect(Parser.parse(obj, false)).to.deep.equal({
+            key: 'test_bin',
+            value: new Buffer('test')
+        });
+
+        done();
+    });
+
     it('leaves vclocks as buffers when parse = true', function (done) {
 
         var obj = {

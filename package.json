@@ -5,6 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "generic-pool": "^2.1.0",
+    "joi": "^4.6.1",
     "protobuf.js": "^1.1.2",
     "riakproto": "^1.4.7"
   },

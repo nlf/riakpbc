@@ -33,4 +33,29 @@ describe('Quorum', function () {
 
         done();
     });
+
+    it('converts numerical values to strings', function (done) {
+
+        var obj = {
+            pr: 4294967294,
+            r: 4294967292,
+            w: 4294967293,
+            pw: 4294967291,
+            dw: 4294967294,
+            rw: 4294967292,
+            missing: 12341234
+        };
+
+        expect(Quorum.convert(obj)).to.deep.equal({
+            pr: 'one',
+            r: 'all',
+            w: 'quorum',
+            pw: 'default',
+            dw: 'one',
+            rw: 'all',
+            missing: 12341234
+        });
+
+        done();
+    });
 });

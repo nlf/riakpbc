@@ -2,43 +2,31 @@ var Stream = require('stream');
 var Quorum = require('./lib/quorum');
 var Connection= require('./lib/connection');
 var Pool = require('generic-pool').Pool;
+var schema = require('./lib/schema');
 
 function RiakPBC(options) {
 
-    options = options || {};
+    schema.validate(options, function (err, options) {
 
-    // host settings
-    options.host = options.host || '127.0.0.1';
-    options.port = options.port || 8087;
+        this.pool = Pool({
+            name: 'riakpbc',
+            max: options.max_connections,
+            min: options.min_connections,
+            idleTimeoutMillis: options.idle_timeout,
+            create: function (callback) {
 
-    // timeout settings
-    options.connect_timeout = options.connect_timeout || 1000;
-    options.request_timeout = options.request_timeout || 2000;
+                var client = new Connection(options);
+                client.connect(function () {
 
-    // pool settings
-    options.idle_timeout = options.idle_timeout || 30000;
-    options.min_connections = options.min_connections || 2;
-    options.max_connections = options.max_connections || 10;
+                    callback(null, client);
+                });
+            },
+            destroy: function (client) {
 
-    this.pool = Pool({
-        name: 'riakpbc',
-        max: options.max_connections,
-        min: options.min_connections,
-        idleTimeoutMillis: options.idle_timeout,
-        refreshIdle: false,
-        create: function (callback) {
-
-            var client = new Connection(options);
-            client.connect(function () {
-
-                callback(null, client);
-            });
-        },
-        destroy: function (client) {
-
-            client.disconnect();
-        }
-    });
+                client.disconnect();
+            }
+        });
+    }.bind(this));
 }
 
 RiakPBC.prototype.makeRequest = function (options) {
@@ -225,24 +213,6 @@ RiakPBC.prototype.search = function (params, callback) {
     });
 };
 
-RiakPBC.prototype.getClientId = function (callback) {
-
-    return this.makeRequest({
-        type: 'RpbGetClientIdReq',
-        params: null,
-        callback: callback
-    });
-};
-
-RiakPBC.prototype.setClientId = function (params, callback) {
-
-    return this.makeRequest({
-        type: 'RpbSetClientIdReq',
-        params: params,
-        callback: callback
-    });
-};
-
 RiakPBC.prototype.getServerInfo = function (callback) {
 
     return this.makeRequest({
@@ -261,21 +231,14 @@ RiakPBC.prototype.ping = function (callback) {
     });
 };
 
-// RiakPBC.prototype.connect = function (callback) {
-//
-//     this.connection.connect(callback);
-// };
-//
-// RiakPBC.prototype.disconnect = function () {
-//
-//     if (this.task) {
-//         this.queue.unshift(this.task);
-//         this.task = undefined;
-//     }
-//
-//     this.connection.disconnect();
-// };
-//
+RiakPBC.prototype.end = function (callback) {
+
+    this.pool.drain(function () {
+
+        this.pool.destroyAllNow(callback);
+    }.bind(this));
+};
+
 exports.createClient = function (options) {
 
     return new RiakPBC(options);
