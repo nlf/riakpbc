@@ -115,11 +115,15 @@ RiakPBC.prototype.makeRequest = function (opts) {
 
     if (typeof opts.callback === 'function') {
         var _cb = opts.callback;
+        var domain = process.domain;
         cb = function (_err, _reply) {
             process.nextTick(function () {
                 _cb(_err, _reply);
             });
         };
+        if (domain) {
+            cb = domain.bind(cb);
+        }
     } else {
         stream = writableStream();
     }
