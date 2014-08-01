@@ -1,6 +1,6 @@
 var Stream = require('stream');
 var Quorum = require('./lib/quorum');
-var Connection= require('./lib/connection');
+var Connection = require('./lib/connection');
 var Pool = require('generic-pool').Pool;
 var schema = require('./lib/schema');
 
