@@ -7,4 +7,4 @@ before_script:
   - "curl http://s3.amazonaws.com/downloads.basho.com/riak/2.0/2.0.0/ubuntu/precise/riak_2.0.0-1_amd64.deb -O"
   - "sudo dpkg -i riak_2.0.0-1_amd64.deb"
   - "sudo service riak start"
-  - 'until "riak-admin test"; do echo "checking if riak is up"; done'
+  - 'until riak-admin test; do echo "waiting for riak..."; done'
