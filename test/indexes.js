@@ -1,15 +1,16 @@
 var Lab = require('lab');
 var RiakPBC = require('../');
 
-var after = Lab.after;
-var before = Lab.before;
-var describe = Lab.experiment;
+var lab = exports.lab = Lab.script();
+var after = lab.after;
+var before = lab.before;
+var describe = lab.experiment;
 var expect = Lab.expect;
-var it = Lab.test;
+var it = lab.test;
 
 var client = RiakPBC.createClient();
 
-describe('indexes', function (done) {
+describe('indexes', function () {
 
     describe('callbacks', function () {
 
@@ -77,6 +78,18 @@ describe('indexes', function (done) {
                 expect(reply.keys).to.be.an('array');
                 expect(reply.keys).to.have.length.gte(1);
 
+                done();
+            });
+        });
+
+        after(function (done) {
+
+            client.del({
+                bucket: '_test_indexes',
+                key: 'meat'
+            }, function (err) {
+
+                expect(err).to.not.exist;
                 done();
             });
         });
@@ -153,6 +166,17 @@ describe('indexes', function (done) {
             });
             
             keys.on('end', done);
+        });
+
+        after(function (done) {
+
+            var key = client.del({
+                bucket: '_test_indexes',
+                key: 'meat'
+            });
+
+            key.resume();
+            key.on('end', done);
         });
     });
 });

@@ -1,11 +1,12 @@
 var Lab = require('lab');
 var RiakPBC = require('../');
 
-var after = Lab.after;
-var before = Lab.before;
-var describe = Lab.experiment;
+var lab = exports.lab = Lab.script();
+var after = lab.after;
+var before = lab.before;
+var describe = lab.experiment;
 var expect = Lab.expect;
-var it = Lab.test;
+var it = lab.test;
 
 var client = RiakPBC.createClient();
 var allow_mult;
@@ -114,20 +115,15 @@ describe('buckets', function () {
                 }
             });
 
-            bucket.on('data', function (data) {
-                // do nothing, just need a listener so it can end
-            });
-
+            bucket.resume();
             bucket.on('end', done);
         });
 
         it('can reset bucket properties', function (done) {
 
             var bucket = client.resetBucket({ bucket: '_test_buckets' });
-            bucket.on('data', function (data) { 
-                // do nothing, just need a listener so it can end
-            });
-
+            
+            bucket.resume();
             bucket.on('end', done);
         });
     });

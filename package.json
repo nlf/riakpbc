@@ -7,10 +7,10 @@
     "generic-pool": "^2.1.0",
     "joi": "^4.6.1",
     "protobuf.js": "^1.1.2",
-    "riakproto": "^1.4.7"
+    "riakproto": "^2.0.0"
   },
   "devDependencies": {
-    "lab": "^3.0.0",
+    "lab": "^4.0.0",
     "precommit-hook": "^1.0.2"
   },
   "scripts": {

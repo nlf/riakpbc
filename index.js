@@ -102,6 +102,42 @@ RiakPBC.prototype.resetBucket = function (params, callback) {
     });
 };
 
+RiakPBC.prototype.setBucketType = function (params, callback) {
+
+    return this.makeRequest({
+        type: 'RpbSetBucketTypeReq',
+        params: params,
+        callback: callback
+    });
+};
+
+RiakPBC.prototype.getBucketType = function (params, callback) {
+
+    return this.makeRequest({
+        type: 'RpbGetBucketTypeReq',
+        params: params,
+        callback: callback
+    });
+};
+
+RiakPBC.prototype.updateCrdt = function (params, callback) {
+
+    return this.makeRequest({
+        type: 'DtUpdateReq',
+        params: params,
+        callback: callback
+    });
+};
+
+RiakPBC.prototype.getCrdt = function (params, callback) {
+
+    return this.makeRequest({
+        type: 'DtFetchReq',
+        params: params,
+        callback: callback
+    });
+};
+
 RiakPBC.prototype.getKeys = function (params, callback) {
 
     return this.makeRequest({
@@ -200,6 +236,51 @@ RiakPBC.prototype.getIndex = function (params, callback) {
         type: 'RpbIndexReq',
         params: params,
         expectMultiple: true,
+        callback: callback
+    });
+};
+
+RiakPBC.prototype.createSearchSchema = function (params, callback) {
+
+    return this.makeRequest({
+        type: 'RpbYokozunaSchemaPutReq',
+        params: params,
+        callback: callback
+    });
+};
+
+RiakPBC.prototype.getSearchSchema = function (params, callback) {
+
+    return this.makeRequest({
+        type: 'RpbYokozunaSchemaGetReq',
+        params: params,
+        callback: callback
+    });
+};
+
+RiakPBC.prototype.createSearchIndex = function (params, callback) {
+
+    return this.makeRequest({
+        type: 'RpbYokozunaIndexPutReq',
+        params: params,
+        callback: callback
+    });
+};
+
+RiakPBC.prototype.getSearchIndex = function (params, callback) {
+
+    return this.makeRequest({
+        type: 'RpbYokozunaIndexGetReq',
+        params: params,
+        callback: callback
+    });
+};
+
+RiakPBC.prototype.deleteSearchIndex = function (params, callback) {
+
+    return this.makeRequest({
+        type: 'RpbYokozunaIndexDeleteReq',
+        params: params,
         callback: callback
     });
 };

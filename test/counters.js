@@ -1,11 +1,12 @@
 var Lab = require('lab');
 var RiakPBC = require('../');
 
-var after = Lab.after;
-var before = Lab.before;
-var describe = Lab.experiment;
+var lab = exports.lab = Lab.script();
+var after = lab.after;
+var before = lab.before;
+var describe = lab.experiment;
 var expect = Lab.expect;
-var it = Lab.test;
+var it = lab.test;
 
 var client = RiakPBC.createClient();
 var value;
@@ -72,6 +73,18 @@ describe('counters', function () {
                 done();
             });
         });
+
+        after(function (done) {
+
+            client.del({
+                bucket: '_test_counters',
+                key: 'counter'
+            }, function (err) {
+
+                expect(err).to.not.exist;
+                done();
+            });
+        });
     });
 
     describe('streams', function () {
@@ -98,10 +111,8 @@ describe('counters', function () {
                 key: 'counter',
                 amount: 1
             });
-            counter.on('data', function (data) {
-                // do nothing, just need a listener
-            });
 
+            counter.resume();
             counter.on('end', done);
         });
 
@@ -125,11 +136,20 @@ describe('counters', function () {
                 bucket: '_test_counters',
                 key: 'counter_nothere'
             });
-            counter.on('data', function (data) {
-                // do nothing, just need a listener
+
+            counter.resume();
+            counter.on('end', done);
+        });
+
+        after(function (done) {
+
+            var key = client.del({
+                bucket: '_test_counters',
+                key: 'counter'
             });
 
-            counter.on('end', done);
+            key.resume();
+            key.on('end', done);
         });
     });
 });

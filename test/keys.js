@@ -1,11 +1,12 @@
 var Lab = require('lab');
 var RiakPBC = require('../');
 
-var after = Lab.after;
-var before = Lab.before;
-var describe = Lab.experiment;
+var lab = exports.lab = Lab.script();
+var after = lab.after;
+var before = lab.before;
+var describe = lab.experiment;
 var expect = Lab.expect;
-var it = Lab.test;
+var it = lab.test;
 
 var client = RiakPBC.createClient();
 
@@ -115,12 +116,17 @@ describe('key commands', function () {
             client.del({
                 bucket: '_test_keys',
                 key: 'text'
-            }, function (err, reply) {
+            }, function (err) {
 
                 expect(err).to.not.exist;
-                expect(reply).to.deep.equal({});
+                client.del({
+                    bucket: '_test_keys',
+                    key: 'large'
+                }, function (err) {
 
-                done();
+                    expect(err).to.not.exist;
+                    done();
+                });
             });
         });
     });
@@ -196,10 +202,7 @@ describe('key commands', function () {
                 key: 'text'
             });
 
-            key.on('data', function (data) {
-                // do nothing, just need a handler
-            });
-
+            key.resume();
             key.on('end', done);
         });
     });
