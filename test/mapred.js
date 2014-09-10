@@ -10,9 +10,9 @@ var it = lab.test;
 
 var client = RiakPBC.createClient();
 
-describe('mapreduce', function () {
+describe('MapReduce', function () {
 
-    describe('callbacks', function () {
+    describe('(callbacks)', function () {
 
         before(function (done) {
 
@@ -87,7 +87,7 @@ describe('mapreduce', function () {
         });
     });
 
-    describe('streams', function () {
+    describe('(streams)', function () {
 
         before(function (done) {
 

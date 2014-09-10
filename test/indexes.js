@@ -10,9 +10,9 @@ var it = lab.test;
 
 var client = RiakPBC.createClient();
 
-describe('indexes', function () {
+describe('Secondary Indexes', function () {
 
-    describe('callbacks', function () {
+    describe('(callbacks)', function () {
 
         it('can put a key with an index', function (done) {
 
@@ -95,7 +95,7 @@ describe('indexes', function () {
         });
     });
 
-    describe('streams', function () {
+    describe('(streams)', function () {
 
         it('can put a key with an index', function (done) {
 

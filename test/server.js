@@ -10,9 +10,9 @@ var it = lab.test;
 
 var client = RiakPBC.createClient();
 
-describe('server commands', function () {
+describe('Server', function () {
 
-    describe('callbacks', function () {
+    describe('(callbacks)', function () {
 
         it('can get server info', function (done) {
 
@@ -37,7 +37,7 @@ describe('server commands', function () {
         });
     });
 
-    describe('streams', function () {
+    describe('(streams)', function () {
 
         it('can get server info', function (done) {
 

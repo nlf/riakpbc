@@ -208,26 +208,6 @@ RiakPBC.prototype.mapred = function (params, callback) {
     }));
 };
 
-
-RiakPBC.prototype.getCounter = function (params, callback) {
-
-    return this.makeRequest({
-        type: 'RpbCounterGetReq',
-        params: params,
-        callback: callback
-    });
-};
-
-
-RiakPBC.prototype.updateCounter = function (params, callback) {
-
-    return this.makeRequest({
-        type: 'RpbCounterUpdateReq',
-        params: params,
-        callback: callback
-    });
-};
-
 RiakPBC.prototype.getIndex = function (params, callback) {
 
     params.stream = true;

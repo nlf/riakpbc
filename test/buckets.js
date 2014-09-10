@@ -11,9 +11,9 @@ var it = lab.test;
 var client = RiakPBC.createClient();
 var allow_mult;
 
-describe('buckets', function () {
+describe('Buckets', function () {
 
-    describe('callbacks', function () {
+    describe('(callbacks)', function () {
 
         it('can list buckets', function (done) {
 
@@ -81,7 +81,7 @@ describe('buckets', function () {
         });
     });
 
-    describe('streams', function () {
+    describe('(streams)', function () {
 
         it('can list buckets', function (done) {
 

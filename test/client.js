@@ -8,9 +8,9 @@ var describe = lab.experiment;
 var expect = Lab.expect;
 var it = lab.test;
 
-describe('client', function () {
+describe('Client', function () {
 
-    describe('callbacks', function () {
+    describe('(callbacks)', function () {
 
         it('returns an error when unable to connect', function (done) {
 
@@ -38,7 +38,7 @@ describe('client', function () {
         });
     });
 
-    describe('streams', function () {
+    describe('(streams)', function () {
 
         it('returns an error when unable to connect', function (done) {
 

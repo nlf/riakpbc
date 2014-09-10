@@ -10,5 +10,11 @@ var it = lab.test;
 
 var client = RiakPBC.createClient();
 
-describe('maps', function () {
+describe('Maps', function () {
+
+    describe('(callbacks)', function () {
+    });
+
+    describe('(streams)', function () {
+    });
 });

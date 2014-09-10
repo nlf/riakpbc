@@ -10,5 +10,11 @@ var it = lab.test;
 
 var client = RiakPBC.createClient();
 
-describe('sets', function () {
+describe('Sets', function () {
+
+    describe('(callbacks)', function () {
+    });
+
+    describe('(streams)', function () {
+    });
 });

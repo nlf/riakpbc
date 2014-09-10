@@ -8,7 +8,7 @@ var describe = lab.experiment;
 var expect = Lab.expect;
 var it = lab.test;
 
-describe('schema', function () {
+describe('Options', function () {
 
     it('populates defaults when given undefined', function (done) {
 

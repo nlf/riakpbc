@@ -18,9 +18,9 @@ var searchSchema = {
 };
 
 
-describe('search', function () {
+describe('Search', function () {
 
-    describe('callbacks', function () {
+    describe('(callbacks)', function () {
 
         it('can create a schema', function (done) {
 
@@ -62,7 +62,7 @@ describe('search', function () {
             });
         });
 
-        it('can retrieve an index', { timeout: 10000 }, function (done) {
+        it('can retrieve an index', { timeout: 12000 }, function (done) {
 
             setTimeout(function () {
                 client.getSearchIndex({
@@ -160,7 +160,7 @@ describe('search', function () {
         });
     });
 
-    describe('streams', function () {
+    describe('(streams)', function () {
 
         it('can create a schema', function (done) {
 

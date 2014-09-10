@@ -10,9 +10,9 @@ var it = lab.test;
 
 var client = RiakPBC.createClient();
 
-describe('key commands', function () {
+describe('Keys', function () {
 
-    describe('callbacks', function () {
+    describe('(callbacks)', function () {
 
         it('can write text to a key', function (done) {
 
@@ -131,7 +131,7 @@ describe('key commands', function () {
         });
     });
 
-    describe('streams', function () {
+    describe('(streams)', function () {
 
         it('can write text to a key', function (done) {
 
