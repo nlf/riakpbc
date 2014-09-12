@@ -162,6 +162,19 @@ describe('Parser', function () {
         done();
     });
 
+    it('leaves context as buffer when parse = true', function (done) {
+
+        var obj = {
+            context: new Buffer([0x00, 0x01, 0x02, 0x03])
+        };
+
+        expect(Parser.parse(obj, true)).to.deep.equal({
+            context: new Buffer([0x00, 0x01, 0x02, 0x03])
+        });
+
+        done();
+    });
+
     it('converts other buffers to strings', function (done) {
 
         var obj = {
