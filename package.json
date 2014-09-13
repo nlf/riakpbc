@@ -10,7 +10,7 @@
     "riakproto": "^2.0.0"
   },
   "devDependencies": {
-    "lab": "4.1.0",
+    "lab": "4.0.0",
     "precommit-hook": "^1.0.2"
   },
   "scripts": {
