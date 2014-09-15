@@ -20,11 +20,7 @@ describe('Buckets', function () {
             client.getBuckets(function (err, reply) {
 
                 expect(err).to.not.exist;
-
-                if (reply.buckets) {
-                    expect(reply.buckets).to.be.an('array');
-                }
-
+                expect(reply).to.have.property('buckets').that.is.an('array');
                 done();
             });
         });
@@ -34,47 +30,36 @@ describe('Buckets', function () {
             client.getBucket({ bucket: '_test_buckets' }, function (err, reply) {
 
                 expect(err).to.not.exist;
-                expect(reply.props).to.be.an('object');
-                // don't bother checking for everything, just make sure it's a bucket
+                expect(reply).to.have.property('props').that.is.an('object');
                 expect(reply.props).to.contain.keys(['allow_mult', 'n_val', 'r', 'rw', 'dw', 'w']);
-
+                allow_mult = reply.props.allow_mult;
                 done();
             });
         });
 
         it('can set bucket properties', function (done) {
 
-            client.getBucket({ bucket: '_test_buckets' }, function (err, reply) {
+            client.setBucket({ bucket: '_test_buckets', props: { allow_mult: !allow_mult } }, function (err) {
 
                 expect(err).to.not.exist;
-                allow_mult = reply.props.allow_mult;
-
-                client.setBucket({ bucket: '_test_buckets', props: { allow_mult: !allow_mult } }, function (err, reply) {
+                client.getBucket({ bucket: '_test_buckets' }, function (err, reply) {
 
                     expect(err).to.not.exist;
-                    expect(reply).to.deep.equal({});
-                    client.getBucket({ bucket: '_test_buckets' }, function (err, reply) {
-
-                        expect(err).to.not.exist;
-                        expect(reply.props.allow_mult).to.equal(!allow_mult);
-
-                        done();
-                    });
+                    expect(reply).to.have.deep.property('props.allow_mult', !allow_mult);
+                    done();
                 });
             });
         });
 
         it('can reset bucket properties', function (done) {
 
-            client.resetBucket({ bucket: '_test_buckets' }, function (err, reply) {
+            client.resetBucket({ bucket: '_test_buckets' }, function (err) {
 
                 expect(err).to.not.exist;
-
                 client.getBucket({ bucket: '_test_buckets' }, function (err, reply) {
 
                     expect(err).to.not.exist;
-                    expect(reply.props.allow_mult).to.equal(allow_mult);
-
+                    expect(reply).to.have.deep.property('props.allow_mult', allow_mult);
                     done();
                 });
             });
@@ -85,46 +70,65 @@ describe('Buckets', function () {
 
         it('can list buckets', function (done) {
 
-            var buckets = client.getBuckets();
-            buckets.on('data', function (data) {
+            client.getBuckets().on('error', function (err) {
 
-                expect(data).to.have.key('buckets');
-                expect(data.buckets).to.be.an('array');
-            });
+                expect(err).to.not.exist;
+            }).on('data', function (reply) {
 
-            buckets.on('end', done);
+                expect(reply).to.have.property('buckets').that.is.an('array');
+            }).on('end', done);
         });
 
         it('can get bucket properties', function (done) {
 
-            var bucket = client.getBucket({ bucket: '_test_buckets' });
-            bucket.on('data', function (data) {
+            client.getBucket({ bucket: '_test_buckets' }).on('error', function (err) {
+                
+                expect(err).to.not.exist;
+            }).on('data', function (reply) {
 
-                expect(data).to.have.key('props');
-            });
-
-            bucket.on('end', done);
+                expect(reply).to.have.property('props').that.is.an('object');
+                expect(reply.props).to.contain.keys(['allow_mult', 'n_val', 'r', 'rw', 'dw', 'w']);
+                allow_mult = reply.props.allow_mult;
+            }).on('end', done);
         });
 
         it('can set bucket properties', function (done) {
 
-            var bucket = client.setBucket({
+            client.setBucket({
                 bucket: '_test_buckets',
                 props: {
                     allow_mult: true
                 }
-            });
+            }).on('error', function (err) {
 
-            bucket.resume();
-            bucket.on('end', done);
+                expect(err).to.not.exist;
+            }).on('end', function () {
+
+                client.getBucket({ bucket: '_test_buckets' }).on('error', function (err) {
+
+                    expect(err).to.not.exist;
+                }).on('data', function (reply) {
+
+                    expect(reply).to.have.deep.property('props.allow_mult', !allow_mult);
+                }).on('end', done);
+            }).resume();
         });
 
         it('can reset bucket properties', function (done) {
 
-            var bucket = client.resetBucket({ bucket: '_test_buckets' });
-            
-            bucket.resume();
-            bucket.on('end', done);
+            client.resetBucket({ bucket: '_test_buckets' }).on('error', function (err) {
+
+                expect(err).to.not.exist;
+            }).on('end', function () {
+
+                client.getBucket({ bucket: '_test_buckets' }).on('error', function (err) {
+
+                    expect(err).to.not.exist;
+                }).on('data', function (reply) {
+
+                    expect(reply).to.have.deep.property('props.allow_mult', allow_mult);
+                }).on('end', done);
+            }).resume();
         });
     });
 });
