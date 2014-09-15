@@ -74,9 +74,6 @@ describe('Bucket Types', function () {
 
             client.getBucketType({
                 type: '_test_crdt_counter'
-            }).on('error', function (err) {
-
-                expect(err).to.not.exist;
             }).on('data', function (reply) {
 
                 expect(reply).to.be.an('object');
@@ -94,16 +91,10 @@ describe('Bucket Types', function () {
                 props: {
                     n_val: n_val + 1
                 }
-            }).on('error', function (err) {
-
-                expect(err).to.not.exist;
             }).on('end', function () {
 
                 client.getBucketType({
                     type: '_test_crdt_counter'
-                }).on('error', function (err) {
-
-                    expect(err).to.not.exist;
                 }).on('data', function (reply) {
 
                     expect(reply).to.be.an('object');
