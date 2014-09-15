@@ -62,13 +62,16 @@ describe('Search', function () {
             });
         });
 
-        it('can retrieve an index', { timeout: 12000 }, function (done) {
+        it('can retrieve an index', { timeout: 10000 }, function (done) {
 
-            setTimeout(function () {
+            var getIndex = function () {
                 client.getSearchIndex({
                     name: '_test_search'
                 }, function (err, reply) {
 
+                    if (err && err.message === 'notfound') {
+                        return getIndex();
+                    }
                     expect(err).to.not.exist;
                     expect(reply).to.be.an('object');
                     expect(reply).to.have.property('index');
@@ -79,10 +82,12 @@ describe('Search', function () {
                     expect(reply.index[0]).to.have.property('schema', searchSchema.name);
                     done();
                 });
-            }, 8000);
+            }
+
+            getIndex();
         });
 
-        it('can assign a search index to a bucket', { timeout: 10000 }, function (done) {
+        it('can assign a search index to a bucket', function (done) {
 
             client.setBucket({
                 bucket: '_test_search',
@@ -112,7 +117,7 @@ describe('Search', function () {
             });
         });
 
-        it('can search', { timeout: 5000 }, function (done) {
+        it('can search', { timeout: 10000 }, function (done) {
 
             setTimeout(function () {
                 client.search({
@@ -204,10 +209,17 @@ describe('Search', function () {
 
         it('can retrieve an index', { timeout: 10000 }, function (done) {
 
-            setTimeout(function () {
+            var retry = false;
 
+            var getIndex = function () {
                 var index = client.getSearchIndex({
                     name: '_test_search'
+                });
+
+                index.on('error', function (err) {
+                    if (err && err.message) {
+                        retry = true;
+                    }
                 });
 
                 index.on('data', function (reply) {
@@ -221,11 +233,19 @@ describe('Search', function () {
                     expect(reply.index[0]).to.have.property('schema', searchSchema.name);
                 });
 
-                index.on('end', done);
-            }, 8000);
+                index.on('end', function () {
+                    if (retry) {
+                        return getIndex();
+                    }
+
+                    done();
+                });
+            }
+
+            getIndex();
         });
 
-        it('can assign a search index to a bucket', { timeout: 10000 }, function (done) {
+        it('can assign a search index to a bucket', function (done) {
 
             var bucket = client.setBucket({
                 bucket: '_test_search',
@@ -254,26 +274,24 @@ describe('Search', function () {
             });
         });
 
-        it('can search', { timeout: 5000 }, function (done) {
+        it('can search', { timeout: 10000 }, function (done) {
 
-            setTimeout(function () {
-                var search = client.search({
-                    q: 'text:abc AND title:test',
-                    index: '_test_search'
-                });
+            var search = client.search({
+                q: 'text:abc AND title:test',
+                index: '_test_search'
+            });
 
-                search.on('data', function (reply) {
+            search.on('data', function (reply) {
 
-                    expect(reply).to.be.an('object');
-                    expect(reply).to.have.property('docs');
-                    expect(reply.docs).to.be.an('array');
-                    expect(reply.docs).to.have.length.above(0);
-                    expect(reply).to.have.property('num_found');
-                    expect(reply.num_found).to.be.above(0);
-                });
+                expect(reply).to.be.an('object');
+                expect(reply).to.have.property('docs');
+                expect(reply.docs).to.be.an('array');
+                expect(reply.docs).to.have.length.above(0);
+                expect(reply).to.have.property('num_found');
+                expect(reply.num_found).to.be.above(0);
+            });
 
-                search.on('end', done);
-            }, 1000);
+            search.on('end', done);
         });
 
         it('can delete a search index', function (done) {
