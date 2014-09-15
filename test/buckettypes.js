@@ -24,8 +24,7 @@ describe('Bucket Types', function () {
 
                 expect(err).to.not.exist;
                 expect(reply).to.be.an('object');
-                expect(reply).to.have.property('props');
-                expect(reply.props).to.be.an('object');
+                expect(reply).to.have.property('props').that.is.an('object');
                 expect(reply.props).to.have.property('datatype', 'counter');
                 expect(reply.props).to.have.property('allow_mult', true);
                 n_val = reply.props.n_val;
@@ -49,8 +48,7 @@ describe('Bucket Types', function () {
 
                     expect(err).to.not.exist;
                     expect(reply).to.be.an('object');
-                    expect(reply).to.have.property('props');
-                    expect(reply.props).to.be.an('object');
+                    expect(reply).to.have.property('props').that.is.an('object');
                     expect(reply.props).to.have.property('datatype', 'counter');
                     expect(reply.props).to.have.property('allow_mult', true);
                     expect(reply.props).to.have.property('n_val', n_val + 1);
@@ -66,11 +64,7 @@ describe('Bucket Types', function () {
                 props: {
                     n_val: n_val
                 }
-            }, function (err) {
-
-                expect(err).to.not.exist;
-                done();
-            });
+            }, done);
         });
     });
 
@@ -78,64 +72,57 @@ describe('Bucket Types', function () {
 
         it('can get a bucket type', function (done) {
 
-            var type = client.getBucketType({
+            client.getBucketType({
                 type: '_test_crdt_counter'
-            });
+            }).on('error', function (err) {
 
-            type.on('data', function (reply) {
+                expect(err).to.not.exist;
+            }).on('data', function (reply) {
 
                 expect(reply).to.be.an('object');
-                expect(reply).to.have.property('props');
-                expect(reply.props).to.be.an('object');
+                expect(reply).to.have.property('props').that.is.an('object');
                 expect(reply.props).to.have.property('datatype', 'counter');
                 expect(reply.props).to.have.property('allow_mult', true);
                 n_val = reply.props.n_val;
-            });
-
-            type.on('end', done);
+            }).on('end', done);
         });
 
         it('can change a bucket type', function (done) {
 
-            var type = client.setBucketType({
+            client.setBucketType({
                 type: '_test_crdt_counter',
                 props: {
                     n_val: n_val + 1
                 }
-            });
+            }).on('error', function (err) {
 
-            type.resume();
-            type.on('end', function () {
+                expect(err).to.not.exist;
+            }).on('end', function () {
 
-                var type = client.getBucketType({
+                client.getBucketType({
                     type: '_test_crdt_counter'
-                });
+                }).on('error', function (err) {
 
-                type.on('data', function (reply) {
+                    expect(err).to.not.exist;
+                }).on('data', function (reply) {
 
                     expect(reply).to.be.an('object');
-                    expect(reply).to.have.property('props');
-                    expect(reply.props).to.be.an('object');
+                    expect(reply).to.have.property('props').that.is.an('object');
                     expect(reply.props).to.have.property('datatype', 'counter');
                     expect(reply.props).to.have.property('allow_mult', true);
                     expect(reply.props).to.have.property('n_val', n_val + 1);
-                });
-
-                type.on('end', done);
-            });
+                }).on('end', done);
+            }).resume();
         });
 
         after(function (done) {
 
-            var type = client.setBucketType({
+            client.setBucketType({
                 type: '_test_crdt_counter',
                 props: {
                     n_val: n_val
                 }
-            });
-
-            type.resume();
-            type.on('end', done);
+            }).on('end', done).resume();
         });
     });
 });
