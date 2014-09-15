@@ -74,10 +74,7 @@ describe('Buckets', function () {
 
         it('can list buckets', function (done) {
 
-            client.getBuckets().on('error', function (err) {
-
-                expect(err).to.not.exist;
-            }).on('data', function (reply) {
+            client.getBuckets().on('data', function (reply) {
 
                 expect(reply).to.be.an('object');
                 expect(reply).to.have.property('buckets').that.is.an('array');
@@ -86,10 +83,7 @@ describe('Buckets', function () {
 
         it('can get bucket properties', function (done) {
 
-            client.getBucket({ bucket: '_test_buckets' }).on('error', function (err) {
-                
-                expect(err).to.not.exist;
-            }).on('data', function (reply) {
+            client.getBucket({ bucket: '_test_buckets' }).on('data', function (reply) {
 
                 expect(reply).to.be.an('object');
                 expect(reply).to.have.property('props').that.is.an('object');
@@ -105,9 +99,6 @@ describe('Buckets', function () {
                 props: {
                     allow_mult: true
                 }
-            }).on('error', function (err) {
-
-                expect(err).to.not.exist;
             }).on('end', function () {
 
                 client.getBucket({ bucket: '_test_buckets' }).on('error', function (err) {
@@ -123,10 +114,7 @@ describe('Buckets', function () {
 
         it('can reset bucket properties', function (done) {
 
-            client.resetBucket({ bucket: '_test_buckets' }).on('error', function (err) {
-
-                expect(err).to.not.exist;
-            }).on('end', function () {
+            client.resetBucket({ bucket: '_test_buckets' }).on('end', function () {
 
                 client.getBucket({ bucket: '_test_buckets' }).on('error', function (err) {
 
