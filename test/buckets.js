@@ -20,6 +20,7 @@ describe('Buckets', function () {
             client.getBuckets(function (err, reply) {
 
                 expect(err).to.not.exist;
+                expect(reply).to.be.an('object');
                 expect(reply).to.have.property('buckets').that.is.an('array');
                 done();
             });
@@ -30,6 +31,7 @@ describe('Buckets', function () {
             client.getBucket({ bucket: '_test_buckets' }, function (err, reply) {
 
                 expect(err).to.not.exist;
+                expect(reply).to.be.an('object');
                 expect(reply).to.have.property('props').that.is.an('object');
                 expect(reply.props).to.contain.keys(['allow_mult', 'n_val', 'r', 'rw', 'dw', 'w']);
                 allow_mult = reply.props.allow_mult;
@@ -45,6 +47,7 @@ describe('Buckets', function () {
                 client.getBucket({ bucket: '_test_buckets' }, function (err, reply) {
 
                     expect(err).to.not.exist;
+                    expect(reply).to.be.an('object');
                     expect(reply).to.have.deep.property('props.allow_mult', !allow_mult);
                     done();
                 });
@@ -59,6 +62,7 @@ describe('Buckets', function () {
                 client.getBucket({ bucket: '_test_buckets' }, function (err, reply) {
 
                     expect(err).to.not.exist;
+                    expect(reply).to.be.an('object');
                     expect(reply).to.have.deep.property('props.allow_mult', allow_mult);
                     done();
                 });
@@ -75,6 +79,7 @@ describe('Buckets', function () {
                 expect(err).to.not.exist;
             }).on('data', function (reply) {
 
+                expect(reply).to.be.an('object');
                 expect(reply).to.have.property('buckets').that.is.an('array');
             }).on('end', done);
         });
@@ -86,6 +91,7 @@ describe('Buckets', function () {
                 expect(err).to.not.exist;
             }).on('data', function (reply) {
 
+                expect(reply).to.be.an('object');
                 expect(reply).to.have.property('props').that.is.an('object');
                 expect(reply.props).to.contain.keys(['allow_mult', 'n_val', 'r', 'rw', 'dw', 'w']);
                 allow_mult = reply.props.allow_mult;
@@ -109,6 +115,7 @@ describe('Buckets', function () {
                     expect(err).to.not.exist;
                 }).on('data', function (reply) {
 
+                    expect(reply).to.be.an('object');
                     expect(reply).to.have.deep.property('props.allow_mult', !allow_mult);
                 }).on('end', done);
             }).resume();
@@ -126,6 +133,7 @@ describe('Buckets', function () {
                     expect(err).to.not.exist;
                 }).on('data', function (reply) {
 
+                    expect(reply).to.be.an('object');
                     expect(reply).to.have.deep.property('props.allow_mult', allow_mult);
                 }).on('end', done);
             }).resume();
