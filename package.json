@@ -1,17 +1,17 @@
 {
   "name": "riakpbc",
   "version": "2.0.0",
-  "description": "RiakPBC is a low-level Riak 1.4 proto buffer client.",
+  "description": "RiakPBC is a low-level Riak protocol buffer client.",
   "main": "index.js",
   "dependencies": {
-    "generic-pool": "^2.1.0",
-    "joi": "^4.6.1",
-    "protobuf.js": "^1.1.2",
-    "riakproto": "^2.0.0"
+    "generic-pool": "2.x.x",
+    "joi": "4.x.x",
+    "protobuf.js": "1.x.x",
+    "riakproto": "2.x.x"
   },
   "devDependencies": {
     "lab": "4.x.x",
-    "precommit-hook": "^1.0.2"
+    "precommit-hook": "1.x.x"
   },
   "scripts": {
     "test": "make test-cov"
@@ -28,6 +28,6 @@
   "author": "Nathan LaFreniere <quitlahok@gmail.com> (https://github.com/nlf)",
   "license": "MIT",
   "engines": {
-    "node": ">= 0.10.0 < 0.11"
+    "node": ">= 0.10.0 < 0.12"
   }
 }
