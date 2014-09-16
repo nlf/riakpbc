@@ -49,5 +49,17 @@ describe('Client', function () {
                 done();
             });
         });
+
+        it('can specify a list of nodes', function (done) {
+
+            var nodes = [{ host: '127.0.0.1', port: 8087 }];
+            var client = RiakPBC.createClient({ nodes: nodes });
+
+            client.ping(function (err) {
+
+                expect(err).to.not.exist;
+                done();
+            });
+        });
     });
 });

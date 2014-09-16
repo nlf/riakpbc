@@ -1,5 +1,5 @@
 var Lab = require('lab');
-var Schema = require('../lib/schema');
+var Options = require('../lib/options');
 
 var lab = exports.lab = Lab.script();
 var after = lab.after;
@@ -12,12 +12,11 @@ describe('Options', function () {
 
     it('populates defaults when given undefined', function (done) {
 
-        Schema.validate(undefined, function (err, value) {
+        Options.validate(undefined, function (err, value) {
 
             expect(err).to.not.exist;
             expect(value).to.deep.equal({
-                host: '127.0.0.1',
-                port: 8087,
+                nodes: [{ host: '127.0.0.1', port: 8087 }],
                 connect_timeout: 1000,
                 request_timeout: 2000,
                 idle_timeout: 30000,
@@ -32,12 +31,11 @@ describe('Options', function () {
 
     it('populates defaults when given an empty object', function (done) {
 
-        Schema.validate({}, function (err, value) {
+        Options.validate({}, function (err, value) {
 
             expect(err).to.not.exist;
             expect(value).to.deep.equal({
-                host: '127.0.0.1',
-                port: 8087,
+                nodes: [{ host: '127.0.0.1', port: 8087 }],
                 connect_timeout: 1000,
                 request_timeout: 2000,
                 idle_timeout: 30000,
@@ -53,7 +51,16 @@ describe('Options', function () {
     it('throws when options are invalid', function (done) {
 
         expect(function () {
-            Schema.validate({ port: 'bacon' });
+            Options.validate({ port: 'bacon' });
+        }).to.throw(Error);
+
+        done();
+    });
+
+    it('does not allow host/port combo when specifying nodes', function (done) {
+
+        expect(function () {
+            Options.validate({ host: '127.0.0.1', port: 8087, nodes: [{ host: '127.0.0.1', port: 8087 }] })
         }).to.throw(Error);
 
         done();

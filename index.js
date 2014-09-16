@@ -2,20 +2,24 @@ var Stream = require('stream');
 var Quorum = require('./lib/quorum');
 var Connection = require('./lib/connection');
 var Pool = require('generic-pool').Pool;
-var schema = require('./lib/schema');
+var Balancer = require('./lib/balancer');
+var Options = require('./lib/options');
 
 function RiakPBC(options) {
 
-    schema.validate(options, function (err, options) {
+    var self = this;
 
-        this.pool = Pool({
+    Options.validate(options, function (err, options) {
+
+        self.balancer = new Balancer(options);
+        self.pool = Pool({
             name: 'riakpbc',
             max: options.max_connections,
             min: options.min_connections,
             idleTimeoutMillis: options.idle_timeout,
             create: function (callback) {
 
-                var client = new Connection(options);
+                var client = new Connection(self.balancer.next());
                 client.connect(function () {
 
                     callback(null, client);
@@ -26,7 +30,7 @@ function RiakPBC(options) {
                 client.disconnect();
             }
         });
-    }.bind(this));
+    });
 }
 
 RiakPBC.prototype.makeRequest = function (options) {
