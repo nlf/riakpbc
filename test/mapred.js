@@ -23,12 +23,7 @@ describe('MapReduce', function () {
                     value: 'test',
                     content_type: 'text/plain'
                 }
-            }, function (err) {
-
-                expect(err).to.not.exist;
-
-                done();
-            });
+            }, done);
         });
 
         it('can execute a mapreduce query', function (done) {
@@ -52,7 +47,6 @@ describe('MapReduce', function () {
                 expect(reply).to.be.an('array');
                 expect(reply).to.have.length.gte(1);
                 expect(reply).to.contain('test');
-
                 done();
             });
         });
@@ -69,7 +63,6 @@ describe('MapReduce', function () {
             }, function (err, reply) {
 
                 expect(err).to.exist;
-
                 done();
             });
         });
@@ -79,11 +72,7 @@ describe('MapReduce', function () {
             client.del({
                 bucket: '_test_mapred',
                 key: 'test'
-            }, function (err) {
-
-                expect(err).to.not.exist;
-                done();
-            });
+            }, done);
         });
     });
 
@@ -98,12 +87,7 @@ describe('MapReduce', function () {
                     value: 'test',
                     content_type: 'text/plain'
                 }
-            }, function (err) {
-
-                expect(err).to.not.exist;
-
-                done();
-            });
+            }).on('end', done).resume();
         });
 
         it('can execute a mapreduce query', function (done) {
@@ -118,17 +102,13 @@ describe('MapReduce', function () {
                 }]
             };
 
-            var mapred = client.mapred({
+            client.mapred({
                 request: JSON.stringify(request),
                 content_type: 'application/json'
-            });
+            }).on('data', function (reply) {
 
-            mapred.on('data', function (data) {
-
-                expect(data).to.equal('test');
-            });
-
-            mapred.on('end', done);
+                expect(reply).to.equal('test');
+            }).on('end', done);
         });
 
         it('returns errors when mapreduce query is invalid', function (done) {
@@ -137,12 +117,10 @@ describe('MapReduce', function () {
                 inputs: 5
             };
 
-            var mapred = client.mapred({
+            client.mapred({
                 request: JSON.stringify(request),
                 content_type: 'application/json'
-            });
-
-            mapred.on('error', function (err) {
+            }).on('error', function (err) {
 
                 expect(err).to.exist;
                 done();
@@ -151,13 +129,10 @@ describe('MapReduce', function () {
 
         after(function (done) {
 
-            var key = client.del({
+            client.del({
                 bucket: '_test_mapred',
                 key: 'test'
-            });
-
-            key.resume();
-            key.on('end', done);
+            }).on('end', done).resume();
         });
     });
 });
