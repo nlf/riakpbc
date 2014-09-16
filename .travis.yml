@@ -11,8 +11,8 @@ before_script:
   - "pushd /etc/riak"
   - "sudo sed -i -e 's/search = off/search = on/' riak.conf"
   - "sudo sed -i -e 's/storage_backend = bitcask/storage_backend = memory/' riak.conf"
-  - "sudo sed -i -e 's/## ssl.certfile = $(platform_etc_dir)/cert.pem/ssl.certfile = $(platform_etc_dir)/server.crt/' riak.conf"
-  - "sudo sed -i -e 's/## ssl.keyfile = $(platform_etc_dir)/key.pem/ssl.keyfile = $(platform_etc_dir)/server.key/' riak.conf"
+  - "sudo sed -i -e 's|## ssl.certfile = $(platform_etc_dir)/cert.pem|ssl.certfile = $(platform_etc_dir)/server.crt|' riak.conf"
+  - "sudo sed -i -e 's|## ssl.keyfile = $(platform_etc_dir)/key.pem|ssl.keyfile = $(platform_etc_dir)/server.key|' riak.conf"
   - "popd"
   - "sudo service riak start"
   - 'until sudo riak-admin test > /dev/null 2>&1; do sleep 2; done'
