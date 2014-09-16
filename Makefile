@@ -15,4 +15,13 @@ dt-setup:
 	@riak-admin bucket-type activate _test_crdt_map > /dev/null || true
 	@riak-admin bucket-type activate _test_crdt_set > /dev/null || true
 
-.PHONY: test test-cov test-cov-html dt-setup
+enable-security:
+	@riak-admin security enable > /dev/null || true
+	@riak-admin security add-user riak password=testing > /dev/null || true
+	@riak-admin security add-grant riak_kv.put,riak_kv.get,riak_kv.del on any to riak > /dev/null || true
+	@riak-admin security add-source riak 127.0.0.1/32 password > /dev/null || true
+
+disable-security:
+	@riak-admin security disable > /dev/null || true
+
+.PHONY: test test-cov test-cov-html dt-setup enable-security disable-security

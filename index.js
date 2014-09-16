@@ -20,9 +20,9 @@ function RiakPBC(options) {
             create: function (callback) {
 
                 var client = new Connection(self.balancer.next());
-                client.connect(function () {
+                client.connect(function (err) {
 
-                    callback(null, client);
+                    callback(err, client);
                 });
             },
             destroy: function (client) {
@@ -58,6 +58,17 @@ RiakPBC.prototype.makeRequest = function (options) {
     }
 
     self.pool.acquire(function (err, client) {
+
+        if (err) {
+            if (callback) {
+                callback(err);
+            }
+            else {
+                stream.emit('error', err);
+            }
+
+            return self.pool.release(client);
+        }
 
         client.makeRequest({
             type: options.type,
