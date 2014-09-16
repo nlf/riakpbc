@@ -28,13 +28,11 @@ describe('Keys', function () {
 
                 expect(err).to.not.exist;
                 expect(reply).to.be.an('object');
-                expect(reply.vclock).to.exist;
-                expect(reply.content).to.be.an('array');
+                expect(reply).to.have.property('vclock').that.is.an.instanceof(Buffer);
+                expect(reply).to.have.property('content').that.is.an('array');
                 expect(reply.content).to.have.length(1);
-                expect(reply.content[0]).to.contain.keys(['value', 'content_type']);
-                expect(reply.content[0].value).to.equal('testing');
-                expect(reply.content[0].content_type).to.equal('text/plain');
-
+                expect(reply.content[0]).to.have.property('value', 'testing');
+                expect(reply.content[0]).to.have.property('content_type', 'text/plain');
                 done();
             });
         });
@@ -48,13 +46,11 @@ describe('Keys', function () {
 
                 expect(err).to.not.exist;
                 expect(reply).to.be.an('object');
-                expect(reply.vclock).to.exist;
-                expect(reply.content).to.be.an('array');
-                expect(reply.content).to.have.length.gte(1);
-                expect(reply.content[0]).to.contain.keys(['value', 'content_type']);
-                expect(reply.content[0].value).to.equal('testing');
-                expect(reply.content[0].content_type).to.equal('text/plain');
-
+                expect(reply).to.have.property('vclock').that.is.an.instanceof(Buffer);
+                expect(reply).to.have.property('content').that.is.an('array');
+                expect(reply.content).to.have.length(1);
+                expect(reply.content[0]).to.have.property('value', 'testing');
+                expect(reply.content[0]).to.have.property('content_type', 'text/plain');
                 done();
             });
         });
@@ -75,13 +71,11 @@ describe('Keys', function () {
 
                 expect(err).to.not.exist;
                 expect(reply).to.be.an('object');
-                expect(reply.vclock).to.exist;
-                expect(reply.content).to.be.an('array');
+                expect(reply).to.have.property('vclock').that.is.an.instanceof(Buffer);
+                expect(reply).to.have.property('content').that.is.an('array');
                 expect(reply.content).to.have.length(1);
-                expect(reply.content[0]).to.contain.keys(['value', 'content_type']);
-                expect(reply.content[0].value).to.equal(data);
-                expect(reply.content[0].content_type).to.equal('text/plain');
-
+                expect(reply.content[0]).to.have.property('value', data);
+                expect(reply.content[0]).to.have.property('content_type', 'text/plain');
                 done();
             });
         });
@@ -92,10 +86,8 @@ describe('Keys', function () {
 
                 expect(err).to.not.exist;
                 expect(reply).to.be.an('object');
-                expect(reply.keys).to.be.an('array');
+                expect(reply).to.have.property('keys').that.is.an('array');
                 expect(reply.keys).to.have.length.above(0);
-                expect(reply.keys[0]).to.be.a('string');
-
                 done();
             });
         });
@@ -105,8 +97,8 @@ describe('Keys', function () {
             client.getKeys({ bucket: '_test_does_not_exist' }, function (err, reply) {
 
                 expect(err).to.not.exist;
-                expect(reply).to.deep.equal({});
-
+                expect(reply).to.be.an('object');
+                expect(reply).to.be.empty;
                 done();
             });
         });
@@ -135,7 +127,7 @@ describe('Keys', function () {
 
         it('can write text to a key', function (done) {
 
-            var key = client.put({
+            client.put({
                 bucket: '_test_keys',
                 key: 'text',
                 content: {
@@ -143,67 +135,88 @@ describe('Keys', function () {
                     value: 'testing'
                 },
                 return_body: true
-            });
-            
-            key.on('data', function (data) {
+            }).on('data', function (reply) {
 
-                expect(data).to.be.an('object');
-                expect(data.vclock).to.exist;
-                expect(data.content).to.be.an('array');
-                expect(data.content).to.have.length(1);
-                expect(data.content[0]).to.contain.keys(['value', 'content_type']);
-                expect(data.content[0].value).to.equal('testing');
-                expect(data.content[0].content_type).to.equal('text/plain');
-            });
-
-            key.on('end', done);
+                expect(reply).to.be.an('object');
+                expect(reply).to.have.property('vclock').that.is.an.instanceof(Buffer);
+                expect(reply).to.have.property('content').that.is.an('array');
+                expect(reply.content).to.have.length(1);
+                expect(reply.content[0]).to.have.property('value', 'testing');
+                expect(reply.content[0]).to.have.property('content_type', 'text/plain');
+            }).on('end', done);
         });
 
         it('can retrieve text from a key', function (done) {
 
-            var key = client.get({
+            client.get({
                 bucket: '_test_keys',
                 key: 'text'
-            });
+            }).on('data', function (reply) {
 
-            key.on('data', function (data) {
 
-                expect(data).to.be.an('object');
-                expect(data.vclock).to.exist;
-                expect(data.content).to.be.an('array');
-                expect(data.content).to.have.length.gte(1);
-                expect(data.content[0]).to.contain.keys(['value', 'content_type']);
-                expect(data.content[0].value).to.equal('testing');
-                expect(data.content[0].content_type).to.equal('text/plain');
-            });
+                expect(reply).to.be.an('object');
+                expect(reply).to.have.property('vclock').that.is.an.instanceof(Buffer);
+                expect(reply).to.have.property('content').that.is.an('array');
+                expect(reply.content).to.have.length(1);
+                expect(reply.content[0]).to.have.property('value', 'testing');
+                expect(reply.content[0]).to.have.property('content_type', 'text/plain');
+            }).on('end', done);
+        });
 
-            key.on('end', done);
+        it('can write large data to a key', function (done) {
+
+            var data = new Array(100000).join('12345');
+
+            client.put({
+                bucket: '_test_keys',
+                key: 'large',
+                content: {
+                    value: data,
+                    content_type: 'text/plain'
+                },
+                return_body: true
+            }).on('data', function (reply) {
+
+                expect(reply).to.be.an('object');
+                expect(reply).to.have.property('vclock').that.is.an.instanceof(Buffer);
+                expect(reply).to.have.property('content').that.is.an('array');
+                expect(reply.content).to.have.length(1);
+                expect(reply.content[0]).to.have.property('value', data);
+                expect(reply.content[0]).to.have.property('content_type', 'text/plain');
+            }).on('end', done);
         });
 
         it('can list keys', function (done) {
 
-            var keys = client.getKeys({ bucket: '_test_keys' });
+            client.getKeys({ bucket: '_test_keys' }).on('data', function (reply) {
 
-            keys.on('data', function (data) {
+                expect(reply).to.be.an('object');
+                expect(reply.keys).to.be.an('array');
+                expect(reply.keys).to.have.length.above(0);
+            }).on('end', done);
+        });
 
-                expect(data).to.be.an('object');
-                expect(data.keys).to.be.an('array');
-                expect(data.keys).to.have.length.above(0);
-                expect(data.keys[0]).to.be.a('string');
-            });
+        it('returns an empty object when listing keys in an empty bucket', function (done) {
 
-            keys.on('end', done);
+            client.getKeys({ bucket: '_test_does_not_exist' }).on('data', function (reply) {
+
+                expect(reply).to.be.an('object');
+                expect(reply).to.be.empty;
+            }).on('end', done);
         });
 
         it('can delete a key', function (done) {
 
-            var key = client.del({
+            client.del({
                 bucket: '_test_keys',
                 key: 'text'
-            });
+            }).on('end', function () {
 
-            key.resume();
-            key.on('end', done);
+                client.del({
+                    bucket: '_test_keys',
+                    key: 'large'
+                }).on('end', done).resume();
+            }).resume();
         });
     });
 });
