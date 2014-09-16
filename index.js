@@ -40,6 +40,10 @@ RiakPBC.prototype.makeRequest = function (options) {
                 options.callback(err, reply);
             });
         };
+
+        if (process.domain) {
+            callback = process.domain.bind(callback);
+        }
     }
     else {
         stream = writableStream();
