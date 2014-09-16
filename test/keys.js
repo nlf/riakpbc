@@ -153,7 +153,6 @@ describe('Keys', function () {
                 key: 'text'
             }).on('data', function (reply) {
 
-
                 expect(reply).to.be.an('object');
                 expect(reply).to.have.property('vclock').that.is.an.instanceof(Buffer);
                 expect(reply).to.have.property('content').that.is.an('array');
