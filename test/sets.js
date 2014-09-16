@@ -42,6 +42,7 @@ describe('Sets', function () {
             }, function (err, reply) {
 
                 expect(err).to.not.exist;
+                expect(reply).to.be.an('object');
                 expect(reply).to.have.a.property('type').that.is.a('number').that.equals(2);
                 expect(reply).to.have.a.property('context').that.is.an.instanceof(Buffer);
                 expect(reply).to.have.a.deep.property('value.set_value').that.is.an('array').that.deep.equals(['one']);
@@ -66,6 +67,7 @@ describe('Sets', function () {
             }, function (err, reply) {
                 
                 expect(err).to.not.exist;
+                expect(reply).to.be.an('object');
                 expect(reply).to.have.a.property('context').that.is.an.instanceof(Buffer);
                 expect(reply).to.have.a.property('set_value').that.is.an('array').that.has.members(['one', 'two', 'three']);
                 context = reply.context;
@@ -89,6 +91,7 @@ describe('Sets', function () {
             }, function (err, reply) {
                 
                 expect(err).to.not.exist;
+                expect(reply).to.be.an('object');
                 expect(reply).to.have.a.property('context').that.is.an.instanceof(Buffer);
                 expect(reply).to.have.a.property('set_value').that.is.an('array').that.has.members(['one', 'two']);
                 expect(reply.set_value).to.not.contain('three');
@@ -114,6 +117,7 @@ describe('Sets', function () {
             }, function (err, reply) {
                 
                 expect(err).to.not.exist;
+                expect(reply).to.be.an('object');
                 expect(reply).to.have.a.property('context').that.is.an.instanceof(Buffer);
                 expect(reply).to.have.a.property('set_value').that.is.an('array').that.has.members(['a', 'b', 'c']);
                 expect(reply.set_value).to.not.have.members(['one', 'two', 'three']);
@@ -127,11 +131,7 @@ describe('Sets', function () {
                 bucket: '_test_sets',
                 type: '_test_crdt_set',
                 key: 'set'
-            }, function (err) {
-
-                expect(err).to.not.exist;
-                done();
-            });
+            }, done);
         });
     });
 
@@ -139,7 +139,7 @@ describe('Sets', function () {
 
         it('can initialize a set', function (done) {
 
-            var set = client.updateCrdt({
+            client.updateCrdt({
                 bucket: '_test_sets',
                 type: '_test_crdt_set',
                 key: 'set',
@@ -148,34 +148,28 @@ describe('Sets', function () {
                         adds: ['one']
                     }
                 }
-            });
-
-            set.resume();
-            set.on('end', done);
+            }).on('end', done).resume();
         });
 
         it('can retrieve a set', function (done) {
 
-            var set = client.getCrdt({
+            client.getCrdt({
                 bucket: '_test_sets',
                 type: '_test_crdt_set',
                 key: 'set'
-            });
+            }).on('data', function (reply) {
 
-            set.on('data', function (reply) {
-
+                expect(reply).to.be.an('object');
                 expect(reply).to.have.a.property('type').that.is.a('number').that.equals(2);
                 expect(reply).to.have.a.property('context').that.is.an.instanceof(Buffer);
                 expect(reply).to.have.a.deep.property('value.set_value').that.is.an('array').that.deep.equals(['one']);
                 context = reply.context;
-            });
-
-            set.on('end', done);
+            }).on('end', done);
         });
 
         it('can append to a set', function (done) {
 
-            var set = client.updateCrdt({
+            client.updateCrdt({
                 bucket: '_test_sets',
                 type: '_test_crdt_set',
                 key: 'set',
@@ -186,21 +180,18 @@ describe('Sets', function () {
                 },
                 context: context,
                 return_body: true
-            });
-
-            set.on('data', function (reply) {
+            }).on('data', function (reply) {
                 
+                expect(reply).to.be.an('object');
                 expect(reply).to.have.a.property('context').that.is.an.instanceof(Buffer);
                 expect(reply).to.have.a.property('set_value').that.is.an('array').that.has.members(['one', 'two', 'three']);
                 context = reply.context;
-            });
-
-            set.on('end', done);
+            }).on('end', done);
         });
 
         it('can remove from a set', function (done) {
 
-            var set = client.updateCrdt({
+            client.updateCrdt({
                 bucket: '_test_sets',
                 type: '_test_crdt_set',
                 key: 'set',
@@ -211,22 +202,19 @@ describe('Sets', function () {
                 },
                 context: context,
                 return_body: true
-            });
-
-            set.on('data', function (reply) {
+            }).on('data', function (reply) {
                 
+                expect(reply).to.be.an('object');
                 expect(reply).to.have.a.property('context').that.is.an.instanceof(Buffer);
                 expect(reply).to.have.a.property('set_value').that.is.an('array').that.has.members(['one', 'two']);
                 expect(reply.set_value).to.not.contain('three');
                 context = reply.context;
-            });
-
-            set.on('end', done);
+            }).on('end', done);
         });
 
         it('can add and remove from a set at the same time', function (done) {
 
-            var set = client.updateCrdt({
+            client.updateCrdt({
                 bucket: '_test_sets',
                 type: '_test_crdt_set',
                 key: 'set',
@@ -238,28 +226,22 @@ describe('Sets', function () {
                 },
                 context: context,
                 return_body: true
-            });
-
-            set.on('data', function (reply) {
+            }).on('data', function (reply) {
                 
+                expect(reply).to.be.an('object');
                 expect(reply).to.have.a.property('context').that.is.an.instanceof(Buffer);
                 expect(reply).to.have.a.property('set_value').that.is.an('array').that.has.members(['a', 'b', 'c']);
                 expect(reply.set_value).to.not.have.members(['one', 'two', 'three']);
-            });
-
-            set.on('end', done);
+            }).on('end', done);
         });
 
         after(function (done) {
 
-            var set = client.del({
+            client.del({
                 bucket: '_test_sets',
                 type: '_test_crdt_set',
                 key: 'set'
-            });
-
-            set.resume();
-            set.on('end', done);
+            }).on('end', done).resume();
         });
     });
 });
