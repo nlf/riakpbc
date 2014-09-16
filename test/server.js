@@ -19,8 +19,8 @@ describe('Server', function () {
             client.getServerInfo(function (err, reply) {
 
                 expect(err).to.not.exist;
+                expect(reply).to.be.an('object');
                 expect(reply).to.contain.keys(['node', 'server_version']);
-
                 done();
             });
         });
@@ -30,8 +30,8 @@ describe('Server', function () {
             client.ping(function (err, reply) {
 
                 expect(err).to.not.exist;
-                expect(reply).to.deep.equal({});
-
+                expect(reply).to.be.an('object');
+                expect(reply).to.be.empty;
                 done();
             });
         });
@@ -41,24 +41,20 @@ describe('Server', function () {
 
         it('can get server info', function (done) {
 
-            var info = client.getServerInfo();
-            info.on('data', function (data) {
+            client.getServerInfo().on('data', function (reply) {
 
-                expect(data).to.contain.keys(['node', 'server_version']);
-            });
-
-            info.on('end', done);
+                expect(reply).to.be.an('object');
+                expect(reply).to.contain.keys(['node', 'server_version']);
+            }).on('end', done);
         });
 
         it('can ping', function (done) {
 
-            var ping = client.ping();
-            ping.on('data', function (data) {
+            client.ping().on('data', function (reply) {
 
-                expect(data).to.deep.equal({});
-            });
-
-            ping.on('end', done);
+                expect(reply).to.be.an('object');
+                expect(reply).to.be.empty;
+            }).on('end', done);
         });
     });
 });
