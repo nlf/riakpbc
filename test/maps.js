@@ -57,6 +57,7 @@ describe('Maps', function () {
             }, function (err, reply) {
 
                 expect(err).to.not.exist;
+                expect(reply).to.be.an('object');
                 expect(reply).to.have.property('context').that.is.an.instanceof(Buffer);
                 expect(reply).to.have.property('type', 3);
                 expect(reply).to.have.property('value').that.is.an('object');
@@ -87,6 +88,7 @@ describe('Maps', function () {
             }, function (err, reply) {
 
                 expect(err).to.not.exist;
+                expect(reply).to.be.an('object');
                 expect(reply).to.have.property('context').that.is.an.instanceof(Buffer);
                 context = reply.context;
                 expect(reply).to.have.property('map_value').that.is.an.instanceof(Array);
@@ -123,6 +125,7 @@ describe('Maps', function () {
             }, function (err, reply) {
 
                 expect(err).to.not.exist;
+                expect(reply).to.be.an('object');
                 expect(reply).to.have.property('context').that.is.an.instanceof(Buffer);
                 context = reply.context;
                 expect(reply).to.have.property('map_value').that.is.an.instanceof(Array);
@@ -154,6 +157,7 @@ describe('Maps', function () {
             }, function (err, reply) {
 
                 expect(err).to.not.exist;
+                expect(reply).to.be.an('object');
                 expect(reply).to.have.property('context').that.is.an.instanceof(Buffer);
                 context = reply.context;
                 expect(reply).to.have.property('map_value').that.is.an.instanceof(Array);
@@ -185,6 +189,7 @@ describe('Maps', function () {
             }, function (err, reply) {
 
                 expect(err).to.not.exist;
+                expect(reply).to.be.an('object');
                 expect(reply).to.have.property('context').that.is.an.instanceof(Buffer);
                 context = reply.context;
                 expect(reply).to.have.property('map_value').that.is.an.instanceof(Array);
@@ -224,6 +229,7 @@ describe('Maps', function () {
             }, function (err, reply) {
             
                 expect(err).to.not.exist;
+                expect(reply).to.be.an('object');
                 expect(reply).to.have.property('context').that.is.an.instanceof(Buffer);
                 context = reply.context;
                 expect(reply).to.have.property('map_value').that.is.an.instanceof(Array);
@@ -252,6 +258,7 @@ describe('Maps', function () {
             }, function (err, reply) {
 
                 expect(err).to.not.exist;
+                expect(reply).to.be.an('object');
                 expect(reply).to.have.property('context').that.is.an.instanceof(Buffer);
                 expect(reply).to.have.property('map_value').that.is.an.instanceof(Array);
                 expect(reply.map_value).to.have.length(4);
@@ -266,11 +273,7 @@ describe('Maps', function () {
                 bucket: '_test_maps',
                 type: '_test_crdt_map',
                 key: '_test_map'
-            }, function (err) {
-
-                expect(err).to.not.exist;
-                done();
-            });
+            }, done);
         });
     });
 
@@ -278,7 +281,7 @@ describe('Maps', function () {
 
         it('can create a map', function (done) {
 
-            var map = client.updateCrdt({
+            client.updateCrdt({
                 bucket: '_test_maps',
                 type: '_test_crdt_map',
                 key: '_test_map',
@@ -302,33 +305,27 @@ describe('Maps', function () {
                         }]
                     }
                 }
-            });
-
-            map.resume();
-            map.on('end', done);
+            }).on('end', done).resume();
         });
 
         it('can get a map', function (done) {
 
-            var map = client.getCrdt({
+            client.getCrdt({
                 bucket: '_test_maps',
                 type: '_test_crdt_map',
                 key: '_test_map'
-            });
+            }).on('data', function (reply) {
 
-            map.on('data', function (reply) {
-
+                expect(reply).to.be.an('object');
                 expect(reply).to.have.property('context').that.is.an.instanceof(Buffer);
                 expect(reply).to.have.property('type', 3);
                 expect(reply).to.have.property('value').that.is.an('object');
-            });
-            
-            map.on('end', done);
+            }).on('end', done);
         });
 
         it('can update a counter within a map', function (done) {
 
-            var map = client.updateCrdt({
+            client.updateCrdt({
                 bucket: '_test_maps',
                 type: '_test_crdt_map',
                 key: '_test_map',
@@ -346,10 +343,9 @@ describe('Maps', function () {
                     }
                 },
                 return_body: true
-            });
+            }).on('data', function (reply) {
 
-            map.on('data', function (reply) {
-
+                expect(reply).to.be.an('object');
                 expect(reply).to.have.property('context').that.is.an.instanceof(Buffer);
                 context = reply.context;
                 expect(reply).to.have.property('map_value').that.is.an.instanceof(Array);
@@ -358,14 +354,12 @@ describe('Maps', function () {
                 expect(reply.map_value[0]).to.have.deep.property('field.type', 1);
                 expect(reply.map_value[0]).to.have.property('counter_value');
                 expect(reply.map_value[0].counter_value.toNumber()).to.equal(5);
-            });
-
-            map.on('end', done);
+            }).on('end', done);
         });
 
         it('can update a set within a map', function (done) {
 
-            var map = client.updateCrdt({
+            client.updateCrdt({
                 bucket: '_test_maps',
                 type: '_test_crdt_map',
                 key: '_test_map',
@@ -384,23 +378,20 @@ describe('Maps', function () {
                 },
                 context: context,
                 return_body: true
-            });
+            }).on('data', function (reply) {
 
-            map.on('data', function (reply) {
-
+                expect(reply).to.be.an('object');
                 expect(reply).to.have.property('context').that.is.an.instanceof(Buffer);
                 context = reply.context;
                 expect(reply).to.have.property('map_value').that.is.an.instanceof(Array);
                 expect(reply.map_value).to.have.length(2);
                 expect(reply.map_value).to.include({ field: { name: '_set', type: 2 }, set_value: ['one', 'two'] });
-            });
-
-            map.on('end', done);
+            }).on('end', done);
         });
 
         it('can update a register within a map', function (done) {
 
-            var map = client.updateCrdt({
+            client.updateCrdt({
                 bucket: '_test_maps',
                 type: '_test_crdt_map',
                 key: '_test_map',
@@ -417,23 +408,20 @@ describe('Maps', function () {
                 },
                 context: context,
                 return_body: true
-            });
+            }).on('data', function (reply) {
 
-            map.on('data', function (reply) {
-
+                expect(reply).to.be.an('object');
                 expect(reply).to.have.property('context').that.is.an.instanceof(Buffer);
                 context = reply.context;
                 expect(reply).to.have.property('map_value').that.is.an.instanceof(Array);
                 expect(reply.map_value).to.have.length(3);
                 expect(reply.map_value).to.include({ field: { name: '_register', type: 3 }, register_value: 'testing' });
-            });
-
-            map.on('end', done);
+            }).on('end', done);
         });
 
         it('can update a flag within a map', function (done) {
 
-            var map = client.updateCrdt({
+            client.updateCrdt({
                 bucket: '_test_maps',
                 type: '_test_crdt_map',
                 key: '_test_map',
@@ -450,23 +438,20 @@ describe('Maps', function () {
                 },
                 context: context,
                 return_body: true
-            });
+            }).on('data', function (reply) {
 
-            map.on('data', function (reply) {
-
+                expect(reply).to.be.an('object');
                 expect(reply).to.have.property('context').that.is.an.instanceof(Buffer);
                 context = reply.context;
                 expect(reply).to.have.property('map_value').that.is.an.instanceof(Array);
                 expect(reply.map_value).to.have.length(4);
                 expect(reply.map_value).to.include({ field: { name: '_flag', type: 4 }, flag_value: true });
-            });
-
-            map.on('end', done);
+            }).on('end', done);
         });
 
         it('can update a map within a map', function (done) {
 
-            var map = client.updateCrdt({
+            client.updateCrdt({
                 bucket: '_test_maps',
                 type: '_test_crdt_map',
                 key: '_test_map',
@@ -491,23 +476,20 @@ describe('Maps', function () {
                 },
                 context: context,
                 return_body: true
-            });
-
-            map.on('data', function (reply) {
+            }).on('data', function (reply) {
             
+                expect(reply).to.be.an('object');
                 expect(reply).to.have.property('context').that.is.an.instanceof(Buffer);
                 context = reply.context;
                 expect(reply).to.have.property('map_value').that.is.an.instanceof(Array);
                 expect(reply.map_value).to.have.length(5);
                 expect(reply.map_value).to.include({ field: { name: '_map', type: 5 }, map_value: [{ field: { name: '_test', type: 4 }, flag_value: false }] });
-            });
-
-            map.on('end', done);
+            }).on('end', done);
         });
 
         it('can remove a field from a map', function (done) {
 
-            var map = client.updateCrdt({
+            client.updateCrdt({
                 bucket: '_test_maps',
                 type: '_test_crdt_map',
                 key: '_test_map',
@@ -521,29 +503,23 @@ describe('Maps', function () {
                 },
                 context: context,
                 return_body: true
-            });
+            }).on('data', function (reply) {
 
-            map.on('data', function (reply) {
-
+                expect(reply).to.be.an('object');
                 expect(reply).to.have.property('context').that.is.an.instanceof(Buffer);
                 expect(reply).to.have.property('map_value').that.is.an.instanceof(Array);
                 expect(reply.map_value).to.have.length(4);
                 expect(reply.map_value).to.not.include({ field: { name: '_map', type: 5 }, map_value: [{ field: { name: '_test', type: 4 }, flag_value: false }] });
-            });
-
-            map.on('end', done);
+            }).on('end', done);
         });
 
         after(function (done) {
 
-            var map = client.del({
+            client.del({
                 bucket: '_test_maps',
                 type: '_test_crdt_map',
                 key: '_test_map'
-            });
-
-            map.resume();
-            map.on('end', done);
+            }).on('end', done).resume();
         });
     });
 });
