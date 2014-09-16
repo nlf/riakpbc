@@ -41,9 +41,9 @@ describe('Counters', function () {
             }, function (err, reply) {
 
                 expect(err).to.not.exist;
+                expect(reply).to.be.an('object');
                 expect(reply).to.have.property('type', 1);
-                expect(reply).to.have.property('value');
-                expect(reply.value).to.be.an('object');
+                expect(reply).to.have.property('value').that.is.an('object');
                 expect(reply.value).to.have.property('counter_value');
                 expect(reply.value.counter_value.toNumber()).to.equal(1);
                 done();
@@ -60,24 +60,15 @@ describe('Counters', function () {
                     counter_op: {
                         increment: 5
                     }
-                }
-            }, function (err) {
+                },
+                return_body: true
+            }, function (err, reply) {
 
                 expect(err).to.not.exist;
-                client.getCrdt({
-                    bucket: '_test_counters',
-                    type: '_test_crdt_counter',
-                    key: 'counter'
-                }, function (err, reply) {
-
-                    expect(err).to.not.exist;
-                    expect(reply).to.have.property('type', 1);
-                    expect(reply).to.have.property('value');
-                    expect(reply.value).to.be.an('object');
-                    expect(reply.value).to.have.property('counter_value');
-                    expect(reply.value.counter_value.toNumber()).to.equal(6);
-                    done();
-                });
+                expect(reply).to.be.an('object');
+                expect(reply).to.have.property('counter_value');
+                expect(reply.counter_value.toNumber()).to.equal(6);
+                done();
             });
         });
 
@@ -91,24 +82,15 @@ describe('Counters', function () {
                     counter_op: {
                         increment: '5'
                     }
-                }
-            }, function (err) {
+                },
+                return_body: true
+            }, function (err, reply) {
 
                 expect(err).to.not.exist;
-                client.getCrdt({
-                    bucket: '_test_counters',
-                    type: '_test_crdt_counter',
-                    key: 'counter'
-                }, function (err, reply) {
-
-                    expect(err).to.not.exist;
-                    expect(reply).to.have.property('type', 1);
-                    expect(reply).to.have.property('value');
-                    expect(reply.value).to.be.an('object');
-                    expect(reply.value).to.have.property('counter_value');
-                    expect(reply.value.counter_value.toNumber()).to.equal(11);
-                    done();
-                });
+                expect(reply).to.be.an('object');
+                expect(reply).to.have.property('counter_value');
+                expect(reply.counter_value.toNumber()).to.equal(11);
+                done();
             });
         });
 
@@ -122,24 +104,15 @@ describe('Counters', function () {
                     counter_op: {
                         increment: -2
                     }
-                }
-            }, function (err) {
+                },
+                return_body: true
+            }, function (err, reply) {
 
                 expect(err).to.not.exist;
-                client.getCrdt({
-                    bucket: '_test_counters',
-                    type: '_test_crdt_counter',
-                    key: 'counter'
-                }, function (err, reply) {
-
-                    expect(err).to.not.exist;
-                    expect(reply).to.have.property('type', 1);
-                    expect(reply).to.have.property('value');
-                    expect(reply.value).to.be.an('object');
-                    expect(reply.value).to.have.property('counter_value');
-                    expect(reply.value.counter_value.toNumber()).to.equal(9);
-                    done();
-                });
+                expect(reply).to.be.an('object');
+                expect(reply).to.have.property('counter_value');
+                expect(reply.counter_value.toNumber()).to.equal(9);
+                done();
             });
         });
 
@@ -153,24 +126,15 @@ describe('Counters', function () {
                     counter_op: {
                         increment: '-2'
                     }
-                }
-            }, function (err) {
+                },
+                return_body: true
+            }, function (err, reply) {
 
                 expect(err).to.not.exist;
-                client.getCrdt({
-                    bucket: '_test_counters',
-                    type: '_test_crdt_counter',
-                    key: 'counter'
-                }, function (err, reply) {
-
-                    expect(err).to.not.exist;
-                    expect(reply).to.have.property('type', 1);
-                    expect(reply).to.have.property('value');
-                    expect(reply.value).to.be.an('object');
-                    expect(reply.value).to.have.property('counter_value');
-                    expect(reply.value.counter_value.toNumber()).to.equal(7);
-                    done();
-                });
+                expect(reply).to.be.an('object');
+                expect(reply).to.have.property('counter_value');
+                expect(reply.counter_value.toNumber()).to.equal(7);
+                done();
             });
         });
 
@@ -183,8 +147,8 @@ describe('Counters', function () {
             }, function (err, reply) {
 
                 expect(err).to.not.exist;
-                expect(reply).to.deep.equal({ type: 1 });
-
+                expect(reply).to.be.an('object');
+                expect(reply).to.have.property('type', 1);
                 done();
             });
         });
@@ -195,11 +159,7 @@ describe('Counters', function () {
                 bucket: '_test_counters',
                 type: '_test_crdt_counter',
                 key: 'counter'
-            }, function (err) {
-
-                expect(err).to.not.exist;
-                done();
-            });
+            }, done);
         });
     });
 
@@ -207,7 +167,7 @@ describe('Counters', function () {
 
         it('can initialize a counter', function (done) {
 
-            var counter = client.updateCrdt({
+            client.updateCrdt({
                 bucket: '_test_counters',
                 type: '_test_crdt_counter',
                 key: 'counter',
@@ -216,35 +176,28 @@ describe('Counters', function () {
                         increment: 1
                     }
                 }
-            });
-
-            counter.resume();
-            counter.on('end', done);
+            }).on('end', done).resume();
         });
 
         it('can retrieve a counter', function (done) {
 
-            var counter = client.getCrdt({
+            client.getCrdt({
                 bucket: '_test_counters',
                 type: '_test_crdt_counter',
                 key: 'counter'
-            });
+            }).on('data', function (reply) {
 
-            counter.on('data', function (reply) {
-
+                expect(reply).to.be.an('object');
                 expect(reply).to.have.property('type', 1);
-                expect(reply).to.have.property('value');
-                expect(reply.value).to.be.an('object');
+                expect(reply).to.have.property('value').that.is.an('object');
                 expect(reply.value).to.have.property('counter_value');
                 expect(reply.value.counter_value.toNumber()).to.equal(1);
-            });
-
-            counter.on('end', done);
+            }).on('end', done);
         });
 
         it('can increment a counter', function (done) {
 
-            var counter = client.updateCrdt({
+            client.updateCrdt({
                 bucket: '_test_counters',
                 type: '_test_crdt_counter',
                 key: 'counter',
@@ -252,33 +205,19 @@ describe('Counters', function () {
                     counter_op: {
                         increment: 5
                     }
-                }
-            });
+                },
+                return_body: true
+            }).on('data', function (reply) {
 
-            counter.resume();
-            counter.on('end', function () {
-                var counter = client.getCrdt({
-                    bucket: '_test_counters',
-                    type: '_test_crdt_counter',
-                    key: 'counter'
-                });
-
-                counter.on('data', function (reply) {
-
-                    expect(reply).to.have.property('type', 1);
-                    expect(reply).to.have.property('value');
-                    expect(reply.value).to.be.an('object');
-                    expect(reply.value).to.have.property('counter_value');
-                    expect(reply.value.counter_value.toNumber()).to.equal(6);
-                });
-
-                counter.on('end', done);
-            });
+                expect(reply).to.be.an('object');
+                expect(reply).to.have.property('counter_value');
+                expect(reply.counter_value.toNumber()).to.equal(6);
+            }).on('end', done);
         });
 
         it('can increment a counter by a string', function (done) {
 
-            var counter = client.updateCrdt({
+            client.updateCrdt({
                 bucket: '_test_counters',
                 type: '_test_crdt_counter',
                 key: 'counter',
@@ -286,33 +225,19 @@ describe('Counters', function () {
                     counter_op: {
                         increment: '5'
                     }
-                }
-            });
+                },
+                return_body: true
+            }).on('data', function (reply) {
 
-            counter.resume();
-            counter.on('end', function () {
-                var counter = client.getCrdt({
-                    bucket: '_test_counters',
-                    type: '_test_crdt_counter',
-                    key: 'counter'
-                });
-
-                counter.on('data', function (reply) {
-
-                    expect(reply).to.have.property('type', 1);
-                    expect(reply).to.have.property('value');
-                    expect(reply.value).to.be.an('object');
-                    expect(reply.value).to.have.property('counter_value');
-                    expect(reply.value.counter_value.toNumber()).to.equal(11);
-                });
-
-                counter.on('end', done);
-            });
+                expect(reply).to.be.an('object');
+                expect(reply).to.have.property('counter_value');
+                expect(reply.counter_value.toNumber()).to.equal(11);
+            }).on('end', done);
         });
 
         it('can decrement a counter by passing a negative number', function (done) {
 
-            var counter = client.updateCrdt({
+            client.updateCrdt({
                 bucket: '_test_counters',
                 type: '_test_crdt_counter',
                 key: 'counter',
@@ -320,33 +245,19 @@ describe('Counters', function () {
                     counter_op: {
                         increment: -2
                     }
-                }
-            });
+                },
+                return_body: true
+            }).on('data', function (reply) {
 
-            counter.resume();
-            counter.on('end', function () {
-                var counter = client.getCrdt({
-                    bucket: '_test_counters',
-                    type: '_test_crdt_counter',
-                    key: 'counter'
-                });
-
-                counter.on('data', function (reply) {
-
-                    expect(reply).to.have.property('type', 1);
-                    expect(reply).to.have.property('value');
-                    expect(reply.value).to.be.an('object');
-                    expect(reply.value).to.have.property('counter_value');
-                    expect(reply.value.counter_value.toNumber()).to.equal(9);
-                });
-
-                counter.on('end', done);
-            });
+                expect(reply).to.be.an('object');
+                expect(reply).to.have.property('counter_value');
+                expect(reply.counter_value.toNumber()).to.equal(9);
+            }).on('end', done);
         });
 
         it('can decrement a counter by passing a negative number in a string', function (done) {
 
-            var counter = client.updateCrdt({
+            client.updateCrdt({
                 bucket: '_test_counters',
                 type: '_test_crdt_counter',
                 key: 'counter',
@@ -354,52 +265,36 @@ describe('Counters', function () {
                     counter_op: {
                         increment: '-2'
                     }
-                }
-            });
+                },
+                return_body: true
+            }).on('data', function (reply) {
 
-            counter.resume();
-            counter.on('end', function () {
-                var counter = client.getCrdt({
-                    bucket: '_test_counters',
-                    type: '_test_crdt_counter',
-                    key: 'counter'
-                });
-
-                counter.on('data', function (reply) {
-
-                    expect(reply).to.have.property('type', 1);
-                    expect(reply).to.have.property('value');
-                    expect(reply.value).to.be.an('object');
-                    expect(reply.value).to.have.property('counter_value');
-                    expect(reply.value.counter_value.toNumber()).to.equal(7);
-                });
-
-                counter.on('end', done);
-            });
+                expect(reply).to.be.an('object');
+                expect(reply).to.have.property('counter_value');
+                expect(reply.counter_value.toNumber()).to.equal(7);
+            }).on('end', done);
         });
 
         it('returns an empty object when retrieving an empty counter', function (done) {
 
-            var counter = client.getCrdt({
+            client.getCrdt({
                 bucket: '_test_counters',
                 type: '_test_crdt_counter',
                 key: 'counter_nothere'
-            });
+            }).on('data', function (reply) {
 
-            counter.resume();
-            counter.on('end', done);
+                expect(reply).to.be.an('object');
+                expect(reply).to.have.property('type', 1);
+            }).on('end', done);
         });
 
         after(function (done) {
 
-            var key = client.del({
+            client.del({
                 bucket: '_test_counters',
                 type: '_test_crdt_counter',
                 key: 'counter'
-            });
-
-            key.resume();
-            key.on('end', done);
+            }).on('end', done).resume();
         });
     });
 });
