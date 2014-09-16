@@ -16,3 +16,5 @@ before_script:
   - "popd"
   - "sudo service riak start"
   - 'until sudo riak-admin test > /dev/null 2>&1; do sleep 2; done'
+
+script: sudo npm test
