@@ -21,6 +21,19 @@ describe('Client', function () {
                 done();
             });
         });
+
+        it('does not retry a request on a connection timeout', function (done) {
+
+            var count = 0;
+            var client = RiakPBC.createClient({ connect_timeout: 1 });
+            client.ping(function (err) {
+
+                ++count;
+                expect(err).to.not.exist;
+                expect(count).to.equal(1);
+                done();
+            });
+        });
     });
 
     describe('(streams)', function () {
