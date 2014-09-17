@@ -17,7 +17,7 @@ describe('Maps', function () {
 
         it('can create a map', function (done) {
 
-            client.updateCrdt({
+            client.putCrdt({
                 bucket: '_test_maps',
                 type: '_test_crdt_map',
                 key: '_test_map',
@@ -67,7 +67,7 @@ describe('Maps', function () {
 
         it('can update a counter within a map', function (done) {
 
-            client.updateCrdt({
+            client.putCrdt({
                 bucket: '_test_maps',
                 type: '_test_crdt_map',
                 key: '_test_map',
@@ -103,7 +103,7 @@ describe('Maps', function () {
 
         it('can update a set within a map', function (done) {
 
-            client.updateCrdt({
+            client.putCrdt({
                 bucket: '_test_maps',
                 type: '_test_crdt_map',
                 key: '_test_map',
@@ -137,7 +137,7 @@ describe('Maps', function () {
 
         it('can update a register within a map', function (done) {
 
-            client.updateCrdt({
+            client.putCrdt({
                 bucket: '_test_maps',
                 type: '_test_crdt_map',
                 key: '_test_map',
@@ -169,7 +169,7 @@ describe('Maps', function () {
 
         it('can update a flag within a map', function (done) {
 
-            client.updateCrdt({
+            client.putCrdt({
                 bucket: '_test_maps',
                 type: '_test_crdt_map',
                 key: '_test_map',
@@ -201,7 +201,7 @@ describe('Maps', function () {
 
         it('can update a map within a map', function (done) {
 
-            client.updateCrdt({
+            client.putCrdt({
                 bucket: '_test_maps',
                 type: '_test_crdt_map',
                 key: '_test_map',
@@ -241,7 +241,7 @@ describe('Maps', function () {
 
         it('can remove a field from a map', function (done) {
 
-            client.updateCrdt({
+            client.putCrdt({
                 bucket: '_test_maps',
                 type: '_test_crdt_map',
                 key: '_test_map',
@@ -281,7 +281,7 @@ describe('Maps', function () {
 
         it('can create a map', function (done) {
 
-            client.updateCrdt({
+            client.putCrdt({
                 bucket: '_test_maps',
                 type: '_test_crdt_map',
                 key: '_test_map',
@@ -325,7 +325,7 @@ describe('Maps', function () {
 
         it('can update a counter within a map', function (done) {
 
-            client.updateCrdt({
+            client.putCrdt({
                 bucket: '_test_maps',
                 type: '_test_crdt_map',
                 key: '_test_map',
@@ -359,7 +359,7 @@ describe('Maps', function () {
 
         it('can update a set within a map', function (done) {
 
-            client.updateCrdt({
+            client.putCrdt({
                 bucket: '_test_maps',
                 type: '_test_crdt_map',
                 key: '_test_map',
@@ -391,7 +391,7 @@ describe('Maps', function () {
 
         it('can update a register within a map', function (done) {
 
-            client.updateCrdt({
+            client.putCrdt({
                 bucket: '_test_maps',
                 type: '_test_crdt_map',
                 key: '_test_map',
@@ -421,7 +421,7 @@ describe('Maps', function () {
 
         it('can update a flag within a map', function (done) {
 
-            client.updateCrdt({
+            client.putCrdt({
                 bucket: '_test_maps',
                 type: '_test_crdt_map',
                 key: '_test_map',
@@ -451,7 +451,7 @@ describe('Maps', function () {
 
         it('can update a map within a map', function (done) {
 
-            client.updateCrdt({
+            client.putCrdt({
                 bucket: '_test_maps',
                 type: '_test_crdt_map',
                 key: '_test_map',
@@ -489,7 +489,7 @@ describe('Maps', function () {
 
         it('can remove a field from a map', function (done) {
 
-            client.updateCrdt({
+            client.putCrdt({
                 bucket: '_test_maps',
                 type: '_test_crdt_map',
                 key: '_test_map',

@@ -17,7 +17,7 @@ describe('Sets', function () {
 
         it('can initialize a set', function (done) {
 
-            client.updateCrdt({
+            client.putCrdt({
                 bucket: '_test_sets',
                 type: '_test_crdt_set',
                 key: 'set',
@@ -53,7 +53,7 @@ describe('Sets', function () {
 
         it('can append to a set', function (done) {
 
-            client.updateCrdt({
+            client.putCrdt({
                 bucket: '_test_sets',
                 type: '_test_crdt_set',
                 key: 'set',
@@ -77,7 +77,7 @@ describe('Sets', function () {
 
         it('can remove from a set', function (done) {
 
-            client.updateCrdt({
+            client.putCrdt({
                 bucket: '_test_sets',
                 type: '_test_crdt_set',
                 key: 'set',
@@ -102,7 +102,7 @@ describe('Sets', function () {
 
         it('can add and remove from a set at the same time', function (done) {
 
-            client.updateCrdt({
+            client.putCrdt({
                 bucket: '_test_sets',
                 type: '_test_crdt_set',
                 key: 'set',
@@ -139,7 +139,7 @@ describe('Sets', function () {
 
         it('can initialize a set', function (done) {
 
-            client.updateCrdt({
+            client.putCrdt({
                 bucket: '_test_sets',
                 type: '_test_crdt_set',
                 key: 'set',
@@ -169,7 +169,7 @@ describe('Sets', function () {
 
         it('can append to a set', function (done) {
 
-            client.updateCrdt({
+            client.putCrdt({
                 bucket: '_test_sets',
                 type: '_test_crdt_set',
                 key: 'set',
@@ -191,7 +191,7 @@ describe('Sets', function () {
 
         it('can remove from a set', function (done) {
 
-            client.updateCrdt({
+            client.putCrdt({
                 bucket: '_test_sets',
                 type: '_test_crdt_set',
                 key: 'set',
@@ -214,7 +214,7 @@ describe('Sets', function () {
 
         it('can add and remove from a set at the same time', function (done) {
 
-            client.updateCrdt({
+            client.putCrdt({
                 bucket: '_test_sets',
                 type: '_test_crdt_set',
                 key: 'set',

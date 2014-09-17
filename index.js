@@ -139,7 +139,7 @@ RiakPBC.prototype.getBucketType = function (params, callback) {
     });
 };
 
-RiakPBC.prototype.updateCrdt = function (params, callback) {
+RiakPBC.prototype.putCrdt = function (params, callback) {
 
     return this.makeRequest({
         type: 'DtUpdateReq',

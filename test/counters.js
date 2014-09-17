@@ -16,7 +16,7 @@ describe('Counters', function () {
 
         it('can initialize a counter', function (done) {
 
-            client.updateCrdt({
+            client.putCrdt({
                 bucket: '_test_counters',
                 type: '_test_crdt_counter',
                 key: 'counter',
@@ -52,7 +52,7 @@ describe('Counters', function () {
 
         it('can increment a counter', function (done) {
 
-            client.updateCrdt({
+            client.putCrdt({
                 bucket: '_test_counters',
                 type: '_test_crdt_counter',
                 key: 'counter',
@@ -74,7 +74,7 @@ describe('Counters', function () {
 
         it('can increment a counter by a string', function (done) {
 
-            client.updateCrdt({
+            client.putCrdt({
                 bucket: '_test_counters',
                 type: '_test_crdt_counter',
                 key: 'counter',
@@ -96,7 +96,7 @@ describe('Counters', function () {
 
         it('can decrement a counter by passing a negative number', function (done) {
 
-            client.updateCrdt({
+            client.putCrdt({
                 bucket: '_test_counters',
                 type: '_test_crdt_counter',
                 key: 'counter',
@@ -118,7 +118,7 @@ describe('Counters', function () {
 
         it('can decrement a counter by passing a negative number as a string', function (done) {
 
-            client.updateCrdt({
+            client.putCrdt({
                 bucket: '_test_counters',
                 type: '_test_crdt_counter',
                 key: 'counter',
@@ -167,7 +167,7 @@ describe('Counters', function () {
 
         it('can initialize a counter', function (done) {
 
-            client.updateCrdt({
+            client.putCrdt({
                 bucket: '_test_counters',
                 type: '_test_crdt_counter',
                 key: 'counter',
@@ -197,7 +197,7 @@ describe('Counters', function () {
 
         it('can increment a counter', function (done) {
 
-            client.updateCrdt({
+            client.putCrdt({
                 bucket: '_test_counters',
                 type: '_test_crdt_counter',
                 key: 'counter',
@@ -217,7 +217,7 @@ describe('Counters', function () {
 
         it('can increment a counter by a string', function (done) {
 
-            client.updateCrdt({
+            client.putCrdt({
                 bucket: '_test_counters',
                 type: '_test_crdt_counter',
                 key: 'counter',
@@ -237,7 +237,7 @@ describe('Counters', function () {
 
         it('can decrement a counter by passing a negative number', function (done) {
 
-            client.updateCrdt({
+            client.putCrdt({
                 bucket: '_test_counters',
                 type: '_test_crdt_counter',
                 key: 'counter',
@@ -257,7 +257,7 @@ describe('Counters', function () {
 
         it('can decrement a counter by passing a negative number in a string', function (done) {
 
-            client.updateCrdt({
+            client.putCrdt({
                 bucket: '_test_counters',
                 type: '_test_crdt_counter',
                 key: 'counter',
