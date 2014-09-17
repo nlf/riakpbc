@@ -60,7 +60,7 @@ describe('Options', function () {
     it('does not allow host/port combo when specifying nodes', function (done) {
 
         expect(function () {
-            Options.validate({ host: '127.0.0.1', port: 8087, nodes: [{ host: '127.0.0.1', port: 8087 }] })
+            Options.validate({ host: '127.0.0.1', port: 8087, nodes: [{ host: '127.0.0.1', port: 8087 }] });
         }).to.throw(Error);
 
         done();
