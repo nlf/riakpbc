@@ -29,7 +29,7 @@ describe('Security', function () {
 
         before(function (done) {
 
-            Exec('make enable-security', done);
+            Exec('make enable-security', { env: process.env }, done);
         });
 
         it('returns an error when attempting to use a secure node without auth', function (done) {
@@ -55,7 +55,7 @@ describe('Security', function () {
 
         after(function (done) {
 
-            Exec('make disable-security', done);
+            Exec('make disable-security', { env: process.env }, done);
         });
     });
 });
