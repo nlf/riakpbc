@@ -11,7 +11,7 @@ RiakPBC is a low-level [riak 2.0](http://basho.com/riak) [protocol buffer](https
   - [Client options](#client-options)
   - [Client methods](#client-methods)
 - [Bucket Operations](#bucket-operations)
-  - [`client.getBuckets([callback])](#clientgetbucketscallback)
+  - [`client.getBuckets([callback])`](#clientgetbucketscallback)
   - [`client.getKeys(params, [callback])`](#clientgetkeysparams-callback)
   - [`client.getBucket(params, [callback])`](#clientgetbucketparams-callback)
   - [`client.setBucket(params, [callback])`](#clientsetbucketparams-callback)
