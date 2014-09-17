@@ -183,6 +183,8 @@ RiakPBC.prototype.getCrdt = function (params, callback) {
 
 RiakPBC.prototype.getKeys = function (params, callback) {
 
+    params.stream = true;
+
     return this.makeRequest({
         type: 'RpbListKeysReq',
         params: params,
