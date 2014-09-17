@@ -14,9 +14,9 @@ function RiakPBC(options) {
         self.balancer = new Balancer(options);
         self.pool = Pool({
             name: 'riakpbc',
-            max: options.max_connections,
-            min: options.min_connections,
-            idleTimeoutMillis: options.idle_timeout,
+            max: options.maxConnections,
+            min: options.minConnections,
+            idleTimeoutMillis: options.idleTimeout,
             create: function (callback) {
 
                 var client = new Connection(self.balancer.next());

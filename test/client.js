@@ -14,7 +14,7 @@ describe('Client', function () {
 
         it('returns an error when unable to connect', function (done) {
 
-            var client = RiakPBC.createClient({ port: 4312, connect_timeout: 10 });
+            var client = RiakPBC.createClient({ port: 4312, connectTimeout: 10 });
             client.ping(function (err) {
 
                 expect(err).to.exist;
@@ -27,7 +27,7 @@ describe('Client', function () {
 
         it('returns an error when unable to connect', function (done) {
 
-            var client = RiakPBC.createClient({ port: 4312, connect_timeout: 10 });
+            var client = RiakPBC.createClient({ port: 4312, connectTimeout: 10 });
             client.ping().on('error', function (err) {
 
                 expect(err).to.exist;
@@ -40,7 +40,7 @@ describe('Client', function () {
 
         it('destroys the client pool when asked', function (done) {
 
-            var client = RiakPBC.createClient({ min_connections: 5 });
+            var client = RiakPBC.createClient({ minConnections: 5 });
 
             expect(client.pool.getPoolSize()).to.equal(5);
             client.end(function () {

@@ -17,12 +17,11 @@ describe('Options', function () {
             expect(err).to.not.exist;
             expect(value).to.deep.equal({
                 nodes: [{ host: '127.0.0.1', port: 8087 }],
-                connect_timeout: 1000,
-                request_timeout: 2000,
-                idle_timeout: 30000,
-                min_connections: 0,
-                max_connections: 10,
-                parse_values: true
+                connectTimeout: 1000,
+                idleTimeout: 30000,
+                minConnections: 0,
+                maxConnections: 10,
+                parseValues: true
             });
 
             done();
@@ -36,12 +35,11 @@ describe('Options', function () {
             expect(err).to.not.exist;
             expect(value).to.deep.equal({
                 nodes: [{ host: '127.0.0.1', port: 8087 }],
-                connect_timeout: 1000,
-                request_timeout: 2000,
-                idle_timeout: 30000,
-                min_connections: 0,
-                max_connections: 10,
-                parse_values: true
+                connectTimeout: 1000,
+                idleTimeout: 30000,
+                minConnections: 0,
+                maxConnections: 10,
+                parseValues: true
             });
 
             done();
