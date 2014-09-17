@@ -11,7 +11,8 @@
   },
   "devDependencies": {
     "lab": "4.x.x",
-    "precommit-hook": "1.x.x"
+    "precommit-hook": "1.x.x",
+    "jshint": "2.4.x"
   },
   "scripts": {
     "test": "make test-cov"

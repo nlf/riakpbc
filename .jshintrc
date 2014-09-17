@@ -8,11 +8,5 @@
   "indent": 4,
   "maxparams": 8,
   "curly": true,
-  "node": true,
-  "globals": {
-    "it": true,
-    "describe": true,
-    "before": true,
-    "after": true
-  }
+  "node": true
 }
