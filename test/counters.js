@@ -42,7 +42,7 @@ describe('Counters', function () {
 
                 expect(err).to.not.exist;
                 expect(reply).to.be.an('object');
-                expect(reply).to.have.property('type', 1);
+                expect(reply).to.have.property('type', RiakPBC.DataType.Counter);
                 expect(reply).to.have.property('value').that.is.an('object');
                 expect(reply.value).to.have.property('counter_value');
                 expect(reply.value.counter_value.toNumber()).to.equal(1);
@@ -148,7 +148,7 @@ describe('Counters', function () {
 
                 expect(err).to.not.exist;
                 expect(reply).to.be.an('object');
-                expect(reply).to.have.property('type', 1);
+                expect(reply).to.have.property('type', RiakPBC.DataType.Counter);
                 done();
             });
         });
@@ -188,7 +188,7 @@ describe('Counters', function () {
             }).on('data', function (reply) {
 
                 expect(reply).to.be.an('object');
-                expect(reply).to.have.property('type', 1);
+                expect(reply).to.have.property('type', RiakPBC.DataType.Counter);
                 expect(reply).to.have.property('value').that.is.an('object');
                 expect(reply.value).to.have.property('counter_value');
                 expect(reply.value.counter_value.toNumber()).to.equal(1);
@@ -284,7 +284,7 @@ describe('Counters', function () {
             }).on('data', function (reply) {
 
                 expect(reply).to.be.an('object');
-                expect(reply).to.have.property('type', 1);
+                expect(reply).to.have.property('type', RiakPBC.DataType.Counter);
             }).on('end', done);
         });
 

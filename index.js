@@ -33,6 +33,30 @@ function RiakPBC(options) {
     });
 }
 
+exports.FieldType = {
+    Counter: 1,
+    Set: 2,
+    Register: 3,
+    Flag: 4,
+    Map: 5
+};
+
+exports.Flag = {
+    Enable: 1,
+    Disable: 2
+};
+
+exports.DataType = {
+    Counter: 1,
+    Set: 2,
+    Map: 3
+};
+
+exports.IndexType = {
+    Exact: 0,
+    Range: 1
+};
+
 RiakPBC.prototype.makeRequest = function (options) {
 
     var self = this;

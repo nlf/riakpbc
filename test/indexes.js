@@ -51,7 +51,7 @@ describe('Secondary Indexes', function () {
                 bucket: '_test_indexes',
                 index: 'delicious_bin',
                 key: 'yes',
-                qtype: 0
+                qtype: RiakPBC.IndexType.Exact
             }, function (err, reply) {
 
                 expect(err).to.not.exist;
@@ -70,7 +70,7 @@ describe('Secondary Indexes', function () {
                 index: 'delicious_bin',
                 range_min: 'yer',
                 range_max: 'yet',
-                qtype: 1
+                qtype: RiakPBC.IndexType.Range
             }, function (err, reply) {
 
                 expect(err).to.not.exist;
@@ -128,7 +128,7 @@ describe('Secondary Indexes', function () {
                 bucket: '_test_indexes',
                 index: 'delicious_bin',
                 key: 'yes',
-                qtype: 0
+                qtype: RiakPBC.IndexType.Exact
             }).on('data', function (reply) {
 
                 expect(reply).to.be.an('object');
@@ -145,7 +145,7 @@ describe('Secondary Indexes', function () {
                 index: 'delicious_bin',
                 range_min: 'yer',
                 range_max: 'yet',
-                qtype: 1
+                qtype: RiakPBC.IndexType.Range
             }).on('data', function (reply) {
 
                 expect(reply).to.be.an('object');

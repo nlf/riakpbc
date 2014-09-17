@@ -43,7 +43,7 @@ describe('Sets', function () {
 
                 expect(err).to.not.exist;
                 expect(reply).to.be.an('object');
-                expect(reply).to.have.a.property('type').that.is.a('number').that.equals(2);
+                expect(reply).to.have.a.property('type').that.is.a('number').that.equals(RiakPBC.DataType.Set);
                 expect(reply).to.have.a.property('context').that.is.an.instanceof(Buffer);
                 expect(reply).to.have.a.deep.property('value.set_value').that.is.an('array').that.deep.equals(['one']);
                 context = reply.context;
@@ -160,7 +160,7 @@ describe('Sets', function () {
             }).on('data', function (reply) {
 
                 expect(reply).to.be.an('object');
-                expect(reply).to.have.a.property('type').that.is.a('number').that.equals(2);
+                expect(reply).to.have.a.property('type').that.is.a('number').that.equals(RiakPBC.DataType.Set);
                 expect(reply).to.have.a.property('context').that.is.an.instanceof(Buffer);
                 expect(reply).to.have.a.deep.property('value.set_value').that.is.an('array').that.deep.equals(['one']);
                 context = reply.context;

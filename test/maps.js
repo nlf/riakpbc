@@ -25,19 +25,19 @@ describe('Maps', function () {
                     map_op: {
                         adds: [{
                             name: '_counter',
-                            type: 1
+                            type: RiakPBC.FieldType.Counter
                         }, {
                             name: '_set',
-                            type: 2
+                            type: RiakPBC.FieldType.Set
                         }, {
                             name: '_register',
-                            type: 3
+                            type: RiakPBC.FieldType.Register
                         }, {
                             name: '_flag',
-                            type: 4
+                            type: RiakPBC.FieldType.Flag
                         }, {
                             name: '_map',
-                            type: 5
+                            type: RiakPBC.FieldType.Map
                         }]
                     }
                 }
@@ -59,7 +59,7 @@ describe('Maps', function () {
                 expect(err).to.not.exist;
                 expect(reply).to.be.an('object');
                 expect(reply).to.have.property('context').that.is.an.instanceof(Buffer);
-                expect(reply).to.have.property('type', 3);
+                expect(reply).to.have.property('type', RiakPBC.DataType.Map);
                 expect(reply).to.have.property('value').that.is.an('object');
                 done();
             });
@@ -76,7 +76,7 @@ describe('Maps', function () {
                         updates: [{
                             field: {
                                 name: '_counter',
-                                type: 1
+                                type: RiakPBC.FieldType.Counter
                             },
                             counter_op: {
                                 increment: 5
@@ -94,7 +94,7 @@ describe('Maps', function () {
                 expect(reply).to.have.property('map_value').that.is.an.instanceof(Array);
                 expect(reply.map_value).to.have.length(1);
                 expect(reply.map_value[0]).to.have.deep.property('field.name', '_counter');
-                expect(reply.map_value[0]).to.have.deep.property('field.type', 1);
+                expect(reply.map_value[0]).to.have.deep.property('field.type', RiakPBC.FieldType.Counter);
                 expect(reply.map_value[0]).to.have.property('counter_value');
                 expect(reply.map_value[0].counter_value.toNumber()).to.equal(5);
                 done();
@@ -112,7 +112,7 @@ describe('Maps', function () {
                         updates: [{
                             field: {
                                 name: '_set',
-                                type: 2
+                                type: RiakPBC.FieldType.Set
                             },
                             set_op: {
                                 adds: ['one', 'two']
@@ -130,7 +130,7 @@ describe('Maps', function () {
                 context = reply.context;
                 expect(reply).to.have.property('map_value').that.is.an.instanceof(Array);
                 expect(reply.map_value).to.have.length(2);
-                expect(reply.map_value).to.include({ field: { name: '_set', type: 2 }, set_value: ['one', 'two'] });
+                expect(reply.map_value).to.include({ field: { name: '_set', type: RiakPBC.FieldType.Set }, set_value: ['one', 'two'] });
                 done();
             });
         });
@@ -146,7 +146,7 @@ describe('Maps', function () {
                         updates: [{
                             field: {
                                 name: '_register',
-                                type: 3
+                                type: RiakPBC.FieldType.Register
                             },
                             register_op: 'testing'
                         }]
@@ -162,7 +162,7 @@ describe('Maps', function () {
                 context = reply.context;
                 expect(reply).to.have.property('map_value').that.is.an.instanceof(Array);
                 expect(reply.map_value).to.have.length(3);
-                expect(reply.map_value).to.include({ field: { name: '_register', type: 3 }, register_value: 'testing' });
+                expect(reply.map_value).to.include({ field: { name: '_register', type: RiakPBC.FieldType.Register }, register_value: 'testing' });
                 done();
             });
         });
@@ -178,9 +178,9 @@ describe('Maps', function () {
                         updates: [{
                             field: {
                                 name: '_flag',
-                                type: 4
+                                type: RiakPBC.FieldType.Flag
                             },
-                            flag_op: 1
+                            flag_op: RiakPBC.Flag.Enable
                         }]
                     }
                 },
@@ -194,7 +194,7 @@ describe('Maps', function () {
                 context = reply.context;
                 expect(reply).to.have.property('map_value').that.is.an.instanceof(Array);
                 expect(reply.map_value).to.have.length(4);
-                expect(reply.map_value).to.include({ field: { name: '_flag', type: 4 }, flag_value: true });
+                expect(reply.map_value).to.include({ field: { name: '_flag', type: RiakPBC.FieldType.Flag }, flag_value: true });
                 done();
             });
         });
@@ -210,15 +210,15 @@ describe('Maps', function () {
                         updates: [{
                             field: {
                                 name: '_map',
-                                type: 5
+                                type: RiakPBC.FieldType.Map
                             },
                             map_op: {
                                 updates: [{
                                     field: {
                                         name: '_test',
-                                        type: 4
+                                        type: RiakPBC.FieldType.Flag
                                     },
-                                    flag_op: 2
+                                    flag_op: RiakPBC.Flag.Disable
                                 }]
                             }
                         }]
@@ -234,7 +234,7 @@ describe('Maps', function () {
                 context = reply.context;
                 expect(reply).to.have.property('map_value').that.is.an.instanceof(Array);
                 expect(reply.map_value).to.have.length(5);
-                expect(reply.map_value).to.include({ field: { name: '_map', type: 5 }, map_value: [{ field: { name: '_test', type: 4 }, flag_value: false }] });
+                expect(reply.map_value).to.include({ field: { name: '_map', type: RiakPBC.FieldType.Map }, map_value: [{ field: { name: '_test', type: RiakPBC.FieldType.Flag }, flag_value: false }] });
                 done();
             });
         });
@@ -249,7 +249,7 @@ describe('Maps', function () {
                     map_op: {
                         removes: [{
                             name: '_map',
-                            type: 5
+                            type: RiakPBC.FieldType.Map
                         }]
                     }
                 },
@@ -262,7 +262,7 @@ describe('Maps', function () {
                 expect(reply).to.have.property('context').that.is.an.instanceof(Buffer);
                 expect(reply).to.have.property('map_value').that.is.an.instanceof(Array);
                 expect(reply.map_value).to.have.length(4);
-                expect(reply.map_value).to.not.include({ field: { name: '_map', type: 5 }, map_value: [{ field: { name: '_test', type: 4 }, flag_value: false }] });
+                expect(reply.map_value).to.not.include({ field: { name: '_map', type: RiakPBC.FieldType.Map }, map_value: [{ field: { name: '_test', type: 4 }, flag_value: false }] });
                 done();
             });
         });
@@ -289,19 +289,19 @@ describe('Maps', function () {
                     map_op: {
                         adds: [{
                             name: '_counter',
-                            type: 1
+                            type: RiakPBC.FieldType.Counter
                         }, {
                             name: '_set',
-                            type: 2
+                            type: RiakPBC.FieldType.Set
                         }, {
                             name: '_register',
-                            type: 3
+                            type: RiakPBC.FieldType.Register
                         }, {
                             name: '_flag',
-                            type: 4
+                            type: RiakPBC.FieldType.Flag
                         }, {
                             name: '_map',
-                            type: 5
+                            type: RiakPBC.FieldType.Map
                         }]
                     }
                 }
@@ -318,7 +318,7 @@ describe('Maps', function () {
 
                 expect(reply).to.be.an('object');
                 expect(reply).to.have.property('context').that.is.an.instanceof(Buffer);
-                expect(reply).to.have.property('type', 3);
+                expect(reply).to.have.property('type', RiakPBC.DataType.Map);
                 expect(reply).to.have.property('value').that.is.an('object');
             }).on('end', done);
         });
@@ -334,7 +334,7 @@ describe('Maps', function () {
                         updates: [{
                             field: {
                                 name: '_counter',
-                                type: 1
+                                type: RiakPBC.FieldType.Counter
                             },
                             counter_op: {
                                 increment: 5
@@ -351,7 +351,7 @@ describe('Maps', function () {
                 expect(reply).to.have.property('map_value').that.is.an.instanceof(Array);
                 expect(reply.map_value).to.have.length(1);
                 expect(reply.map_value[0]).to.have.deep.property('field.name', '_counter');
-                expect(reply.map_value[0]).to.have.deep.property('field.type', 1);
+                expect(reply.map_value[0]).to.have.deep.property('field.type', RiakPBC.FieldType.Counter);
                 expect(reply.map_value[0]).to.have.property('counter_value');
                 expect(reply.map_value[0].counter_value.toNumber()).to.equal(5);
             }).on('end', done);
@@ -368,7 +368,7 @@ describe('Maps', function () {
                         updates: [{
                             field: {
                                 name: '_set',
-                                type: 2
+                                type: RiakPBC.FieldType.Set
                             },
                             set_op: {
                                 adds: ['one', 'two']
@@ -385,7 +385,7 @@ describe('Maps', function () {
                 context = reply.context;
                 expect(reply).to.have.property('map_value').that.is.an.instanceof(Array);
                 expect(reply.map_value).to.have.length(2);
-                expect(reply.map_value).to.include({ field: { name: '_set', type: 2 }, set_value: ['one', 'two'] });
+                expect(reply.map_value).to.include({ field: { name: '_set', type: RiakPBC.FieldType.Set }, set_value: ['one', 'two'] });
             }).on('end', done);
         });
 
@@ -400,7 +400,7 @@ describe('Maps', function () {
                         updates: [{
                             field: {
                                 name: '_register',
-                                type: 3
+                                type: RiakPBC.FieldType.Register
                             },
                             register_op: 'testing'
                         }]
@@ -415,7 +415,7 @@ describe('Maps', function () {
                 context = reply.context;
                 expect(reply).to.have.property('map_value').that.is.an.instanceof(Array);
                 expect(reply.map_value).to.have.length(3);
-                expect(reply.map_value).to.include({ field: { name: '_register', type: 3 }, register_value: 'testing' });
+                expect(reply.map_value).to.include({ field: { name: '_register', type: RiakPBC.FieldType.Register }, register_value: 'testing' });
             }).on('end', done);
         });
 
@@ -430,9 +430,9 @@ describe('Maps', function () {
                         updates: [{
                             field: {
                                 name: '_flag',
-                                type: 4
+                                type: RiakPBC.FieldType.Flag
                             },
-                            flag_op: 1
+                            flag_op: RiakPBC.Flag.Enable
                         }]
                     }
                 },
@@ -445,7 +445,7 @@ describe('Maps', function () {
                 context = reply.context;
                 expect(reply).to.have.property('map_value').that.is.an.instanceof(Array);
                 expect(reply.map_value).to.have.length(4);
-                expect(reply.map_value).to.include({ field: { name: '_flag', type: 4 }, flag_value: true });
+                expect(reply.map_value).to.include({ field: { name: '_flag', type: RiakPBC.FieldType.Flag }, flag_value: true });
             }).on('end', done);
         });
 
@@ -460,15 +460,15 @@ describe('Maps', function () {
                         updates: [{
                             field: {
                                 name: '_map',
-                                type: 5
+                                type: RiakPBC.FieldType.Map
                             },
                             map_op: {
                                 updates: [{
                                     field: {
                                         name: '_test',
-                                        type: 4
+                                        type: RiakPBC.FieldType.Flag
                                     },
-                                    flag_op: 2
+                                    flag_op: RiakPBC.Flag.Disable
                                 }]
                             }
                         }]
@@ -483,7 +483,7 @@ describe('Maps', function () {
                 context = reply.context;
                 expect(reply).to.have.property('map_value').that.is.an.instanceof(Array);
                 expect(reply.map_value).to.have.length(5);
-                expect(reply.map_value).to.include({ field: { name: '_map', type: 5 }, map_value: [{ field: { name: '_test', type: 4 }, flag_value: false }] });
+                expect(reply.map_value).to.include({ field: { name: '_map', type: RiakPBC.FieldType.Map }, map_value: [{ field: { name: '_test', type: RiakPBC.FieldType.Flag }, flag_value: false }] });
             }).on('end', done);
         });
 
@@ -497,7 +497,7 @@ describe('Maps', function () {
                     map_op: {
                         removes: [{
                             name: '_map',
-                            type: 5
+                            type: RiakPBC.FieldType.Map
                         }]
                     }
                 },
@@ -509,7 +509,7 @@ describe('Maps', function () {
                 expect(reply).to.have.property('context').that.is.an.instanceof(Buffer);
                 expect(reply).to.have.property('map_value').that.is.an.instanceof(Array);
                 expect(reply.map_value).to.have.length(4);
-                expect(reply.map_value).to.not.include({ field: { name: '_map', type: 5 }, map_value: [{ field: { name: '_test', type: 4 }, flag_value: false }] });
+                expect(reply.map_value).to.not.include({ field: { name: '_map', type: RiakPBC.FieldType.Map }, map_value: [{ field: { name: '_test', type: RiakPBC.FieldType.Flag }, flag_value: false }] });
             }).on('end', done);
         });
 
