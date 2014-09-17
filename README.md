@@ -35,9 +35,9 @@ The `options` object accepts the following parameters:
 - `maxConnections`: The maximum number of connections that may be active in the connection pool at any given time. (Default: `10`)
 - `parseValues`: If set to `false`, values will be returned as buffers rather than strings or parsed JSON. (Default: `true`)
 - `nodes`: An array of `{ host, port }` objects specifying all of the Riak nodes to use. These are then load balanced via round-robin.
-- `host`/`port`: If only connecting to a single node, you may specify the `host` and `port` properties directly rather than passing an array of `nodes`. (Default `host`: `'127.0.0.1'`, Default `port`: `8087`)
-- `auth.user`: Username to authenticate as if using [Riak security](http://docs.basho.com/riak/latest/ops/running/authz/).
-- `auth.password`: Password to use for authentication if using [Riak security](http://docs.basho.com/riak/latest/ops/running/authz/).
+- `host`: If only connecting to a single node, you may specify the `host` property directly rather than passing an array of `nodes`. (Default: `'127.0.0.1'`)
+- `port`: Again, if only connecting to a single node, you may specify the `port` directly. (Default: `8087`)
+- `auth`: Username and password, specified as a `{ user, password }` object, to use for authentication if using [Riak security](http://docs.basho.com/riak/latest/ops/running/authz/).
 
 ## License
 
