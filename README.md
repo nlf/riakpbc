@@ -10,9 +10,35 @@ RiakPBC is a low-level [riak 2.0](http://basho.com/riak) [protocol buffer](https
 - [Client](#client)
   - [Client options](#client-options)
   - [Client methods](#client-methods)
-- [Server methods](#server-methods)
+- [Bucket Operations](#bucket-operations)
+  - [`client.getBuckets([callback])](#clientgetbucketscallback)
+  - [`client.getKeys(params, [callback])`](#clientgetkeysparams-callback)
+  - [`client.getBucket(params, [callback])`](#clientgetbucketparams-callback)
+  - [`client.setBucket(params, [callback])`](#clientsetbucketparams-callback)
+  - [`client.resetBucket(params, [callback])`](#clientresetbucketparams-callback)
+- [Object/Key Operations](#objectkey-operations)
+  - [`client.get(params, [callback])`](#clientgetparams-callback)
+  - [`client.put(params, [callback])`](#clientputparams-callback)
+  - [`client.del(params, [callback])`](#clientdelparams-callback)
+- [Query Operations](#query-operations)
+  - [`client.mapred(params, [callback])`](#clientmapredparams-callback)
+  - [`client.getIndex(params, [callback])`](#clientgetindexparams-callback)
+  - [`client.search(params, [callback])`](#clientsearchparams-callback)
+- [Server Operations](#server-operations)
   - [`client.ping([callback])`](#clientpingcallback)
   - [`client.getServerInfo([callback])`](#getserverinfocallback)
+- [Bucket Type Operations](#bucket-type-operations)
+  - [`client.getBucketType(params, [callback])`](#clientgetbuckettypeparams-callback)
+  - [`client.setBucketType(params, [callback])`](#clientsetbuckettypeparams-callback)
+- [Data Type Operations](#data-type-operations)
+  - [`client.getCrdt(params, [callback])`](#clientgetcrdtparams-callback)
+  - [`client.putCrdt(params, [callback])`](#clientputcrdtparams-callback)
+- [Yokozuna Operations](#yokozuna-operations)
+  - [`client.getSearchIndex(params, [callback])`](#clientgetsearchindexparams-callback)
+  - [`client.putSearchIndex(params, [callback])`](#clientputsearchindexparams-callback)
+  - [`client.delSearchIndex(params, [callback])`](#clientdelsearchindexparams-callback)
+  - [`client.getSearchSchema(params, [callback])`](#clientgetsearchschemaparams-callback)
+  - [`client.putSearchSchema(params, [callback])`](#clientputsearchschemaparams-callback)
 - [License](#license)
 
 
@@ -51,7 +77,46 @@ Every method on the client accepts an optional `callback` as the last parameter.
 
 If a `callback` is not specified, the method will return a stream instead. You should assign listeners for the `error`, `data` and `end` events on that stream. If an error occurs, the `error` event will be emitted with an `err` object as its parameter. Otherwise, one or more `data` events will be emitted with a response object from the server. A final `end` event will be emitted when all `data` events have been sent.
 
-## Server methods
+## Bucket Operations
+
+### `client.getBuckets([callback])`
+[API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/list-buckets/)
+
+### `client.getKeys(params, [callback])`
+[API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/list-keys/)
+
+### `client.getBucket(params, [callback])`
+[API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/get-bucket-props/)
+
+### `client.setBucket(params, [callback])`
+[API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/set-bucket-props/)
+
+### `client.resetBucket(params, [callback])`
+[API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/reset-bucket-props/)
+
+## Object/Key Operations
+
+### `client.get(params, [callback])`
+[API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/fetch-object/)
+
+### `client.put(params, [callback])`
+[API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/store-object/)
+
+### `client.del(params, [callback])`
+[API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/delete-object/)
+
+## Query Operations
+
+### `client.mapred(params, [callback])`
+[API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/mapreduce/)
+
+### `client.getIndex(params, [callback])`
+[API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/secondary-indexes/)
+
+### `client.search(params, [callback])`
+[API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/search/)
+
+## Server Operations
 
 ### `client.ping(callback)`
 [API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/ping/)
@@ -80,6 +145,38 @@ client.getServerInfo(function (err, reply) {
 });
 ```
 
+## Bucket Type Operations
+
+### `client.getBucketType(params, [callback])`
+[API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/get-bucket-type/)
+
+### `client.setBucketType(params, [callback])`
+[API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/set-bucket-type/)
+
+## Data Type Operations
+
+### `client.getCrdt(params, [callback])`
+[API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/dt-fetch/)
+
+### `client.putCrdt(params, [callback])`
+[API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/dt-store/)
+
+## Yokozuna Operations
+
+### `client.getSearchIndex(params, [callback])`
+[API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/yz-index-get/)
+
+### `client.putSearchIndex(params, [callback])`
+[API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/yz-index-put/)
+
+### `client.delSearchIndex(params, [callback])`
+[API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/yz-index-delete/)
+
+### `client.getSearchSchema(params, [callback])`
+[API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/yz-schema-get/)
+
+### `client.putSearchSchema(params, [callback])`
+[API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/yz-schema-put/)
 
 ## License
 
