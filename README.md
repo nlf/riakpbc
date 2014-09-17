@@ -82,8 +82,32 @@ If a `callback` is not specified, the method will return a stream instead. You s
 ### `client.getBuckets([callback])`
 [API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/list-buckets/)
 
+** NOTE: Not recommended for use on production systems **
+
+List all existing buckets.
+
+**Input**: none
+
+**Response**:
+
+If successful, and buckets exist, `reply` will have a property `buckets` which will be an array of bucket names as strings.
+
+If successful but no buckets exist, `reply` will be the empty object `{}`.
+
+**Example**:
+
+```javascript
+client.getBuckets(function (err, reply) {
+  console.log(reply); // { buckets: ['bucket_one', 'bucket_two'] }
+});
+```
+
 ### `client.getKeys(params, [callback])`
 [API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/list-keys/)
+
+** NOTE: Not recommended for use on production systems **
+
+List all keys within a bucket.
 
 ### `client.getBucket(params, [callback])`
 [API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/get-bucket-props/)
@@ -121,8 +145,15 @@ If a `callback` is not specified, the method will return a stream instead. You s
 ### `client.ping(callback)`
 [API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/ping/)
 
-Send a ping to the riak node. If successful `reply` will be the empty object `{}`.
+Send a ping to the riak node.
 
+**Input**: none
+
+**Response**:
+
+If successful `reply` will be the empty object `{}`.
+
+**Example**:
 ```javascript
 client.ping(function (err, reply) {
   if (err) {
@@ -137,8 +168,15 @@ client.ping(function (err, reply) {
 ### `client.getServerInfo(callback)`
 [API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/server-info/)
 
-Ask the riak node for general server information. If successful `reply` will be an object containing `node` and `server_version` properties.
+Ask the riak node for general server information.
 
+**Input**: none
+
+**Response**:
+
+If successful `reply` will be an object containing `node` and `server_version` properties.
+
+**Example**:
 ```javascript
 client.getServerInfo(function (err, reply) {
   console.log(reply); // { node: 'riak@127.0.0.1', server_version: '2.0.0' }
