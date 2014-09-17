@@ -82,20 +82,19 @@ If a `callback` is not specified, the method will return a stream instead. You s
 ### `client.getBuckets([callback])`
 [API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/list-buckets/)
 
-** NOTE: Not recommended for use on production systems **
+**NOTE: Not recommended for use on production systems**
 
 List all existing buckets.
 
-**Input**: none
+**Input**:
+None
 
 **Response**:
+If buckets exist an object with the property `buckets` which will be an array of bucket names as strings.
 
-If successful, and buckets exist, `reply` will have a property `buckets` which will be an array of bucket names as strings.
-
-If successful but no buckets exist, `reply` will be the empty object `{}`.
+If no buckets exist the empty object `{}`.
 
 **Example**:
-
 ```javascript
 client.getBuckets(function (err, reply) {
   console.log(reply); // { buckets: ['bucket_one', 'bucket_two'] }
@@ -105,7 +104,7 @@ client.getBuckets(function (err, reply) {
 ### `client.getKeys(params, [callback])`
 [API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/list-keys/)
 
-** NOTE: Not recommended for use on production systems **
+**NOTE: Not recommended for use on production systems**
 
 List all keys within a bucket.
 
@@ -147,11 +146,11 @@ List all keys within a bucket.
 
 Send a ping to the riak node.
 
-**Input**: none
+**Input**:
+None
 
 **Response**:
-
-If successful `reply` will be the empty object `{}`.
+The empty object `{}`.
 
 **Example**:
 ```javascript
@@ -170,11 +169,11 @@ client.ping(function (err, reply) {
 
 Ask the riak node for general server information.
 
-**Input**: none
+**Input**:
+None
 
 **Response**:
-
-If successful `reply` will be an object containing `node` and `server_version` properties.
+An object containing `node` and `server_version` properties.
 
 **Example**:
 ```javascript
