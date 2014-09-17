@@ -90,9 +90,9 @@ List all existing buckets.
 None
 
 **Response**:
-If buckets exist an object with the property `buckets` which will be an array of bucket names as strings.
+If buckets exist, an object with the property `buckets` which will be an array of bucket names as strings.
 
-If no buckets exist the empty object `{}`.
+If no buckets exist, the empty object `{}`.
 
 **Example**:
 ```javascript
@@ -106,7 +106,23 @@ client.getBuckets(function (err, reply) {
 
 **NOTE: Not recommended for use on production systems**
 
-List all keys within a bucket.
+List all keys within a bucket. When used as a stream, this method will emit multiple `data` events.
+
+**Input**: An object with the following properties:
+
+- `bucket`: The name of the bucket to list the keys of.
+
+**Response**:
+If the bucket contains keys, an object with the property `keys` which will be an array of key names as strings.
+
+If the bucket contains no keys, the empty object `{}`.
+
+**Example**:
+```javascript
+client.getKeys({ bucket: 'test' }, function (err, reply) {
+  console.log(reply); // { keys: ['key_one', 'key_two'] }
+});
+```
 
 ### `client.getBucket(params, [callback])`
 [API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/get-bucket-props/)
