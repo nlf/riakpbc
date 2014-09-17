@@ -33,31 +33,7 @@ function RiakPBC(options) {
     });
 }
 
-exports.FieldType = {
-    Counter: 1,
-    Set: 2,
-    Register: 3,
-    Flag: 4,
-    Map: 5
-};
-
-exports.Flag = {
-    Enable: 1,
-    Disable: 2
-};
-
-exports.DataType = {
-    Counter: 1,
-    Set: 2,
-    Map: 3
-};
-
-exports.IndexType = {
-    Exact: 0,
-    Range: 1
-};
-
-RiakPBC.prototype.makeRequest = function (options) {
+RiakPBC.prototype._makeRequest = function (options) {
 
     var self = this;
     var stream, callback;
@@ -111,72 +87,9 @@ RiakPBC.prototype.makeRequest = function (options) {
 
 RiakPBC.prototype.getBuckets = function (callback) {
 
-    return this.makeRequest({
+    return this._makeRequest({
         type: 'RpbListBucketsReq',
         params: null,
-        callback: callback
-    });
-};
-
-RiakPBC.prototype.getBucket = function (params, callback) {
-
-    return this.makeRequest({
-        type: 'RpbGetBucketReq',
-        params: params,
-        callback: callback
-    });
-};
-
-RiakPBC.prototype.setBucket = function (params, callback) {
-
-    return this.makeRequest({
-        type: 'RpbSetBucketReq',
-        params: params,
-        callback: callback
-    });
-};
-
-RiakPBC.prototype.resetBucket = function (params, callback) {
-
-    return this.makeRequest({
-        type: 'RpbResetBucketReq',
-        params: params,
-        callback: callback
-    });
-};
-
-RiakPBC.prototype.setBucketType = function (params, callback) {
-
-    return this.makeRequest({
-        type: 'RpbSetBucketTypeReq',
-        params: params,
-        callback: callback
-    });
-};
-
-RiakPBC.prototype.getBucketType = function (params, callback) {
-
-    return this.makeRequest({
-        type: 'RpbGetBucketTypeReq',
-        params: params,
-        callback: callback
-    });
-};
-
-RiakPBC.prototype.putCrdt = function (params, callback) {
-
-    return this.makeRequest({
-        type: 'DtUpdateReq',
-        params: params,
-        callback: callback
-    });
-};
-
-RiakPBC.prototype.getCrdt = function (params, callback) {
-
-    return this.makeRequest({
-        type: 'DtFetchReq',
-        params: params,
         callback: callback
     });
 };
@@ -185,7 +98,7 @@ RiakPBC.prototype.getKeys = function (params, callback) {
 
     params.stream = true;
 
-    return this.makeRequest({
+    return this._makeRequest({
         type: 'RpbListKeysReq',
         params: params,
         expectMultiple: true,
@@ -193,10 +106,28 @@ RiakPBC.prototype.getKeys = function (params, callback) {
     });
 };
 
-RiakPBC.prototype.put = function (params, callback) {
+RiakPBC.prototype.getBucket = function (params, callback) {
 
-    return this.makeRequest({
-        type: 'RpbPutReq',
+    return this._makeRequest({
+        type: 'RpbGetBucketReq',
+        params: params,
+        callback: callback
+    });
+};
+
+RiakPBC.prototype.setBucket = function (params, callback) {
+
+    return this._makeRequest({
+        type: 'RpbSetBucketReq',
+        params: params,
+        callback: callback
+    });
+};
+
+RiakPBC.prototype.resetBucket = function (params, callback) {
+
+    return this._makeRequest({
+        type: 'RpbResetBucketReq',
         params: params,
         callback: callback
     });
@@ -204,8 +135,17 @@ RiakPBC.prototype.put = function (params, callback) {
 
 RiakPBC.prototype.get = function (params, callback) {
 
-    return this.makeRequest({
+    return this._makeRequest({
         type: 'RpbGetReq',
+        params: params,
+        callback: callback
+    });
+};
+
+RiakPBC.prototype.put = function (params, callback) {
+
+    return this._makeRequest({
+        type: 'RpbPutReq',
         params: params,
         callback: callback
     });
@@ -213,7 +153,7 @@ RiakPBC.prototype.get = function (params, callback) {
 
 RiakPBC.prototype.del = function (params, callback) {
 
-    return this.makeRequest({
+    return this._makeRequest({
         type: 'RpbDelReq',
         params: params,
         callback: callback
@@ -245,7 +185,7 @@ RiakPBC.prototype.mapred = function (params, callback) {
         callback(undefined, rows);
     }
 
-    return parseMapReduceStream(this.makeRequest({
+    return parseMapReduceStream(this._makeRequest({
         type: 'RpbMapRedReq',
         params: params,
         callback: callback ? cb : undefined,
@@ -257,7 +197,7 @@ RiakPBC.prototype.getIndex = function (params, callback) {
 
     params.stream = true;
 
-    return this.makeRequest({
+    return this._makeRequest({
         type: 'RpbIndexReq',
         params: params,
         expectMultiple: true,
@@ -265,28 +205,55 @@ RiakPBC.prototype.getIndex = function (params, callback) {
     });
 };
 
-RiakPBC.prototype.createSearchSchema = function (params, callback) {
+RiakPBC.prototype.ping = function (callback) {
 
-    return this.makeRequest({
-        type: 'RpbYokozunaSchemaPutReq',
+    return this._makeRequest({
+        type: 'RpbPingReq',
+        params: null,
+        callback: callback
+    });
+};
+
+RiakPBC.prototype.getServerInfo = function (callback) {
+
+    return this._makeRequest({
+        type: 'RpbGetServerInfoReq',
+        params: null,
+        callback: callback
+    });
+};
+
+RiakPBC.prototype.getBucketType = function (params, callback) {
+
+    return this._makeRequest({
+        type: 'RpbGetBucketTypeReq',
         params: params,
         callback: callback
     });
 };
 
-RiakPBC.prototype.getSearchSchema = function (params, callback) {
+RiakPBC.prototype.setBucketType = function (params, callback) {
 
-    return this.makeRequest({
-        type: 'RpbYokozunaSchemaGetReq',
+    return this._makeRequest({
+        type: 'RpbSetBucketTypeReq',
         params: params,
         callback: callback
     });
 };
 
-RiakPBC.prototype.createSearchIndex = function (params, callback) {
+RiakPBC.prototype.getCrdt = function (params, callback) {
 
-    return this.makeRequest({
-        type: 'RpbYokozunaIndexPutReq',
+    return this._makeRequest({
+        type: 'DtFetchReq',
+        params: params,
+        callback: callback
+    });
+};
+
+RiakPBC.prototype.putCrdt = function (params, callback) {
+
+    return this._makeRequest({
+        type: 'DtUpdateReq',
         params: params,
         callback: callback
     });
@@ -294,17 +261,44 @@ RiakPBC.prototype.createSearchIndex = function (params, callback) {
 
 RiakPBC.prototype.getSearchIndex = function (params, callback) {
 
-    return this.makeRequest({
+    return this._makeRequest({
         type: 'RpbYokozunaIndexGetReq',
         params: params,
         callback: callback
     });
 };
 
-RiakPBC.prototype.deleteSearchIndex = function (params, callback) {
+RiakPBC.prototype.putSearchIndex = function (params, callback) {
 
-    return this.makeRequest({
+    return this._makeRequest({
+        type: 'RpbYokozunaIndexPutReq',
+        params: params,
+        callback: callback
+    });
+};
+
+RiakPBC.prototype.delSearchIndex = function (params, callback) {
+
+    return this._makeRequest({
         type: 'RpbYokozunaIndexDeleteReq',
+        params: params,
+        callback: callback
+    });
+};
+
+RiakPBC.prototype.getSearchSchema = function (params, callback) {
+
+    return this._makeRequest({
+        type: 'RpbYokozunaSchemaGetReq',
+        params: params,
+        callback: callback
+    });
+};
+
+RiakPBC.prototype.putSearchSchema = function (params, callback) {
+
+    return this._makeRequest({
+        type: 'RpbYokozunaSchemaPutReq',
         params: params,
         callback: callback
     });
@@ -312,27 +306,9 @@ RiakPBC.prototype.deleteSearchIndex = function (params, callback) {
 
 RiakPBC.prototype.search = function (params, callback) {
 
-    return this.makeRequest({
+    return this._makeRequest({
         type: 'RpbSearchQueryReq',
         params: params,
-        callback: callback
-    });
-};
-
-RiakPBC.prototype.getServerInfo = function (callback) {
-
-    return this.makeRequest({
-        type: 'RpbGetServerInfoReq',
-        params: null,
-        callback: callback
-    });
-};
-
-RiakPBC.prototype.ping = function (callback) {
-
-    return this.makeRequest({
-        type: 'RpbPingReq',
-        params: null,
         callback: callback
     });
 };
@@ -343,11 +319,6 @@ RiakPBC.prototype.end = function (callback) {
 
         this.pool.destroyAllNow(callback);
     }.bind(this));
-};
-
-exports.createClient = function (options) {
-
-    return new RiakPBC(options);
 };
 
 function writableStream() {
@@ -384,3 +355,32 @@ function parseMapReduceStream(rawStream) {
     rawStream.pipe(liner);
     return liner;
 }
+
+exports.createClient = function (options) {
+
+    return new RiakPBC(options);
+};
+
+exports.FieldType = {
+    Counter: 1,
+    Set: 2,
+    Register: 3,
+    Flag: 4,
+    Map: 5
+};
+
+exports.Flag = {
+    Enable: 1,
+    Disable: 2
+};
+
+exports.DataType = {
+    Counter: 1,
+    Set: 2,
+    Map: 3
+};
+
+exports.IndexType = {
+    Exact: 0,
+    Range: 1
+};

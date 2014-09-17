@@ -24,7 +24,7 @@ describe('Search', function () {
 
         it('can create a schema', function (done) {
 
-            client.createSearchSchema({
+            client.putSearchSchema({
                 schema: searchSchema
             }, function (err) {
 
@@ -50,7 +50,7 @@ describe('Search', function () {
 
         it('can create an index', function (done) {
 
-            client.createSearchIndex({
+            client.putSearchIndex({
                 index: {
                     name: '_test_search',
                     schema: searchSchema.name
@@ -155,7 +155,7 @@ describe('Search', function () {
             }, function (err) {
 
                 expect(err).to.not.exist;
-                client.deleteSearchIndex({
+                client.delSearchIndex({
                     name: '_test_search'
                 }, function (err) {
 
@@ -177,7 +177,7 @@ describe('Search', function () {
 
         it('can create a schema', function (done) {
 
-            client.createSearchSchema({
+            client.putSearchSchema({
                 schema: searchSchema
             }).on('end', done).resume();
         });
@@ -197,7 +197,7 @@ describe('Search', function () {
 
         it('can create an index', function (done) {
 
-            client.createSearchIndex({
+            client.putSearchIndex({
                 index: {
                     name: '_test_search',
                     schema: searchSchema.name
@@ -308,7 +308,7 @@ describe('Search', function () {
                 }
             }).on('end', function () {
 
-                client.deleteSearchIndex({
+                client.delSearchIndex({
                     name: '_test_search'
                 }).on('end', function () {
 
