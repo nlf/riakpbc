@@ -62,7 +62,7 @@ describe('Search', function () {
             });
         });
 
-        it('can retrieve an index', { timeout: 10000 }, function (done) {
+        it('can retrieve an index', { timeout: 15000 }, function (done) {
 
             var getIndex = function () {
 
@@ -205,7 +205,7 @@ describe('Search', function () {
             }).on('end', done).resume();
         });
 
-        it('can retrieve an index', { timeout: 10000 }, function (done) {
+        it('can retrieve an index', { timeout: 15000 }, function (done) {
 
             var retry = false;
 
