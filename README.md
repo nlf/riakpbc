@@ -118,33 +118,112 @@ client.getKeys({ bucket: 'test' }, function (err, reply) {
 ### `client.getBucket(params, [callback])`
 [API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/get-bucket-props/)
 
+Get a single bucket's properties.
+
+**Input**: [RpbGetBucketReq](doc/Messages.md#rpbgetbucketreq)
+
+**Response**: [RpbGetBucketResp](doc/Messages.md#rpbgetbucketresp)
+
+**Example**:
+```javascript
+client.getBucket({ bucket: 'test' }, function (err, reply) {
+  console.log(reply); // { props: { n_val: 3, allow_mult: false, … } }
+});
+```
+
 ### `client.setBucket(params, [callback])`
 [API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/set-bucket-props/)
 
+Set properties for a single bucket.
+
+**Input**: [RpbSetBucketReq](doc/Messages.md#rpbsetbucketreq)
+
+**Response**: The empty object `{}`
+
+**Example**:
+```javascript
+```
+
 ### `client.resetBucket(params, [callback])`
 [API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/reset-bucket-props/)
+
+**Input**: [RpbResetBucketReq](doc/Messages.md#rpbresetbucketreq)
+
+**Response**: The empty object `{}`
+
+**Example**:
+```javascript
+```
 
 ## Object/Key Operations
 
 ### `client.get(params, [callback])`
 [API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/fetch-object/)
 
+**Input**: [RpbGetReq](doc/Messages.md#rpbgetreq)
+
+**Response**: [RpbGetResp](doc/Messages.md#rpbgetresp)
+
+**Example**:
+```javascript
+```
+
 ### `client.put(params, [callback])`
 [API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/store-object/)
 
+**Input**: [RpbPutReq](doc/Messages.md#rpbputreq)
+
+**Response**: [RpbPutResp](doc/Messages.md#rpbputresp)
+
+**Example**:
+```javascript
+```
+
 ### `client.del(params, [callback])`
 [API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/delete-object/)
+
+**Input**: [RpbDelReq](doc/Messages.md#rpbdelreq)
+
+**Response**: The empty object `{}`
+
+**Example**:
+```javascript
+```
 
 ## Query Operations
 
 ### `client.mapred(params, [callback])`
 [API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/mapreduce/)
 
+**Input**: [RpbMapRedReq](doc/Messages.md#rpbmapredreq)
+
+**Response**: [RpbMapRedResp](doc/Messages.md#rpbmapredresp)
+
+**Example**:
+```javascript
+```
+
 ### `client.getIndex(params, [callback])`
 [API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/secondary-indexes/)
 
+**Input**: [RpbIndexReq](doc/Messages.md#rpbindexreq)
+
+**Response**: [RpbIndexResp](doc/Messages.md#rpbindexresp)
+
+**Example**:
+```javascript
+```
+
 ### `client.search(params, [callback])`
 [API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/search/)
+
+**Input**: [RpbSearchQueryReq](doc/Messages.md#rpbsearchqueryreq)
+
+**Response**: [RpbSearchQueryResp](doc/Messages.md#rpbsearchqueryresp)
+
+**Example**:
+```javascript
+```
 
 ## Server Operations
 
@@ -190,33 +269,105 @@ client.getServerInfo(function (err, reply) {
 ### `client.getBucketType(params, [callback])`
 [API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/get-bucket-type/)
 
+**Input**: [RpbGetBucketTypeReq](doc/Messages.md#rpbgetbuckettypereq)
+
+**Response**: [RpbGetBucketTypeResp](doc/Messages.md#rpbgetbucketresp)
+
+**Example**:
+```javascript
+```
+
 ### `client.setBucketType(params, [callback])`
 [API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/set-bucket-type/)
+
+**Input**: [RpbSetBucketTypeReq](doc/Messages.md#rpbsetbuckettypereq)
+
+**Response**: The empty object `{}`
+
+**Example**:
+```javascript
+```
 
 ## Data Type Operations
 
 ### `client.getCrdt(params, [callback])`
 [API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/dt-fetch/)
 
+**Input**: [DtFetchReq](doc/Messages.md#dtfetchreq)
+
+**Response**: [DtFetchResp](doc/Messages.md#dtfetchresp)
+
+**Example**:
+```javascript
+```
+
 ### `client.putCrdt(params, [callback])`
 [API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/dt-store/)
+
+**Input**: [DtUpdateReq](doc/Messages.md#dtupdatereq)
+
+**Response**: [DtUpdateResp](doc/Messages.md#dtupdateresp)
+
+**Example**:
+```javascript
+```
 
 ## Yokozuna Operations
 
 ### `client.getSearchIndex(params, [callback])`
 [API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/yz-index-get/)
 
+**Input**: [RpbYokozunaIndexGetReq](doc/Messages.md#rpbyokozunaindexgetreq)
+
+**Response**: [RpbYokozunaIndexGetResp](doc/Messages.md#rpbyokozunaindexgetresp)
+
+**Example**:
+```javascript
+```
+
 ### `client.putSearchIndex(params, [callback])`
 [API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/yz-index-put/)
+
+**Input**: [RpbYokozunaIndexPutReq](doc/Messages.md#rpbyokozunaindexputreq)
+
+**Response**: The empty object `{}`
+
+**Example**:
+```javascript
+```
 
 ### `client.delSearchIndex(params, [callback])`
 [API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/yz-index-delete/)
 
+**Input**: [RpbYokozunaIndexDeleteReq](doc/Messages.md#rpbyokozunaindexdeletereq)
+
+**Response**: The empty object `{}`
+
+**Example**:
+```javascript
+```
+
 ### `client.getSearchSchema(params, [callback])`
 [API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/yz-schema-get/)
 
+**Input**: [RpbYokozunaSchemaGetReq](doc/Messages.md#rpbyokozunaschemagetreq)
+
+**Response**: [RpbYokozunaSchemaGetResp](doc/Messages.md#rpbyokozunaschemagetresp)
+
+**Example**:
+```javascript
+```
+
 ### `client.putSearchSchema(params, [callback])`
 [API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/yz-schema-put/)
+
+**Input**: [RpbYokozunaSchemaPutReq](doc/Messages.md#rpbyokozunaschemaputreq)
+
+**Response**: The empty object `{}`
+
+**Example**:
+```javascript
+```
 
 ## License
 
