@@ -91,7 +91,11 @@ keys.on('end', function () {
 
 ## Data Conversions
 
-RiakPBC attempts to stay as accurate as possible when converting data to and from protocol buffer encoding. The primary data types that riak uses are handled as follows:
+RiakPBC attempts to stay as accurate as possible when converting data to and from protocol buffer encoding.
+
+All available messages are documented in the [Messages reference](doc/Messages.md).
+
+The primary data types that riak uses are handled as follows:
 
 ### bytes
 
