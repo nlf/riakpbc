@@ -205,6 +205,15 @@ RiakPBC.prototype.getIndex = function (params, callback) {
     });
 };
 
+RiakPBC.prototype.search = function (params, callback) {
+
+    return this._makeRequest({
+        type: 'RpbSearchQueryReq',
+        params: params,
+        callback: callback
+    });
+};
+
 RiakPBC.prototype.ping = function (callback) {
 
     return this._makeRequest({
@@ -299,15 +308,6 @@ RiakPBC.prototype.putSearchSchema = function (params, callback) {
 
     return this._makeRequest({
         type: 'RpbYokozunaSchemaPutReq',
-        params: params,
-        callback: callback
-    });
-};
-
-RiakPBC.prototype.search = function (params, callback) {
-
-    return this._makeRequest({
-        type: 'RpbSearchQueryReq',
         params: params,
         callback: callback
     });
