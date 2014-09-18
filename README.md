@@ -127,10 +127,22 @@ These fields will always be treated as a plain javascript boolean (i.e. `true` o
 
 Several messages accept an enum field. RiakPBC exports these as variables on the main object to simplify input. They are as follows:
 
-- IndexQueryType: RiakPBC.IndexType.Exact, RiakPBC.IndexType.Range
-- DataType: RiakPBC.DataType.Counter, RiakPBC.DataType.Set, RiakPBC.DataType.Map
-- MapFieldType: RiakPBC.FieldType.Counter, RiakPBC.FieldType.Set, RiakPBC.FieldType.Register, RiakPBC.FieldType.Flag, RiakPBC.FieldType.Map
-- FlagOp: RiakPBC.Flag.Enable, RiakPBC.Flag.Disable
+- IndexQueryType:
+  - RiakPBC.IndexType.Exact
+  - RiakPBC.IndexType.Range
+- DataType:
+  - RiakPBC.DataType.Counter
+  - RiakPBC.DataType.Set
+  - RiakPBC.DataType.Map
+- MapFieldType:
+  - RiakPBC.FieldType.Counter
+  - RiakPBC.FieldType.Set
+  - RiakPBC.FieldType.Register
+  - RiakPBC.FieldType.Flag
+  - RiakPBC.FieldType.Map
+- FlagOp:
+  - RiakPBC.Flag.Enable
+  - RiakPBC.Flag.Disable
 
 These variables are all simple numbers, however, so when RiakPBC returns a message containing one of these types you will receive a plain number. I would recommend using the exported variables for comparison purposes to maintain readable code.
 
