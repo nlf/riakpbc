@@ -29,7 +29,7 @@ var RiakPBC = require('riakpbc');
 var client = RiakPBC.createClient(/* options */);
 ```
 
-### Client options
+### Options
 
 The `options` object accepts the following parameters:
 
