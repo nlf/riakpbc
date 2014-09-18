@@ -86,13 +86,9 @@ If a `callback` is not specified, the method will return a stream instead. You s
 
 List all existing buckets.
 
-**Input**:
-None
+**Input**: None
 
-**Response**:
-If buckets exist, an object with the property `buckets` which will be an array of bucket names as strings.
-
-If no buckets exist, the empty object `{}`.
+**Response**: If buckets exist, [RpbListBucketsResp](doc/Messages.md#rpblistbucketsresp), otherwise the empty object `{}`.
 
 **Example**:
 ```javascript
@@ -108,14 +104,9 @@ client.getBuckets(function (err, reply) {
 
 List all keys within a bucket. When used as a stream, this method will emit multiple `data` events.
 
-**Input**: An object with the following properties:
+**Input**: [RpbListKeysReq](doc/Messages.md#rpblistkeysreq)
 
-- `bucket`: The name of the bucket to list the keys of.
-
-**Response**:
-If the bucket contains keys, an object with the property `keys` which will be an array of key names as strings.
-
-If the bucket contains no keys, the empty object `{}`.
+**Response**: If the bucket contains keys, [RpbListKeysResp](doc/Messages.md#rpblistkeysresp), otherwise the empty object `{}`.
 
 **Example**:
 ```javascript
@@ -162,11 +153,9 @@ client.getKeys({ bucket: 'test' }, function (err, reply) {
 
 Send a ping to the riak node.
 
-**Input**:
-None
+**Input**: None
 
-**Response**:
-The empty object `{}`.
+**Response**: The empty object `{}`.
 
 **Example**:
 ```javascript
@@ -185,11 +174,9 @@ client.ping(function (err, reply) {
 
 Ask the riak node for general server information.
 
-**Input**:
-None
+**Input**: None
 
-**Response**:
-An object containing `node` and `server_version` properties.
+**Response**: [RpbGetServerInfoResp](doc/Messages.md#rpbgetserverinforesp)
 
 **Example**:
 ```javascript
