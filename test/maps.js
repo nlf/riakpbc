@@ -15,39 +15,6 @@ describe('Maps', function () {
 
     describe('(callbacks)', function () {
 
-        it('can create a map', function (done) {
-
-            client.putCrdt({
-                bucket: '_test_maps',
-                type: '_test_crdt_map',
-                key: '_test_map',
-                op: {
-                    map_op: {
-                        adds: [{
-                            name: '_counter',
-                            type: RiakPBC.FieldType.Counter
-                        }, {
-                            name: '_set',
-                            type: RiakPBC.FieldType.Set
-                        }, {
-                            name: '_register',
-                            type: RiakPBC.FieldType.Register
-                        }, {
-                            name: '_flag',
-                            type: RiakPBC.FieldType.Flag
-                        }, {
-                            name: '_map',
-                            type: RiakPBC.FieldType.Map
-                        }]
-                    }
-                }
-            }, function (err) {
-
-                expect(err).to.not.exist;
-                done();
-            });
-        });
-
         it('can get a map', function (done) {
 
             client.getCrdt({
@@ -58,9 +25,7 @@ describe('Maps', function () {
 
                 expect(err).to.not.exist;
                 expect(reply).to.be.an('object');
-                expect(reply).to.have.property('context').that.is.an.instanceof(Buffer);
                 expect(reply).to.have.property('type', RiakPBC.DataType.Map);
-                expect(reply).to.have.property('value').that.is.an('object');
                 done();
             });
         });
@@ -279,35 +244,6 @@ describe('Maps', function () {
 
     describe('(streams)', function () {
 
-        it('can create a map', function (done) {
-
-            client.putCrdt({
-                bucket: '_test_maps',
-                type: '_test_crdt_map',
-                key: '_test_map',
-                op: {
-                    map_op: {
-                        adds: [{
-                            name: '_counter',
-                            type: RiakPBC.FieldType.Counter
-                        }, {
-                            name: '_set',
-                            type: RiakPBC.FieldType.Set
-                        }, {
-                            name: '_register',
-                            type: RiakPBC.FieldType.Register
-                        }, {
-                            name: '_flag',
-                            type: RiakPBC.FieldType.Flag
-                        }, {
-                            name: '_map',
-                            type: RiakPBC.FieldType.Map
-                        }]
-                    }
-                }
-            }).on('end', done).resume();
-        });
-
         it('can get a map', function (done) {
 
             client.getCrdt({
@@ -317,9 +253,7 @@ describe('Maps', function () {
             }).on('data', function (reply) {
 
                 expect(reply).to.be.an('object');
-                expect(reply).to.have.property('context').that.is.an.instanceof(Buffer);
                 expect(reply).to.have.property('type', RiakPBC.DataType.Map);
-                expect(reply).to.have.property('value').that.is.an('object');
             }).on('end', done);
         });
 
