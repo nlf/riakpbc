@@ -8,8 +8,14 @@ RiakPBC is a low-level [riak 2.0](http://basho.com/riak) [protocol buffer](https
 # Contents
 - [Installation](#installation)
 - [Client](#client)
-  - [Client options](#client-options)
-  - [Client methods](#client-methods)
+  - [Options](#options)
+- [Usage](#usage)
+- [Data Conversions](#data-conversions)
+  - [bytes](#bytes)
+  - [uint32/float](#uint32float)
+  - [sint64](#sint64)
+  - [enums](#enums)
+  - [Embedded Messages](#embedded-messages)
 - [License](#license)
 
 
@@ -35,18 +41,98 @@ The `options` object accepts the following parameters:
 - `minConnections`: The minimum number of connections to keep active in the connection pool. (Default: `0`)
 - `maxConnections`: The maximum number of connections that may be active in the connection pool at any given time. (Default: `10`)
 - `parseValues`: If set to `false`, values will be returned as buffers rather than strings or parsed JSON. (Default: `true`)
-- `nodes`: An array of `{ host, port }` objects specifying all of the riak nodes to use. These are then load balanced via round-robin.
+- `nodes`: An array of `{ host: 'string', port: number }` objects specifying all of the riak nodes to use. These are then load balanced via round-robin.
 - `host`: If only connecting to a single node, you may specify the `host` property directly rather than passing an array of `nodes`. (Default: `'127.0.0.1'`)
 - `port`: Again, if only connecting to a single node, you may specify the `port` directly. (Default: `8087`)
-- `auth`: Username and password, specified as a `{ user, password }` object, to use for authentication if using [riak security](http://docs.basho.com/riak/latest/ops/running/authz/).
+- `auth`: User and password, specified as a `{ user: 'string', password: 'string' }` object, to use for authentication if using [riak security](http://docs.basho.com/riak/latest/ops/running/authz/).
 
-### Client methods
+## Usage
 
-Methods that accept input (as detailed in the [API documentation](doc/API.md)) have the signature `(params, callback)`, where `params` is an object containing the input to be sent to riak.
+For a full reference of all available methods, see the [API Reference](doc/API.md).
 
-Every method on the client accepts an optional `callback` as the last parameter. The signature for the `callback` is `function (err, reply)`, where `err` will be defined when an error occurs and `reply` contains the decoded response from the riak node. Note that for many functions, by default, reply will be the empty object `{}`.
+Methods that accept input have the signature `(params, callback)`, where `params` is an object containing the message to be sent to riak.
 
-If a `callback` is not specified, the method will return a stream instead. You should assign listeners for the `error`, `data` and `end` events on that stream. If an error occurs, the `error` event will be emitted with an `err` object as its parameter. Otherwise, one or more `data` events will be emitted with a response object from the server. A final `end` event will be emitted when all `data` events have been sent.
+Methods that do not accept input have the signature `(callback)`.
+
+Callbacks have the signature `(err, response)`.
+
+If an error occurs, the `err` object will be a standard `Error` object wrapping the riak supplied [RpbErrorResp](doc/Messages.md#rpberrorresp) message.
+
+If the call was successful, `response` will be the riak supplied message. Many calls do not return a value, or only return a value when certain flags are set, in these cases the `response` will be an empty object `{}`.
+
+```javascript
+client.ping(function (err, response) {
+  if (err) {
+    return console.error('Failed to ping:', err);
+  }
+
+  console.log(response); // {}
+});
+```
+
+Note that callbacks are always optional, and if not supplied the call will return a stream instead.
+
+These streams will emit only an `error` event if an error occurs. If the call is successful, the stream will emit one or more `data` events and an `end` event.
+```javascript
+var keys = client.getKeys({ bucket: 'test' });
+
+keys.on('error', function (err) {
+  console.error('An error occurred:', err);
+});
+
+keys.on('data', function (response) {
+  console.log('Got some keys:', response.keys); // this could fire multiple times
+});
+
+keys.on('end', function () {
+  console.log('Finished listing keys');
+});
+```
+
+## Data Conversions
+
+RiakPBC attempts to stay as accurate as possible when converting data to and from protocol buffer encoding. The primary data types that riak uses are handled as follows:
+
+### bytes
+
+The `bytes` type may be supplied as either a `string` or a `Buffer`.
+
+By default, when translating a response message these fields will be converted to a `string` unless they are the `vclock` or `context` properties. Since these values are intended to be binary only, they are left as a `Buffer`.
+
+In the case of [RpbContent](doc/Messages.md#rpbcontent) values, RiakPBC will convert the `value` field to a string only if a `content_type` was set, and begins with the string `text` (as in `text/plain` or `text/xml`). In addition, if `content_type` is set to `application/json` RiakPBC will parse the value as JSON automatically.
+
+This behavior can be overridden and `Buffer` objects returned for all `bytes` fields by setting `{ parseValues: false }` in your client options.
+
+### uint32/float
+
+These fields will always be treated as a plain javascript number.
+
+### sint64
+
+Since javascript does not properly handle 64 bit numbers, these are a special case.
+
+When used as input, you may pass either a number (`42`), a string (`'-98549321293'`), or a [long.js](https://github.com/dcodeIO/Long.js) object.
+
+In a reply, you will always receive a [long.js](https://github.com/dcodeIO/Long.js) object. These objects allow RiakPBC to properly support real 64 bit number values.
+
+### bool
+
+These fields will always be treated as a plain javascript boolean (i.e. `true` or `false`).
+
+### enums
+
+Several messages accept an enum field. RiakPBC exports these as variables on the main object to simplify input. They are as follows:
+
+- IndexQueryType: RiakPBC.IndexType.Exact, RiakPBC.IndexType.Range
+- DataType: RiakPBC.DataType.Counter, RiakPBC.DataType.Set, RiakPBC.DataType.Map
+- MapFieldType: RiakPBC.FieldType.Counter, RiakPBC.FieldType.Set, RiakPBC.FieldType.Register, RiakPBC.FieldType.Flag, RiakPBC.FieldType.Map
+- FlagOp: RiakPBC.Flag.Enable, RiakPBC.Flag.Disable
+
+These variables are all simple numbers, however, so when RiakPBC returns a message containing one of these types you will receive a plain number. I would recommend using the exported variables for comparison purposes to maintain readable code.
+
+### Embedded Messages
+
+All other types not documented here are an embedded message and are recursively encoded/decoded in the same fashion as the above types.
 
 ## License
 
