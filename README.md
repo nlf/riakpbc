@@ -2,7 +2,6 @@
 RiakPBC is a low-level [riak 2.0](http://basho.com/riak) [protocol buffer](https://developers.google.com/protocol-buffers/docs/overview) client for [node.js](http://nodejs.org/).
 
 [![build status](http://img.shields.io/travis/nlf/riakpbc/master.svg)](http://travis-ci.org/nlf/riakpbc)
-[![NPM version](http://img.shields.io/npm/v/riakpbc.svg)](https://www.npmjs.org/package/riakpbc)
 [![Code Climate](http://img.shields.io/codeclimate/github/nlf/riakpbc.svg)](https://codeclimate.com/github/nlf/riakpbc)
 
 # Contents
