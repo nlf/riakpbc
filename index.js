@@ -85,11 +85,11 @@ RiakPBC.prototype._makeRequest = function (options) {
     return stream;
 };
 
-RiakPBC.prototype.getBuckets = function (callback) {
+RiakPBC.prototype.getBuckets = function (params, callback) {
 
     return this._makeRequest({
         type: 'RpbListBucketsReq',
-        params: null,
+        params: params,
         callback: callback
     });
 };
