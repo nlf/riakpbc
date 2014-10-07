@@ -28,6 +28,10 @@ function RiakPBC(options) {
             destroy: function (client) {
 
                 client.disconnect();
+            },
+            validate: function (client) {
+
+                return !client.client.destroyed;
             }
         });
     });
