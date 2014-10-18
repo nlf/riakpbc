@@ -17,7 +17,7 @@ describe('Buckets', function () {
 
         it('can list buckets', function (done) {
 
-            client.getBuckets(function (err, reply) {
+            client.getBuckets(null, function (err, reply) {
 
                 expect(err).to.not.exist;
                 expect(reply).to.be.an('object');
