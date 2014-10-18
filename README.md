@@ -35,6 +35,7 @@ The `options` object accepts the following parameters:
 
 - `connectTimeout`: The timeout (in milliseconds) for creating a new connection. (Default: `1000`)
 - `idleTimeout`: The amount of time (in milliseconds) that a node can be idle in the connection pool before it is released. (Default: `30000`)
+- `maxLifetime`: The amount of time (in milliseconds) that a node is used in the connection pool before it is released, regardless of activity. (Default: `Infinity`)
 - `minConnections`: The minimum number of connections to keep active in the connection pool. (Default: `0`)
 - `maxConnections`: The maximum number of connections that may be active in the connection pool at any given time. (Default: `10`)
 - `parseValues`: If set to `false`, values will be returned as buffers rather than strings or parsed JSON. (Default: `true`)
