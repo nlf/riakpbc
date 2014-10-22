@@ -24,6 +24,8 @@ function RiakPBC(options) {
 
                     callback(err, client);
                 });
+
+                client.createdAt = Date.now();
             },
             destroy: function (client) {
 
@@ -31,7 +33,9 @@ function RiakPBC(options) {
             },
             validate: function (client) {
 
-                return !client.client.destroyed;
+                var expired = ((Date.now() - client.createdAt) >= options.maxLifetime);
+
+                return !expired && !client.client.destroyed;
             }
         });
     });

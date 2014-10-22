@@ -19,6 +19,7 @@ describe('Options', function () {
                 nodes: [{ host: '127.0.0.1', port: 8087 }],
                 connectTimeout: 1000,
                 idleTimeout: 30000,
+                maxLifetime: Infinity,
                 minConnections: 0,
                 maxConnections: 10,
                 parseValues: true
@@ -37,6 +38,7 @@ describe('Options', function () {
                 nodes: [{ host: '127.0.0.1', port: 8087 }],
                 connectTimeout: 1000,
                 idleTimeout: 30000,
+                maxLifetime: Infinity,
                 minConnections: 0,
                 maxConnections: 10,
                 parseValues: true
