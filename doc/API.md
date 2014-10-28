@@ -1,6 +1,6 @@
 # API
 - [Bucket Operations](#bucket-operations)
-  - [`client.getBuckets([callback])`](#clientgetbucketscallback)
+  - [`client.getBuckets(params, [callback])`](#clientgetbucketscallback)
   - [`client.getKeys(params, [callback])`](#clientgetkeysparams-callback)
   - [`client.getBucket(params, [callback])`](#clientgetbucketparams-callback)
   - [`client.setBucket(params, [callback])`](#clientsetbucketparams-callback)
