@@ -1,5 +1,4 @@
-# RiakPBC [![build status](http://img.shields.io/travis/nlf/riakpbc/master.svg?style=flat-square)](http://travis-ci.org/nlf/riakpbc)[![Code Climate](http://img.shields.io/codeclimate/github/nlf/riakpbc.svg?style=flat-square)](https://codeclimate.com/github/nlf/riakpbc)
-[![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/nlf/riakpbc?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+# RiakPBC [![build status](http://img.shields.io/travis/nlf/riakpbc/master.svg?style=flat-square)](http://travis-ci.org/nlf/riakpbc)[![Code Climate](http://img.shields.io/codeclimate/github/nlf/riakpbc.svg?style=flat-square)](https://codeclimate.com/github/nlf/riakpbc)[![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/nlf/riakpbc?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 RiakPBC is a low-level [riak 2.0](http://basho.com/riak) [protocol buffer](https://developers.google.com/protocol-buffers/docs/overview) client for [node.js](http://nodejs.org/).
 
