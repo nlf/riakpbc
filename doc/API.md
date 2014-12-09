@@ -40,7 +40,7 @@ List all existing buckets.
 
 **Input**: None
 
-**Response**: If buckets exist, [RpbListBucketsResp](doc/Messages.md#rpblistbucketsresp), otherwise the empty object `{}`.
+**Response**: If buckets exist, [RpbListBucketsResp](Messages.md#rpblistbucketsresp), otherwise the empty object `{}`.
 
 ### `client.getKeys(params, [callback])`
 [API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/list-keys/)
@@ -49,32 +49,32 @@ List all existing buckets.
 
 List all keys within a bucket. When used as a stream, this method will emit multiple `data` events.
 
-**Input**: [RpbListKeysReq](doc/Messages.md#rpblistkeysreq)
+**Input**: [RpbListKeysReq](Messages.md#rpblistkeysreq)
 
-**Response**: If the bucket contains keys, [RpbListKeysResp](doc/Messages.md#rpblistkeysresp), otherwise the empty object `{}`.
+**Response**: If the bucket contains keys, [RpbListKeysResp](Messages.md#rpblistkeysresp), otherwise the empty object `{}`.
 
 ### `client.getBucket(params, [callback])`
 [API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/get-bucket-props/)
 
 Get a single bucket's properties.
 
-**Input**: [RpbGetBucketReq](doc/Messages.md#rpbgetbucketreq)
+**Input**: [RpbGetBucketReq](Messages.md#rpbgetbucketreq)
 
-**Response**: [RpbGetBucketResp](doc/Messages.md#rpbgetbucketresp)
+**Response**: [RpbGetBucketResp](Messages.md#rpbgetbucketresp)
 
 ### `client.setBucket(params, [callback])`
 [API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/set-bucket-props/)
 
 Set properties for a single bucket.
 
-**Input**: [RpbSetBucketReq](doc/Messages.md#rpbsetbucketreq)
+**Input**: [RpbSetBucketReq](Messages.md#rpbsetbucketreq)
 
 **Response**: The empty object `{}`
 
 ### `client.resetBucket(params, [callback])`
 [API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/reset-bucket-props/)
 
-**Input**: [RpbResetBucketReq](doc/Messages.md#rpbresetbucketreq)
+**Input**: [RpbResetBucketReq](Messages.md#rpbresetbucketreq)
 
 **Response**: The empty object `{}`
 
@@ -83,21 +83,21 @@ Set properties for a single bucket.
 ### `client.get(params, [callback])`
 [API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/fetch-object/)
 
-**Input**: [RpbGetReq](doc/Messages.md#rpbgetreq)
+**Input**: [RpbGetReq](Messages.md#rpbgetreq)
 
-**Response**: [RpbGetResp](doc/Messages.md#rpbgetresp)
+**Response**: [RpbGetResp](Messages.md#rpbgetresp)
 
 ### `client.put(params, [callback])`
 [API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/store-object/)
 
-**Input**: [RpbPutReq](doc/Messages.md#rpbputreq)
+**Input**: [RpbPutReq](Messages.md#rpbputreq)
 
-**Response**: [RpbPutResp](doc/Messages.md#rpbputresp)
+**Response**: [RpbPutResp](Messages.md#rpbputresp)
 
 ### `client.del(params, [callback])`
 [API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/delete-object/)
 
-**Input**: [RpbDelReq](doc/Messages.md#rpbdelreq)
+**Input**: [RpbDelReq](Messages.md#rpbdelreq)
 
 **Response**: The empty object `{}`
 
@@ -106,23 +106,23 @@ Set properties for a single bucket.
 ### `client.mapred(params, [callback])`
 [API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/mapreduce/)
 
-**Input**: [RpbMapRedReq](doc/Messages.md#rpbmapredreq)
+**Input**: [RpbMapRedReq](Messages.md#rpbmapredreq)
 
-**Response**: [RpbMapRedResp](doc/Messages.md#rpbmapredresp)
+**Response**: [RpbMapRedResp](Messages.md#rpbmapredresp)
 
 ### `client.getIndex(params, [callback])`
 [API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/secondary-indexes/)
 
-**Input**: [RpbIndexReq](doc/Messages.md#rpbindexreq)
+**Input**: [RpbIndexReq](Messages.md#rpbindexreq)
 
-**Response**: [RpbIndexResp](doc/Messages.md#rpbindexresp)
+**Response**: [RpbIndexResp](Messages.md#rpbindexresp)
 
 ### `client.search(params, [callback])`
 [API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/search/)
 
-**Input**: [RpbSearchQueryReq](doc/Messages.md#rpbsearchqueryreq)
+**Input**: [RpbSearchQueryReq](Messages.md#rpbsearchqueryreq)
 
-**Response**: [RpbSearchQueryResp](doc/Messages.md#rpbsearchqueryresp)
+**Response**: [RpbSearchQueryResp](Messages.md#rpbsearchqueryresp)
 
 ## Server Operations
 
@@ -142,21 +142,21 @@ Ask the riak node for general server information.
 
 **Input**: None
 
-**Response**: [RpbGetServerInfoResp](doc/Messages.md#rpbgetserverinforesp)
+**Response**: [RpbGetServerInfoResp](Messages.md#rpbgetserverinforesp)
 
 ## Bucket Type Operations
 
 ### `client.getBucketType(params, [callback])`
 [API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/get-bucket-type/)
 
-**Input**: [RpbGetBucketTypeReq](doc/Messages.md#rpbgetbuckettypereq)
+**Input**: [RpbGetBucketTypeReq](Messages.md#rpbgetbuckettypereq)
 
-**Response**: [RpbGetBucketTypeResp](doc/Messages.md#rpbgetbucketresp)
+**Response**: [RpbGetBucketTypeResp](Messages.md#rpbgetbucketresp)
 
 ### `client.setBucketType(params, [callback])`
 [API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/set-bucket-type/)
 
-**Input**: [RpbSetBucketTypeReq](doc/Messages.md#rpbsetbuckettypereq)
+**Input**: [RpbSetBucketTypeReq](Messages.md#rpbsetbuckettypereq)
 
 **Response**: The empty object `{}`
 
@@ -165,50 +165,50 @@ Ask the riak node for general server information.
 ### `client.getCrdt(params, [callback])`
 [API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/dt-fetch/)
 
-**Input**: [DtFetchReq](doc/Messages.md#dtfetchreq)
+**Input**: [DtFetchReq](Messages.md#dtfetchreq)
 
-**Response**: [DtFetchResp](doc/Messages.md#dtfetchresp)
+**Response**: [DtFetchResp](Messages.md#dtfetchresp)
 
 ### `client.putCrdt(params, [callback])`
 [API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/dt-store/)
 
-**Input**: [DtUpdateReq](doc/Messages.md#dtupdatereq)
+**Input**: [DtUpdateReq](Messages.md#dtupdatereq)
 
-**Response**: [DtUpdateResp](doc/Messages.md#dtupdateresp)
+**Response**: [DtUpdateResp](Messages.md#dtupdateresp)
 
 ## Yokozuna Operations
 
 ### `client.getSearchIndex(params, [callback])`
 [API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/yz-index-get/)
 
-**Input**: [RpbYokozunaIndexGetReq](doc/Messages.md#rpbyokozunaindexgetreq)
+**Input**: [RpbYokozunaIndexGetReq](Messages.md#rpbyokozunaindexgetreq)
 
-**Response**: [RpbYokozunaIndexGetResp](doc/Messages.md#rpbyokozunaindexgetresp)
+**Response**: [RpbYokozunaIndexGetResp](Messages.md#rpbyokozunaindexgetresp)
 
 ### `client.putSearchIndex(params, [callback])`
 [API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/yz-index-put/)
 
-**Input**: [RpbYokozunaIndexPutReq](doc/Messages.md#rpbyokozunaindexputreq)
+**Input**: [RpbYokozunaIndexPutReq](Messages.md#rpbyokozunaindexputreq)
 
 **Response**: The empty object `{}`
 
 ### `client.delSearchIndex(params, [callback])`
 [API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/yz-index-delete/)
 
-**Input**: [RpbYokozunaIndexDeleteReq](doc/Messages.md#rpbyokozunaindexdeletereq)
+**Input**: [RpbYokozunaIndexDeleteReq](Messages.md#rpbyokozunaindexdeletereq)
 
 **Response**: The empty object `{}`
 
 ### `client.getSearchSchema(params, [callback])`
 [API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/yz-schema-get/)
 
-**Input**: [RpbYokozunaSchemaGetReq](doc/Messages.md#rpbyokozunaschemagetreq)
+**Input**: [RpbYokozunaSchemaGetReq](Messages.md#rpbyokozunaschemagetreq)
 
-**Response**: [RpbYokozunaSchemaGetResp](doc/Messages.md#rpbyokozunaschemagetresp)
+**Response**: [RpbYokozunaSchemaGetResp](Messages.md#rpbyokozunaschemagetresp)
 
 ### `client.putSearchSchema(params, [callback])`
 [API Reference](http://docs.basho.com/riak/latest/dev/references/protocol-buffers/yz-schema-put/)
 
-**Input**: [RpbYokozunaSchemaPutReq](doc/Messages.md#rpbyokozunaschemaputreq)
+**Input**: [RpbYokozunaSchemaPutReq](Messages.md#rpbyokozunaschemaputreq)
 
 **Response**: The empty object `{}`
